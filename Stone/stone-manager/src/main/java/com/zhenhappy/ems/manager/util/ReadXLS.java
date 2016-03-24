@@ -9,7 +9,6 @@ package com.zhenhappy.ems.manager.util;
 import java.io.*;
 import org.apache.commons.lang.*;
 import jxl.*;
-import taobe.tec.jcc.JChineseConvertor;
 
 /**  
  * @author wujianbin 

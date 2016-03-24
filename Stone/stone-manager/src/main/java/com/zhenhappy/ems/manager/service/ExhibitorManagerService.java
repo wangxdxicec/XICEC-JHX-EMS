@@ -15,6 +15,7 @@ import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.InvoiceService;
 import com.zhenhappy.ems.service.MeipaiService;
@@ -26,10 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import taobe.tec.jcc.JChineseConvertor;
-
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -4,6 +4,7 @@ import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
+import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.ems.service.ExhibitorService;
 
@@ -27,7 +28,6 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
-import taobe.tec.jcc.JChineseConvertor;
 
 /**
  * Created by wujianbin on 2014-08-25.

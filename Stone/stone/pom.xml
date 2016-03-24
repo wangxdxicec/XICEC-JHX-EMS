@@ -2,14 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
+	<!--<parent>
 		<artifactId>XICEC-EMS</artifactId>
 		<groupId>com.zhenhappy.ems</groupId>
 		<version>1.2-SNAPSHOT</version>
-	</parent>
+	</parent>-->
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>stone</artifactId>
+	<groupId>com.zhenhappy.ems</groupId>
 	<packaging>war</packaging>
 	<version>1.2</version>
 
@@ -18,8 +19,8 @@
 			<id>local</id>
 			<properties>
 				<log.path>D:\Users\Stone\log\</log.path>
-				<db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=Stone</db.url>
-				<db.username>Sa</db.username>
+				<db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=stone</db.url>
+				<db.username>sa</db.username>
 				<db.password>123456</db.password>
 				<appendix>D:\Users\Stone</appendix>
 			</properties>
@@ -31,8 +32,8 @@
 			<id>dev</id>
 			<properties>
 				<log.path>/Users/Kristine-Mac/Documents/Workspaces/appendix/stone/log/</log.path>
-				<db.url>jdbc\:jtds\:sqlserver\://117.28.237.21\:29953;DatabaseName\=Stone</db.url>
-				<db.username>Sa</db.username>
+				<db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=stone</db.url>
+				<db.username>sa</db.username>
 				<db.password>123456</db.password>
 				<appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/stone</appendix>
 			</properties>
@@ -45,8 +46,8 @@
 			<properties>
 				<log.path>C:\Program Files\Apache Software Foundation\appendix\stone\log\</log.path>
 				<db.url>jdbc\:jtds\:sqlserver\://10.33.0.224\:1433;DatabaseName\=xmut</db.url>
-				<db.username>sa</db.username>
-				<db.password>JhxSQL03</db.password>
+				<db.username>Jhx03SA</db.username>
+				<db.password>gogo03Jhx</db.password>
 				<appendix>C:\Program Files\Apache Software Foundation\appendix\stone</appendix>
 			</properties>
 		</profile>

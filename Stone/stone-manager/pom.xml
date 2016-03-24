@@ -2,14 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
+    <!--<parent>
         <artifactId>XICEC-EMS</artifactId>
         <groupId>com.zhenhappy.ems</groupId>
         <version>1.2-SNAPSHOT</version>
-    </parent>
+    </parent>-->
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>stone-manager</artifactId>
+    <groupId>com.zhenhappy.ems</groupId>
+    <version>1.2-SNAPSHOT</version>
     <packaging>war</packaging>
 	
 	<profiles>
@@ -17,8 +19,8 @@
             <id>local</id>
             <properties>
                 <log.path>D:\Users\Stone\log\</log.path>
-                <db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=Stone</db.url>
-                <db.username>Sa</db.username>
+                <db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=stone</db.url>
+                <db.username>sa</db.username>
                 <db.password>123456</db.password>
                 <appendix>D:\Users\Stone</appendix>
             </properties>
@@ -27,8 +29,8 @@
             <id>dev</id>
             <properties>
                 <log.path>/Users/Kristine-Mac/Documents/Workspaces/appendix/stone/manager/log/</log.path>
-                <db.url>jdbc\:jtds\:sqlserver\://117.28.237.21\:29953;DatabaseName\=Stone</db.url>
-                <db.username>Sa</db.username>
+                <db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=stone</db.url>
+                <db.username>sa</db.username>
                 <db.password>123456</db.password>
                 <appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/stone/manager</appendix>
             </properties>
@@ -41,8 +43,8 @@
 			<properties>
 				<log.path>C:\Program Files\Apache Software Foundation\appendix\stone\manager\log\</log.path>
 				<db.url>jdbc\:jtds\:sqlserver\://10.33.0.224\:1433;DatabaseName\=xmut</db.url>
-				<db.username>sa</db.username>
-				<db.password>JhxSQL03</db.password>
+				<db.username>Jhx03SA</db.username>
+				<db.password>gogo03Jhx</db.password>
 				<appendix>C:\Program Files\Apache Software Foundation\appendix\stone</appendix>
 			</properties>
 		</profile>
@@ -92,18 +94,13 @@
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
-            <version>2.6.13</version>
+            <version>2.6.12</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.7.0</version>
         </dependency>
-        <dependency>
-			<groupId>taobe.tec.jcc.JChineseConvertor</groupId>
-			<artifactId>jcc</artifactId>
-			<version>0.7.3</version>
-		</dependency>
 		<dependency>
 			<groupId>net.coobird</groupId>
 			<artifactId>thumbnailator</artifactId>
