@@ -43,6 +43,12 @@
 	        <div id="exhibitorsList" class="exhibitors">展商列表</div>
 			<div id="exhibitorsGroupList" class="exhibitors">展团列表</div>
         </div>
+        <!--佛事展新增需求开始-->
+        <div title="客商管理" style="padding-left:10px;padding-top:5px;padding-right:5px;">
+            <div id="inlandCustomerList" class="exhibitors">国内客商</div>
+            <div id="foreignCustomerList" class="exhibitors">国外客商</div>
+        </div>
+        <!--佛事展新增需求结束-->
         <div title="标签管理" style="padding:10px;">标签列表</div>
         <div title="公告管理" style="padding:10px;">公告列表</div>
     </div>
@@ -51,5 +57,31 @@
 <div data-options="region:'center',title:'',iconCls:'icon-ok'">
     <#include "/user/exhibitor.html">
 </div>
+<script>
+    //----------------------------------------------------------折叠面板按钮开始-----------------------------------------------------------//
+    // 动态添加标签页
+    function addTab(title, url){
+        if ($('#tabs').tabs('exists', title)){
+            $('#tabs').tabs('select', title);
+        } else {
+            var content = '<iframe scrolling="auto" frameborder="0" src="'+url+'" style="width:100%;height:99%;"></iframe>';
+            $('#tabs').tabs('add',{
+                title:title,
+                content:content,
+                closable:true
+            });
+        }
+    }
+
+    //打开国内客商
+    $('#inlandCustomerList').click(function(){
+        addTab("国内客商","${base}/user/inlandCustomer");
+    });
+    //打开国外客商
+    $('#foreignCustomerList').click(function(){
+        addTab("国外客商","${base}/user/foreignCustomer");
+    });
+    //----------------------------------------------------------折叠面板按钮开始-----------------------------------------------------------//
+</script>
 </body>
 </html>

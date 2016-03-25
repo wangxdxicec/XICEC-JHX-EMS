@@ -110,4 +110,55 @@ public class CustomerAction extends BaseAction {
         }
         return response;
     }
+
+    //==================佛事展新增需求=================
+    @RequestMapping(value = "inlandCustomer")
+    public ModelAndView directToInlandCustomer() {
+        ModelAndView modelAndView = new ModelAndView("user/customer/inlandCustomer");
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "foreignCustomer")
+    public ModelAndView directToForeignCustomer() {
+        ModelAndView modelAndView = new ModelAndView("user/customer/foreignCustomer");
+        return modelAndView;
+    }
+
+    /**
+     * 分页查询国内客商
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryInlandCustomersByPage")
+    public QueryCustomerResponse queryInlandCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryInlandCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query queryInlandCustomersByPage error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询国外客商
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryForeignCustomersByPage")
+    public QueryCustomerResponse queryForeignCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryForeignCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query queryForeignCustomersByPage error.", e);
+        }
+        return response;
+    }
 }

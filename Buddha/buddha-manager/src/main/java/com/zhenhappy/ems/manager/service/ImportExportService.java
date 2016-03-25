@@ -1,13 +1,12 @@
 package com.zhenhappy.ems.manager.service;
 
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
-import com.zhenhappy.ems.entity.TContact;
-import com.zhenhappy.ems.entity.TExhibitor;
-import com.zhenhappy.ems.entity.TExhibitorInfo;
-import com.zhenhappy.ems.entity.TInvoiceApply;
+import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.manager.dto.ExportCustomerInfo;
 import com.zhenhappy.ems.manager.dto.ImportExhibitorsRequest;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorInfo;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
+import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.ems.service.ExhibitorService;
 
 import com.zhenhappy.ems.service.InvoiceService;
@@ -15,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +45,8 @@ public class ImportExportService extends ExhibitorService {
 	private ContactManagerService contactService;
 	@Autowired
 	private InvoiceService invoiceService;
+	@Autowired
+	private CountryProvinceService countryProvinceService;
 
 	public List<QueryExhibitorInfo> exportExhibitor(List<TExhibitor> exhibitors) {
 		List<QueryExhibitorInfo> queryExhibitorInfos = new ArrayList<QueryExhibitorInfo>();
@@ -313,5 +315,49 @@ public class ImportExportService extends ExhibitorService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	//==================佛事展新增需求=================
+	/**
+	 * 导出客商数据
+	 * @param customers
+	 * @return
+	 */
+	public List<ExportCustomerInfo> exportCustomer(List<TVisitorInfo> customers) {
+		List<ExportCustomerInfo> exportCustomerInfos = new ArrayList<ExportCustomerInfo>();
+		if(customers.size() > 0){
+			for(TVisitorInfo customer:customers){
+				ExportCustomerInfo exportCustomerInfo = new ExportCustomerInfo();
+				exportCustomerInfo.setName((customer.getFirstName() == null ? "":customer.getFirstName()) + " " + (customer.getLastName() == null ? "":customer.getLastName()));
+				exportCustomerInfo.setPhone((customer.getMobileCode() == null ? "":customer.getMobileCode()) + (customer.getMobile() == null ? "":customer.getMobile()));
+				if(StringUtils.isNotEmpty(customer.getTel())){
+					if(StringUtils.isNotEmpty(customer.getTelCode2())){
+						exportCustomerInfo.setTel((customer.getTelCode() == null ? "":customer.getTelCode()) + (customer.getTel() == null ? "":customer.getTel()) + "," + (customer.getTelCode2() == null ? "":customer.getTelCode2()));
+					}else{
+						exportCustomerInfo.setTel((customer.getTelCode() == null ? "":customer.getTelCode()) + (customer.getTel() == null ? "":customer.getTel()));
+					}
+				}else{
+					exportCustomerInfo.setTel("");
+				}
+				if(StringUtils.isNotEmpty(customer.getFax())){
+					if(StringUtils.isNotEmpty(customer.getFaxCode2())){
+						exportCustomerInfo.setFaxString((customer.getFaxCode() == null ? "":customer.getFaxCode()) + (customer.getFax() == null ? "":customer.getFax()) + "," + (customer.getFaxCode2() == null ? "":customer.getFaxCode2()));
+					}else{
+						exportCustomerInfo.setFaxString((customer.getFaxCode() == null ? "":customer.getFaxCode()) + (customer.getFax() == null ? "":customer.getFax()));
+					}
+				}else{
+					exportCustomerInfo.setFaxString("");
+				}
+				if(customer.getCountry() != null){
+					WCountry country = countryProvinceService.loadCountryById(customer.getCountry());
+					exportCustomerInfo.setCountryString(country.getChineseName());
+				}else{
+					exportCustomerInfo.setCountryString("");
+				}
+				BeanUtils.copyProperties(customer, exportCustomerInfo);
+				exportCustomerInfos.add(exportCustomerInfo);
+			}
+		}
+		return exportCustomerInfos;
 	}
 }

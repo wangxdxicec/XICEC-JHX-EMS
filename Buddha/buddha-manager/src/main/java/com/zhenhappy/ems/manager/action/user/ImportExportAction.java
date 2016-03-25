@@ -16,7 +16,9 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,17 +36,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import com.zhenhappy.ems.entity.TExhibitor;
-import com.zhenhappy.ems.entity.TExhibitorInfo;
-import com.zhenhappy.ems.entity.TInvoiceApply;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;
 import com.zhenhappy.ems.manager.service.ImportExportService;
 import com.zhenhappy.ems.manager.sys.Constants;
 import com.zhenhappy.ems.manager.util.CreateZip;
 import com.zhenhappy.ems.manager.util.JXLExcelView;
-import com.zhenhappy.ems.service.InvoiceService;
-import com.zhenhappy.ems.service.MeipaiService;
 import com.zhenhappy.system.SystemConfig;
 
 import freemarker.template.Template;
@@ -67,6 +64,8 @@ public class ImportExportAction extends BaseAction {
 	private FreeMarkerConfigurer freeMarker;// 注入FreeMarker模版封装框架
     @Autowired
     private SystemConfig systemConfig;
+    @Autowired
+    private CustomerInfoManagerService customerInfoManagerService;
 
     /**
      * 导出展商列表到Excel
@@ -383,5 +382,54 @@ public class ImportExportAction extends BaseAction {
             e.printStackTrace();
         }
         return targetFile;
+    }
+
+    //==================佛事展新增需求=================
+    /**
+     * 导出国内客商列表到Excel
+     * @param cids
+     * @return
+     */
+    @RequestMapping(value = "exportInlandCustomersToExcel", method = RequestMethod.POST)
+    public ModelAndView exportInlandCustomersToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids) {
+        Map model = new HashMap();
+        List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
+        if(cids[0] == -1) customers = customerInfoManagerService.loadAllInlandCustomer();
+        else customers = customerInfoManagerService.loadSelectedCustomers(cids);
+        List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
+        model.put("list", exportCustomer);
+        String[] titles = new String[] { "公司中文名", "姓名", "性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "company", "name", "sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "remark" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "客商基本信息.xls");
+        model.put("sheetName", "客商基本信息");
+        return new ModelAndView(new JXLExcelView(), model);
+    }
+
+    /**
+     * 导出国外客商列表到Excel
+     * @param cids
+     * @return
+     */
+    @RequestMapping(value = "exportForeignCustomersToExcel", method = RequestMethod.POST)
+    public ModelAndView exportForeignCustomersToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids) {
+        Map model = new HashMap();
+        List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
+        if(cids[0] == -1) customers = customerInfoManagerService.loadAllForeignCustomer();
+        else customers = customerInfoManagerService.loadSelectedCustomers(cids);
+        List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
+        model.put("list", exportCustomer);
+        String[] titles = new String[] { "公司中文名", "姓名", "性别", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "company", "name", "sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "remark" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "客商基本信息.xls");
+        model.put("sheetName", "客商基本信息");
+        return new ModelAndView(new JXLExcelView(), model);
     }
 }
