@@ -44,6 +44,15 @@ public class JoinerManagerService extends JoinerService {
         response.setTotal(page.getTotalCount());
         return response;
     }
+
+    public List<TExhibitorJoiner> queryJoinersEx(Integer eid) {
+        List<String> conditions = new ArrayList<String>();
+        conditions.add(" eid=" + eid);
+        String conditionsSql = StringUtils.join(conditions, " and ");
+        Page page = new Page();
+        List<TExhibitorJoiner> joiners = getJoinerDao().queryPageByHQL("select count(*) from TExhibitorJoiner where " + conditionsSql, "from TExhibitorJoiner where " + conditionsSql + " and isDelete != 1", new Object[]{}, page);
+        return joiners;
+    }
     
     /**
 	 * 通过id获取参展人员
@@ -57,7 +66,7 @@ public class JoinerManagerService extends JoinerService {
 	
 	/**
 	 * 通过姓名获取参展人员
-	 * @param id
+	 * @param eid
 	 * @return
 	 */
 	@Transactional
@@ -67,7 +76,7 @@ public class JoinerManagerService extends JoinerService {
     
     /**
      * 添加参展人员
-     * @param joiner
+     * @param exhibitorJoiner
      */
     @Transactional
     public void addExhibitorJoiner(TExhibitorJoiner exhibitorJoiner) {
@@ -76,7 +85,7 @@ public class JoinerManagerService extends JoinerService {
     
     /**
      * 修改参展人员
-     * @param joiner
+     * @param exhibitorJoiner
      */
     @Transactional
     public void modifyExhibitorJoiner(TExhibitorJoiner exhibitorJoiner) {
@@ -100,7 +109,7 @@ public class JoinerManagerService extends JoinerService {
 
     /**
      * 删除参展人员
-     * @param jids
+     * @param eids
      */
 	public void deleteJoinersByEids(Integer[] eids) {
 		List<TExhibitorJoiner> joiners = joinerDao.loadJoinersByEids(eids);
@@ -110,4 +119,24 @@ public class JoinerManagerService extends JoinerService {
 	    	}
 		}
 	}
+
+    /**
+     * 根据eids查询展商列表
+     * @return
+     */
+    @Transactional
+    public List<TExhibitorJoiner> loadSelectedJoinerById(Integer[] ids) {
+        List<TExhibitorJoiner> customers = joinerDao.loadJoinersByEids(ids);
+        return customers;
+    }
+
+    /**
+     * 根据ids查询展商列表
+     * @return
+     */
+    @Transactional
+    public List<TExhibitorJoiner> loadSelectedJoinerByJid(Integer[] ids) {
+        List<TExhibitorJoiner> customers = joinerDao.loadJoinersByJIds(ids);
+        return customers;
+    }
 }

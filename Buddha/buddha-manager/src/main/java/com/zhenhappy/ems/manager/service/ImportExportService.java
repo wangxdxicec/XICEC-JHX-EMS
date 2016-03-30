@@ -3,6 +3,7 @@ package com.zhenhappy.ems.manager.service;
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.ExportCustomerInfo;
+import com.zhenhappy.ems.manager.dto.ExportExhibitorjoinerInfo;
 import com.zhenhappy.ems.manager.dto.ImportExhibitorsRequest;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorInfo;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
@@ -353,6 +354,39 @@ public class ImportExportService extends ExhibitorService {
 					exportCustomerInfo.setCountryString(country.getChineseName());
 				}else{
 					exportCustomerInfo.setCountryString("");
+				}
+				BeanUtils.copyProperties(customer, exportCustomerInfo);
+				exportCustomerInfos.add(exportCustomerInfo);
+			}
+		}
+		return exportCustomerInfos;
+	}
+
+	/**
+	 * 导出参展人员列表数据
+	 * @param customers
+	 * @return
+	 */
+	public List<ExportExhibitorjoinerInfo> exportExhibitorJoiner(List<TExhibitorJoiner> customers) {
+		List<ExportExhibitorjoinerInfo> exportCustomerInfos = new ArrayList<ExportExhibitorjoinerInfo>();
+		if(customers.size() > 0){
+			for(TExhibitorJoiner customer:customers){
+				ExportExhibitorjoinerInfo exportCustomerInfo = new ExportExhibitorjoinerInfo();
+				exportCustomerInfo.setName(customer.getName());
+				if(StringUtils.isNotEmpty(customer.getTelphone())){
+					exportCustomerInfo.setTelphone(customer.getTelphone());
+				}else{
+					exportCustomerInfo.setTelphone("");
+				}
+				if(StringUtils.isNotEmpty(customer.getPosition())){
+					exportCustomerInfo.setPosition(customer.getPosition());
+				}else{
+					exportCustomerInfo.setPosition("");
+				}
+				if(StringUtils.isNotEmpty(customer.getEmail())){
+					exportCustomerInfo.setEmail(customer.getEmail());
+				}else{
+					exportCustomerInfo.setEmail("");
 				}
 				BeanUtils.copyProperties(customer, exportCustomerInfo);
 				exportCustomerInfos.add(exportCustomerInfo);

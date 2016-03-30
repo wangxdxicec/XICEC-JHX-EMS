@@ -664,11 +664,17 @@
 <!--         <div id="removeContactBtn" class="easyui-linkbutton" iconCls="icon-remove" plain="true">注销联系人</div> 此功能暂时不用-->
     </div>
 </div>
+<!-- 导出展商到Excel -->
+<form id="exportJoinerExisitorToExcel" action="${base}/user/exportJoinerExisitorToExcel" method="post">
+    <div id="cidParm1"></div>
+    <div id="eidParm"></div>
+</form>
 <!-- 参展人员列表工具栏 -->
 <div id="joinerToolbar">
     <div>
         <div id="addJoinerBtn" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加参展人员</div>
         <div id="removeJoinerBtn" class="easyui-linkbutton" iconCls="icon-remove" plain="true">注销参展人员</div>
+        <div id="exportJoinerBtn" class="easyui-linkbutton" iconCls="icon-redo" plain="true">导出参展人员</div>
     </div>
 </div>
 
@@ -818,6 +824,23 @@ $('#addJoinerBtn').click(function(){
 	<#else>
 		$.messager.alert('提示', '请先添加展商基本信息');
 	</#if>
+});
+//导出参展人员列表
+$('#exportJoinerBtn').click(function(){
+    var eidNode = "<input type='hidden' name='eid' value='${eid}'/>";
+    cidParm1.innerHTML = eidNode;
+    var node = "";
+    if(checkedJoiners.length > 0){
+        for (var i = 0; i < checkedJoiners.length; i++) {
+            node = "<input type='hidden' name='cids' value='"+checkedJoiners[i]+"'/>";
+            cidParm1.innerHTML += node;
+        }
+    } else{
+        node = "<input type='hidden' name='cids' value='-1'/>";
+        cidParm1.innerHTML += node;
+    }
+    document.getElementById("exportJoinerExisitorToExcel").submit();
+    $.messager.alert('提示', '导出参展人员列表成功');
 });
 //注销参展人员
 $('#removeJoinerBtn').click(function(){

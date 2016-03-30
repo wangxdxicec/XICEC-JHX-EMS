@@ -71,13 +71,24 @@
 		</tr>
 	</thead>
 </table>
+<!-- 群发邮件 -->
+<form id="emailAllForeignCustomers" action="${base}/user/emailAllForeignCustomers" method="post">
+	<div id="cidParm1"></div>
+</form>
 <!-- 导出客商到Excel -->
 <form id="exportForeignCustomersToExcel" action="${base}/user/exportForeignCustomersToExcel" method="post">
-	<div id="cidParm1"></div>
+	<div id="cidParm2"></div>
 </form>
 <!-- 工具栏 -->
 <div id="customerbar">
-	<div>
+	<div style="display:inline-block;">
+		<div class="easyui-menubutton" menu="#email" iconCls="icon-redo">邮件</div>
+	</div>
+	<div id="email" style="width:180px;">
+		<div id="emailAllCustomers" iconCls="icon-redo">群发所有客商邮件</div>
+		<div id="emailSelectedCustomers" iconCls="icon-redo">群发所选客商邮件</div>
+	</div>
+	<div style="display:inline-block;">
 		<div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
 	</div>
 	<div id="export" style="width:180px;">
@@ -92,23 +103,55 @@
 	var sortForeign = "createdTime";
 	var orderForeign = "asc";
 	//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
-	//导出所有客商信息到Excel
-	$('#exportAllCustomers').click(function(){
+	//群发所有客商邮件
+	$('#emailAllCustomers').click(function(){
 		cidParm1.innerHTML = "";
 		var node = "<input type='hidden' name='cids' value='-1'/>";
 		cidParm1.innerHTML += node;
+		$.ajax({
+			url: "${base}/user/emailAllForeignCustomers",
+			type: "post",
+			dataType: "json",
+			beforeSend:function(XMLHttpRequest){
+				$.messager.show({
+					title: '处理中...',
+					msg: '正在群发邮件，请稍等...',
+					timeout: 10000,
+					showType: 'slide'
+				});
+			},
+			success: function (data) {
+				if (data.resultCode == 0) {
+					$.messager.show({
+						title: '成功',
+						msg: '群发邮件成功',
+						timeout: 5000,
+						showType: 'slide'
+					});
+					$("#customers").datagrid("reload");
+				} else {
+					$.messager.alert('错误', '系统错误');
+				}
+			}
+		});
+	});
+	//导出所有客商信息到Excel
+	$('#exportAllCustomers').click(function(){
+		cidParm2.innerHTML = "";
+		var node = "<input type='hidden' name='cids' value='-1'/>";
+		cidParm2.innerHTML += node;
 		document.getElementById("exportForeignCustomersToExcel").submit();
 		$.messager.alert('提示', '导出所有客商成功');
 	});
 	//导出所选客商信息到Excel
 	$('#exportSelectedCustomers').click(function(){
 //     	alert(checkedItems);
-		cidParm1.innerHTML = "";
+		cidParm2.innerHTML = "";
 //     	alert(cidParm1.innerHTML);
 		if(checkedItems.length > 0){
 			for (var i = 0; i < checkedItems.length; i++) {
 				var node = "<input type='hidden' name='cids' value='"+checkedItems[i]+"'/>";
-				cidParm1.innerHTML += node;
+				cidParm2.innerHTML += node;
 			}
 //         	alert(cidParm1.innerHTML);
 			document.getElementById("exportForeignCustomersToExcel").submit();

@@ -1,11 +1,11 @@
 /*
  *    Copyright 2014-2015 The Happy Network Corporation
  */
-package com.zhenhappy.ems.service;
+package com.zhenhappy.ems.manager.service;
 
-import com.zhenhappy.ems.dao.SendMailDetailDao;
-import com.zhenhappy.ems.email.Email;
-import com.zhenhappy.ems.entity.TEmailSendDetail;
+import com.zhenhappy.ems.manager.dao.SendMailDetailDao;
+import com.zhenhappy.ems.manager.entity.Email;
+import com.zhenhappy.ems.manager.entity.TEmailSendDetail;
 import com.zhenhappy.util.Page;
 import freemarker.template.Template;
 import org.slf4j.Logger;
@@ -40,10 +40,10 @@ import java.util.Map;
  * @project spring-mail
  * @create 2012-3-24 上午12:29:07
  */
-@Service("mailService")
-public class MailServiceImpl implements MailService {
+@Service("emailMailService")
+public class EmailMailServiceImpl implements EmailMailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MailServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(EmailMailServiceImpl.class);
 
     @Autowired
     JavaMailSender mailSender;// 注入Spring封装的javamail，Spring的xml中已让框架装配
@@ -77,7 +77,7 @@ public class MailServiceImpl implements MailService {
             // 设置收件人，寄件人
             InternetAddress[] toAddress = InternetAddress.parse(receivers);
             mailMessage.setRecipients(Message.RecipientType.TO, toAddress); // 发送给多个账号
-            messageHelper.setFrom(email.getFromAddress()); // 发件人
+            messageHelper.setFrom("hxscsd@163.com"); // 发件人
             messageHelper.setSubject(email.getSubject()); // 主题
             // true 表示启动HTML格式的邮件
             messageHelper.setText(getMailText(email), true); // 邮件内容，注意加参数true，表示启用html格式
@@ -183,12 +183,16 @@ public class MailServiceImpl implements MailService {
     private String getMailText(Email email) throws Exception {
         // 通过指定模板名获取FreeMarker模板实例
         Template template = null;
-        if (email.getFlag() == 2) {
-            template = freeMarker.getConfiguration().getTemplate("mail/mailTemplate2.html");
-        }else{
-            template = freeMarker.getConfiguration().getTemplate("mail/mailTemplate1.html");
-        }
-
+        /*if (email.getFlag() == 1 && email.getCountry() == 0) {
+            template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay.html");
+        }else if (email.getFlag() == 1 && email.getCountry() == 1){
+            template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_eng.html");
+        }else if (email.getFlag() == 0 && email.getCountry() == 0){
+            template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro.html");
+        }else if (email.getFlag() == 0 && email.getCountry() == 1){
+            template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro_eng.html");
+        }*/
+        template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay.html");
 
         // FreeMarker通过Map传递动态数据
         Map<Object, Object> model = new HashMap<Object, Object>();
@@ -199,5 +203,76 @@ public class MailServiceImpl implements MailService {
         return htmlText;
     }
 
+    /*
+     * (non-Javadoc) 发送邮件的具体实现, 目前是异步发送
+     *
+     * @see
+     * com.haohui.b2b.service.mail.MailService#sendHtmlEmails(java.lang.String,
+     * java.lang.String, java.lang.String)
+     */
+    public void sendHtmlEmails(String receivers, String subject, String content) {
+        this.sendMailByAsynchronousMode(receivers, subject, content);
+    }
 
+    /**
+     * 异步发送
+     *
+     */
+    public void sendMailByAsynchronousMode(final String receivers, final String subject, final String content) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("当前邮件采取异步发送..");
+        }
+        taskExecutor.execute(new Runnable() {
+            public void run() {
+                try {
+                    sendMailBySynchronizationMode(receivers, subject, content);
+                    logger.info("邮件发送耗时任务完成");
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        });
+    }
+
+    /**
+     * 同步发送
+     *
+     */
+
+    public void sendMailBySynchronizationMode(String receivers, String subject, String content) throws Exception {
+        if (receivers == null) {
+            throw new IllegalArgumentException("收件人不能为空");
+        }
+        // 建立邮件消息,发送简单邮件和html邮件的区别
+        MimeMessage mailMessage = mailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, "utf-8");
+
+        try {
+            receivers = receivers.replaceAll("\\;", ",");
+            // 设置收件人，寄件人
+            InternetAddress[] toAddress = InternetAddress.parse(receivers);
+            mailMessage.setRecipients(Message.RecipientType.TO, toAddress); // 发送给多个账号
+            messageHelper.setFrom("hxscsd@163.com"); // 发件人
+            messageHelper.setSubject(subject); // 主题
+            // true 表示启动HTML格式的邮件
+            messageHelper.setText(content, true); // 邮件内容，注意加参数true，表示启用html格式
+
+            // 发送邮件
+            mailSender.send(mailMessage);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 或者直接使用 spring 3.0 的异步框架 只需使用 @Async 注解即可。
+     * 需要激活 <!-- 注解异步任务驱动 -->
+     * <task:annotation-driven/>
+     * 详细配置请见： spring-mail.xml
+     */
+    @Async
+    public void sendAsync() {
+        System.out.println("###### 或者直接采用 spring 3.0 的异步任务注解, 这里的代码直接会用异步线程来运行 #######");
+    }
 }

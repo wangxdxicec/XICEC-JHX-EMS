@@ -70,13 +70,35 @@
 	</tr>
 	</thead>
 </table>
+<!-- 群发邮件 -->
+<form id="emailAllInlandCustomers" action="${base}/user/emailAllInlandCustomers" method="post">
+	<div id="cidParm1"></div>
+</form>
+<!-- 群发短信 -->
+<form id="msgSelectInlandCustomers" action="${base}/user/msgAllInlandCustomers" method="post">
+	<div id="cidParm2"></div>
+</form>
 <!-- 导出展商到Excel -->
 <form id="exportInlandCustomersToExcel" action="${base}/user/exportInlandCustomersToExcel" method="post">
-	<div id="cidParm1"></div>
+	<div id="cidParm3"></div>
 </form>
 <!-- 工具栏 -->
 <div id="customerbar">
-	<div>
+	<div style="display:inline-block;">
+		<div class="easyui-menubutton" menu="#email" iconCls="icon-redo">邮件</div>
+	</div>
+	<div id="email" style="width:180px;">
+		<div id="emailAllCustomers" iconCls="icon-redo">群发所有客商邮件</div>
+		<div id="emailSelectedCustomers" iconCls="icon-redo">群发所选客商邮件</div>
+	</div>
+	<div style="display:inline-block;">
+		<div class="easyui-menubutton" menu="#msg" iconCls="icon-redo">短信</div>
+	</div>
+	<div id="msg" style="width:180px;">
+		<div id="msgAllCustomers" iconCls="icon-redo">群发所有客商短信</div>
+		<div id="msgSelectedCustomers" iconCls="icon-redo">群发所选客商短信</div>
+	</div>
+	<div style="display:inline-block;">
 		<div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
 	</div>
 	<div id="export" style="width:180px;">
@@ -84,30 +106,172 @@
 		<div id="exportSelectedCustomers" iconCls="icon-redo">所选客商信息到Excel</div>
 	</div>
 </div>
-
 <script>
 	var checkedItems = [];
 
 	//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
+	//群发所有客商邮件
+	$('#emailAllCustomers').click(function(){
+		$.messager.confirm('确认删除','你确定要群发所有客商邮件吗?',function(r){
+			if (r){
+				$.ajax({
+					url: "${base}/user/emailAllInlandCustomers",
+					type: "post",
+					data: {"cids": "-1"},
+					dataType: "json",
+					beforeSend:function(XMLHttpRequest){
+						$.messager.show({
+							title: '处理中...',
+							msg: '正在群发邮件，请稍等...',
+							timeout: 10000,
+							showType: 'slide'
+						});
+					},
+					success: function (data) {
+						if (data.resultCode == 0) {
+							$.messager.show({
+								title: '成功',
+								msg: '群发邮件成功',
+								timeout: 5000,
+								showType: 'slide'
+							});
+							$("#customers").datagrid("reload");
+						} else {
+							$.messager.alert('错误', '系统错误');
+						}
+					}
+				});
+			}
+		});
+	});
+	//群发所选客商邮件
+	$('#emailSelectedCustomers').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认删除','你确定要群发所选客商邮件吗?',function(r){
+				if (r){
+					$.ajax({
+						url: "${base}/user/emailAllInlandCustomers",
+						type: "post",
+						data: {"cids": checkedItems},
+						dataType: "json",
+						traditional: true,
+						beforeSend:function(XMLHttpRequest){
+							$.messager.show({
+								title: '处理中...',
+								msg: '正在群发邮件，请稍等...',
+								timeout: 10000,
+								showType: 'slide'
+							});
+						},
+						success: function (data) {
+							if (data.resultCode == 0) {
+								$.messager.show({
+									title: '成功',
+									msg: '群发所选客商邮件成功',
+									timeout: 5000,
+									showType: 'slide'
+								});
+								$("#customers").datagrid("reload");
+							} else {
+								$.messager.alert('错误', '系统错误');
+							}
+						}
+					});
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项客商再操作');
+		}
+	});
+	//群发所有客商短信
+	$('#msgAllCustomers').click(function(){
+		$.messager.confirm('确认删除','你确定要群发所有客商短信吗?',function(r){
+			if (r){
+				$.ajax({
+					url: "${base}/user/msgAllInlandCustomers",
+					type: "post",
+					data: {"cids": "-1"},
+					dataType: "json",
+					beforeSend:function(XMLHttpRequest){
+						$.messager.show({
+							title: '处理中...',
+							msg: '正在群发短信，请稍等...',
+							timeout: 10000,
+							showType: 'slide'
+						});
+					},
+					success: function (data) {
+						if (data.resultCode == 0) {
+							$.messager.show({
+								title: '成功',
+								msg: '群发所有客商短信成功',
+								timeout: 5000,
+								showType: 'slide'
+							});
+							$("#customers").datagrid("reload");
+						} else {
+							$.messager.alert('错误', '系统错误');
+						}
+					}
+				});
+			}
+		});
+	});
+	//群发所选客商短信
+	$('#msgSelectedCustomers').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认删除','你确定要群发所选客商短信吗?',function(r){
+				if (r){
+					$.ajax({
+						url: "${base}/user/msgAllInlandCustomers",
+						type: "post",
+						data: {"cids": checkedItems},
+						dataType: "json",
+						traditional: true,
+						beforeSend:function(XMLHttpRequest){
+							$.messager.show({
+								title: '处理中...',
+								msg: '正在群发短信，请稍等...',
+								timeout: 10000,
+								showType: 'slide'
+							});
+						},
+						success: function (data) {
+							if (data.resultCode == 0) {
+								$.messager.show({
+									title: '成功',
+									msg: '群发所选客商短信成功',
+									timeout: 5000,
+									showType: 'slide'
+								});
+								$("#customers").datagrid("reload");
+							} else {
+								$.messager.alert('错误', '系统错误');
+							}
+						}
+					});
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项客商再操作');
+		}
+	});
 	//导出所有客商信息到Excel
 	$('#exportAllCustomers').click(function(){
-		cidParm1.innerHTML = "";
+		cidParm3.innerHTML = "";
 		var node = "<input type='hidden' name='cids' value='-1'/>";
-		cidParm1.innerHTML += node;
+		cidParm3.innerHTML += node;
 		document.getElementById("exportInlandCustomersToExcel").submit();
 		$.messager.alert('提示', '导出所有客商成功');
 	});
 	//导出所选客商信息到Excel
 	$('#exportSelectedCustomers').click(function(){
-//     	alert(checkedItems);
-		cidParm1.innerHTML = "";
-//     	alert(cidParm1.innerHTML);
+		cidParm3.innerHTML = "";
 		if(checkedItems.length > 0){
 			for (var i = 0; i < checkedItems.length; i++) {
 				var node = "<input type='hidden' name='cids' value='"+checkedItems[i]+"'/>";
-				cidParm1.innerHTML += node;
+				cidParm3.innerHTML += node;
 			}
-//         	alert(cidParm1.innerHTML);
 			document.getElementById("exportInlandCustomersToExcel").submit();
 			$.messager.alert('提示', '导出所选客商成功');
 		}else{

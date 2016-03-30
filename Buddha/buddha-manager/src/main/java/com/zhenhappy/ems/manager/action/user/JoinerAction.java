@@ -1,20 +1,18 @@
 package com.zhenhappy.ems.manager.action.user;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.entity.TExhibitorJoiner;
+import com.zhenhappy.ems.entity.TVisitorInfo;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.AddExhibitorJoinerRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorJoinerRequest;
-import com.zhenhappy.ems.manager.dto.QueryJoinersRequest;
-import com.zhenhappy.ems.manager.dto.QueryJoinersResponse;
+import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;
+import com.zhenhappy.ems.manager.service.ImportExportService;
 import com.zhenhappy.ems.manager.service.JoinerManagerService;
 
+import com.zhenhappy.ems.manager.util.JXLExcelView;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Created by wujianbin on 2014-04-24.
@@ -40,6 +39,8 @@ public class JoinerAction extends BaseAction {
 
     @Autowired
     private ExhibitorManagerService exhibitorService;
+    @Autowired
+    private ImportExportService importExportService;
 
     @ResponseBody
     @RequestMapping(value = "queryJoiners", method = RequestMethod.POST)
@@ -121,5 +122,43 @@ public class JoinerAction extends BaseAction {
             response.setResultCode(1);
         }
         return response;
+    }
+
+    /**
+     * 导出参展人员列表到Excel
+     * @param cids
+     * @return
+     */
+    @RequestMapping(value = "exportJoinerExisitorToExcel", method = RequestMethod.POST)
+    public ModelAndView exportJoinerExisitorToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                    @RequestParam(value = "eid", defaultValue = "") Integer eid,
+                                                    @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        List<TExhibitorJoiner> joiners = new ArrayList<TExhibitorJoiner>();
+        Map model = new HashMap();
+        TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(eid);
+        if(cids[0] == -1) {
+            try {
+                if (exhibitorInfo != null) {
+                    joiners = joinerManagerService.queryJoinersEx(eid);
+                }
+            } catch (Exception e) {
+                logger.error("query exhibitor joiners error.", e);
+            }
+        } else {
+            if (exhibitorInfo != null) {
+                joiners = joinerManagerService.loadSelectedJoinerByJid(cids);
+            }
+        }
+        List<ExportExhibitorjoinerInfo> exportJoiner = importExportService.exportExhibitorJoiner(joiners);
+        model.put("list", exportJoiner);
+        String[] titles = new String[] { "姓名", "职位", "邮箱", "电话" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "name", "position", "email", "telphone" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{30,30,30,30};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "参展人员列表.xls");
+        model.put("sheetName", "参展人员基本信息");
+        return new ModelAndView(new JXLExcelView(), model);
     }
 }

@@ -16,6 +16,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhenhappy.ems.dao.VisitorInfoDao;
+import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import com.zhenhappy.ems.manager.action.BaseAction;
@@ -66,6 +69,8 @@ public class ImportExportAction extends BaseAction {
     private SystemConfig systemConfig;
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
+    @Autowired
+    private VisitorInfoDao visitorInfoDao;
 
     /**
      * 导出展商列表到Excel

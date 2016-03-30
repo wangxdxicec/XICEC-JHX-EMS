@@ -41,9 +41,9 @@
 				<db.password>123456</db.password>
 				<appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/buddha/manager</appendix>
 			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
 		</profile>
 		<profile>
 			<id>product</id>
