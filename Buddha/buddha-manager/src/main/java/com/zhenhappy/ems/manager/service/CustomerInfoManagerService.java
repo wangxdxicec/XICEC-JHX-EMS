@@ -93,7 +93,7 @@ public class CustomerInfoManagerService {
         page.setPageSize(request.getRows());
         page.setPageIndex(request.getPage());
 		List<TVisitorInfo> exhibitors = customerInfoDao.queryPageByHQL("select count(*) from TVisitorInfo e" + conditionsSqlNoOrder,
-				"select new com.zhenhappy.ems.manager.dto.QueryVisitorInfo(e.firstName, e.company,"
+				"select new com.zhenhappy.ems.manager.dto.QueryVisitorInfo(e.id, e.firstName, e.company,"
 						+  (request.getInlandOrForeign() == 1 ? "e.city" : "e.country")
 						+ ", e.address, e.mobile, e.tel, e.email, e.createTime) "
 						+ "from TVisitorInfo e"  + conditionsSqlNoOrder, new Object[]{}, page);
@@ -202,7 +202,7 @@ public class CustomerInfoManagerService {
 	 */
 	@Transactional
 	public List<TVisitorInfo> loadAllInlandCustomer() {
-		List<TVisitorInfo> customers = visitorInfoDao.queryByHql("from TVisitorInfo where country = 44 order by createTime desc", new Object[]{});
+		List<TVisitorInfo> customers = visitorInfoDao.queryByHql("from TVisitorInfo where country = 44 order by createTime asc", new Object[]{});
 		return customers.size() > 0 ? customers : null;
 	}
 
@@ -212,7 +212,7 @@ public class CustomerInfoManagerService {
 	 */
 	@Transactional
 	public List<TVisitorInfo> loadAllForeignCustomer() {
-		List<TVisitorInfo> customers = visitorInfoDao.queryByHql("from TVisitorInfo where country <> 44 order by createTime desc", new Object[]{});
+		List<TVisitorInfo> customers = visitorInfoDao.queryByHql("from TVisitorInfo where country <> 44 order by createTime asc", new Object[]{});
 		return customers.size() > 0 ? customers : null;
 	}
 

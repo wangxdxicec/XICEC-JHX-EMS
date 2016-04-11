@@ -1,4 +1,4 @@
-package com.zhenhappy.ems.manager.entity;
+package com.zhenhappy.ems.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

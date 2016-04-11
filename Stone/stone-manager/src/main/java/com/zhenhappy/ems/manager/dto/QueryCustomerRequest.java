@@ -1,19 +1,72 @@
 package com.zhenhappy.ems.manager.dto;
 
-import java.util.Date;
-
 /**
  * Created by wujianbin on 2014-08-14.
  */
 public class QueryCustomerRequest extends EasyuiRequest {
+	private Integer id;
 	private String firstName;
+	private String password;
 	private String company;
 	private Integer country;
 	private String address;
+	private String position;
+	private String city;
 	private String mobilePhone;
 	private String telephone;
 	private String email;
-	private String createdTime;
+	private String createTime;
+	private String website;
+	private String fax;
+	private Integer inlandOrForeign;  //1:表示国内客商  2：表示国外客商
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getInlandOrForeign() {
+		return inlandOrForeign;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getWebsite() {
+		return website;
+	}
+
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	public void setInlandOrForeign(Integer inlandOrForeign) {
+		this.inlandOrForeign = inlandOrForeign;
+	}
+
+	public String getMobilePhone() {
+		return mobilePhone;
+	}
+
+	public void setMobilePhone(String mobilePhone) {
+		this.mobilePhone = mobilePhone;
+	}
 
 	public Integer getCountry() {
 		return country;
@@ -21,6 +74,14 @@ public class QueryCustomerRequest extends EasyuiRequest {
 
 	public void setCountry(Integer country) {
 		this.country = country;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+
+	public void setFax(String fax) {
+		this.fax = fax;
 	}
 
 	public String getFirstName() {
@@ -47,14 +108,6 @@ public class QueryCustomerRequest extends EasyuiRequest {
 		this.address = address;
 	}
 
-	public String getMobilePhone() {
-		return mobilePhone;
-	}
-
-	public void setMobilePhone(String mobilePhone) {
-		this.mobilePhone = mobilePhone;
-	}
-
 	public String getTelephone() {
 		return telephone;
 	}
@@ -67,15 +120,23 @@ public class QueryCustomerRequest extends EasyuiRequest {
 		return email;
 	}
 
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
-	public String getCreatedTime() {
-		return createdTime;
+	public String getCreateTime() {
+		return createTime;
 	}
 
-	public void setCreatedTime(String createdTime) {
-		this.createdTime = createdTime;
+	public void setCreateTime(String createdTime) {
+		this.createTime = createdTime;
 	}
 }

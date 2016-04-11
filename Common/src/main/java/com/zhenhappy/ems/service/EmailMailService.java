@@ -1,10 +1,10 @@
 /*
  *    Copyright 2014-2015 The Happy Network Corporation
  */
-package com.zhenhappy.ems.manager.service;
+package com.zhenhappy.ems.service;
 
-import com.zhenhappy.ems.manager.entity.Email;
-import com.zhenhappy.ems.manager.entity.TEmailSendDetail;
+import com.zhenhappy.ems.entity.Email;
+import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.util.Page;
 
 /**

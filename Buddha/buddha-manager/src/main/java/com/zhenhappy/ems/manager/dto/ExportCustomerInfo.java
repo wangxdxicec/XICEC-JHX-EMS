@@ -11,6 +11,33 @@ public class ExportCustomerInfo extends WCustomer {
 	private String phone;
 	private String tel;
 	private String faxString;
+	private String accompanyName;
+	private String accompanyContact;
+	private String tmp_Interest;
+
+	public String getTmp_Interest() {
+		return tmp_Interest;
+	}
+
+	public void setTmp_Interest(String tmp_Interest) {
+		this.tmp_Interest = tmp_Interest;
+	}
+
+	public String getAccompanyContact() {
+		return accompanyContact;
+	}
+
+	public void setAccompanyContact(String accompanyContact) {
+		this.accompanyContact = accompanyContact;
+	}
+
+	public String getAccompanyName() {
+		return accompanyName;
+	}
+
+	public void setAccompanyName(String accompanyName) {
+		this.accompanyName = accompanyName;
+	}
 
 	public String getName() {
 		return name;

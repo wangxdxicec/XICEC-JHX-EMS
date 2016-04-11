@@ -1,6 +1,6 @@
 package com.zhenhappy.ems.manager.service;
 
-import com.zhenhappy.ems.entity.WCustomerTemplate;
+import com.zhenhappy.ems.entity.TVisitorTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,6 +11,6 @@ import java.util.List;
 public interface CustomerTemplateService {
 
     @Transactional
-    public List<WCustomerTemplate> loadAllCustomerTemplate();
+    public List<TVisitorTemplate> loadAllCustomerTemplate();
 
 }

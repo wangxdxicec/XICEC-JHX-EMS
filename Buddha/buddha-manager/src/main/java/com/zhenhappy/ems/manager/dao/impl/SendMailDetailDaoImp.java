@@ -1,8 +1,8 @@
 package com.zhenhappy.ems.manager.dao.impl;
 
 import com.zhenhappy.ems.dao.imp.BaseDaoHibernateImp;
-import com.zhenhappy.ems.manager.dao.SendMailDetailDao;
-import com.zhenhappy.ems.manager.entity.TEmailSendDetail;
+import com.zhenhappy.ems.dao.SendMailDetailDao;
+import com.zhenhappy.ems.entity.TEmailSendDetail;
 import org.springframework.stereotype.Repository;
 
 /**

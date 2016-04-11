@@ -2,19 +2,19 @@ package com.zhenhappy.ems.manager.action.user;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zhenhappy.ems.dto.BaseResponse;
-import com.zhenhappy.ems.entity.TVisitorInfo;
-import com.zhenhappy.ems.entity.WCustomerTemplate;
+import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.dto.GetMailSendDetailsResponse;
 import com.zhenhappy.ems.dto.Principle;
 import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
-import com.zhenhappy.ems.manager.entity.Email;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 import com.zhenhappy.ems.manager.service.CustomerTemplateService;
-import com.zhenhappy.ems.manager.service.ImportExportService;
 import com.zhenhappy.ems.service.ExhibitorService;
-import com.zhenhappy.ems.manager.service.EmailMailService;
+import com.zhenhappy.ems.service.EmailMailService;
+import com.zhenhappy.ems.service.VisitorLogMsgService;
+import com.zhenhappy.util.EmailPattern;
 import com.zhenhappy.util.Page;
+import com.zhenhappy.util.ReadWriteEmailAndMsgFile;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -27,7 +27,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,8 +46,6 @@ public class MailAction extends BaseAction {
     private ExhibitorService exhibitorService;
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
-    @Autowired
-    private ImportExportService importExportService;
 
     @Autowired
     private EmailMailService mailService;
@@ -53,6 +53,8 @@ public class MailAction extends BaseAction {
     private CustomerTemplateService customerTemplaeService;
     @Autowired
     TaskExecutor taskExecutor;// 注入Spring封装的异步执行器
+    @Autowired
+    VisitorLogMsgService visitorLogMsgService;
 
     @RequestMapping(value = "sendMail", method = RequestMethod.GET)
     public String sendMail() {
@@ -96,38 +98,58 @@ public class MailAction extends BaseAction {
         try {
             Email email = new Email();
             if(eids[0] == -1)
-            customers = customerInfoManagerService.loadAllInlandCustomer();
-            else customers = customerInfoManagerService.loadSelectedCustomers(eids);
+                customers = customerInfoManagerService.loadAllInlandCustomer();
+            else
+                customers = customerInfoManagerService.loadSelectedCustomers(eids);
             if(customers.size()>0) {
+                ReadWriteEmailAndMsgFile.creatTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
                 for(int i=0;i<customers.size();i++) {
                     TVisitorInfo customer = customers.get(i);
-                    log.info("======给境内邮箱为：" + customer.getEmail() + "账号发邮件======");
-                    if(customer.getIsProfessional()) {
-                        email.setFlag(1);//专业采购商
-                    } else {
-                        email.setFlag(0);//展会观众
-                    }
-                    email.setSubject("厦门国际佛事用品展览邀请函");
-                    email.setCountry(0);
-                    email.setCompany(customer.getCompany());
-                    email.setName(customer.getFirstName());
-                    if(org.apache.commons.lang.StringUtils.isEmpty(customer.getTmp_V_name1())
-                            && org.apache.commons.lang.StringUtils.isEmpty(customer.getTmp_V_name2())
-                    && org.apache.commons.lang.StringUtils.isEmpty(customer.getTmp_V_name3())) {
-                        email.setFollowName("无");
-                    } else {
-                        email.setFollowName(customer.getTmp_V_name1() + "," + customer.getTmp_V_name2() + "," + customer.getTmp_V_name3());
-                    }
-                    email.setRegID(customer.getCheckingNo());
-                    email.setReceivers(customer.getEmail());
-                    //email.setReceivers("datea120@163.com");
+                    EmailPattern pattern = new EmailPattern();
+                    if(pattern.isEmailPattern(customer.getEmail())) {
+                        SimpleDateFormat bartDateFormat = new SimpleDateFormat("yyyy年MM月dd日 EEE HH:mm:ss");
+                        Date date = new Date();
+                        String str = bartDateFormat.format(date);
+                        ReadWriteEmailAndMsgFile.setFileContentIsNull();
+                        ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
+                        ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境内邮箱为：" + customer.getEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.foshiEmailFileName);
+                        //log.info("======给境内邮箱为：" + customer.getEmail() + "账号发邮件======");
+                        if(customer.getIsProfessional()) {
+                            email.setFlag(1);//专业采购商
+                        } else {
+                            email.setFlag(0);//展会观众
+                        }
+                        email.setCustomerId(customer.getId());
+                        email.setSubject("厦门国际佛事用品展览邀请函");
+                        email.setCountry(0);
+                        email.setUseTemplate(true);
+                        email.setCompany(customer.getCompany());
+                        email.setName(customer.getFirstName());
+                        StringBuffer alllNameStr =  new StringBuffer();
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(customer.getTmp_V_name1())
+                                && !"null".equals(customer.getTmp_V_name1())){
+                            alllNameStr.append(customer.getTmp_V_name1());
+                        }
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(customer.getTmp_V_name2())
+                                && !"null".equals(customer.getTmp_V_name2())){
+                            alllNameStr.append("， " + customer.getTmp_V_name2());
+                        }
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(customer.getTmp_V_name3())
+                                && !"null".equals(customer.getTmp_V_name3())){
+                            alllNameStr.append("， " + customer.getTmp_V_name3());
+                        }
+                        email.setFollowName(alllNameStr.toString());
+                        email.setRegID(customer.getCheckingNo());
+                        email.setReceivers(customer.getEmail());
 
-                    mailService.sendMailByAsyncAnnotationMode(email);
+                        mailService.sendMailByAsyncAnnotationMode(email);
+                    }
                 }
             } else {
                 throw new Exception("Mail can not found");
             }
         } catch (Exception e) {
+            System.out.println("-------exception: " + e);
             baseResponse.setResultCode(1);
         }
         return baseResponse;
@@ -138,35 +160,58 @@ public class MailAction extends BaseAction {
     public BaseResponse emailAllForeignCustomers(@ModelAttribute QueryCustomerRequest request,
                                                 @RequestParam(value = "cids", defaultValue = "") Integer[] cids) {
         BaseResponse baseResponse = new BaseResponse();
+        List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
         try {
             Email email = new Email();
-            List<TVisitorInfo> customers = customerInfoManagerService.loadAllForeignCustomer();
+            if(cids[0] == -1)
+                customers = customerInfoManagerService.loadAllInlandCustomer();
+            else
+                customers = customerInfoManagerService.loadSelectedCustomers(cids);
 
             if(customers.size()>0) {
+                ReadWriteEmailAndMsgFile.creatTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
                 for(int i=0;i<customers.size();i++) {
                     TVisitorInfo customer = customers.get(i);
-                    log.info("======给境外邮箱为：" + customer.getEmail() + "账号发邮件======");
-                    if(customer.getIsProfessional()) {
-                        email.setFlag(1);//专业采购商
-                    } else {
-                        email.setFlag(0);//展会观众
-                    }
+                    EmailPattern pattern = new EmailPattern();
+                    if(pattern.isEmailPattern(customer.getEmail())) {
+                        SimpleDateFormat bartDateFormat = new SimpleDateFormat("yyyy年MM月dd日 EEE HH:mm:ss");
+                        Date date = new Date();
+                        String str = bartDateFormat.format(date);
+                        ReadWriteEmailAndMsgFile.setFileContentIsNull();
+                        ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
+                        ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境外邮箱为：" + customer.getEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.foshiEmailFileName);
+                        //log.info("======给境外邮箱为：" + customer.getEmail() + "账号发邮件======");
+                        if(customer.getIsProfessional()) {
+                            email.setFlag(1);//专业采购商
+                        } else {
+                            email.setFlag(0);//展会观众
+                        }
 
-                    email.setSubject("China Xiamen International Buddhist Items & Crafts Fair Invitation");
-                    email.setCountry(1);
-                    email.setCompany(customer.getCompany());
-                    email.setName(customer.getFirstName());
-                    if(org.apache.commons.lang.StringUtils.isEmpty(customer.getTmp_V_name1())
-                            && org.apache.commons.lang.StringUtils.isEmpty(customer.getTmp_V_name2())
-                            && org.apache.commons.lang.StringUtils.isEmpty(customer.getTmp_V_name3())) {
-                        email.setFollowName("nobody");
-                    } else {
-                        email.setFollowName(customer.getTmp_V_name1() + "," + customer.getTmp_V_name2() + "," + customer.getTmp_V_name3());
-                    }
-                    email.setRegID(customer.getCheckingNo());
-                    email.setReceivers(customer.getEmail());
+                        email.setCustomerId(customer.getId());
+                        email.setSubject("China Xiamen International Buddhist Items & Crafts Fair Invitation");
+                        email.setCountry(1);
+                        email.setUseTemplate(true);
+                        email.setCompany(customer.getCompany());
+                        email.setName(customer.getFirstName());
+                        StringBuffer alllNameStr =  new StringBuffer();
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(customer.getTmp_V_name1())
+                                && !"null".equals(customer.getTmp_V_name1())){
+                            alllNameStr.append(customer.getTmp_V_name1());
+                        }
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(customer.getTmp_V_name2())
+                                && !"null".equals(customer.getTmp_V_name2())){
+                            alllNameStr.append("， " + customer.getTmp_V_name2());
+                        }
+                        if(org.apache.commons.lang.StringUtils.isNotEmpty(customer.getTmp_V_name3())
+                                && !"null".equals(customer.getTmp_V_name3())){
+                            alllNameStr.append("， " + customer.getTmp_V_name3());
+                        }
+                        email.setFollowName(alllNameStr.toString());
+                        email.setRegID(customer.getCheckingNo());
+                        email.setReceivers(customer.getEmail());
 
-                    mailService.sendMailByAsyncAnnotationMode(email);
+                        mailService.sendMailByAsyncAnnotationMode(email);
+                    }
                 }
             } else {
                 throw new Exception("Mail can not found");
@@ -183,31 +228,58 @@ public class MailAction extends BaseAction {
                                                 @RequestParam(value = "cids", defaultValue = "") Integer[] eids) {
         BaseResponse baseResponse = new BaseResponse();
         List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
-        List<WCustomerTemplate> customerTemplatesList = new ArrayList<WCustomerTemplate>();
+        List<TVisitorTemplate> customerTemplatesList = new ArrayList<TVisitorTemplate>();
         String mobileContent = "";
+        String mobileSubject = "";
         try {
             if(eids[0] == -1)
                 customers = customerInfoManagerService.loadAllInlandCustomer();
-            else customers = customerInfoManagerService.loadSelectedCustomers(eids);
+            else
+                customers = customerInfoManagerService.loadSelectedCustomers(eids);
             customerTemplatesList = customerTemplaeService.loadAllCustomerTemplate();
             if(customerTemplatesList != null && customerTemplatesList.size()>0){
                 for(int k=0;k<customerTemplatesList.size();k++){
-                    WCustomerTemplate customerTemplate = customerTemplatesList.get(k);
+                    TVisitorTemplate customerTemplate = customerTemplatesList.get(k);
                     if(customerTemplate.getTpl_key().equals("msg_register_content_cn")){
                         mobileContent = customerTemplate.getTpl_value();
-                        break;
+                    } else if(customerTemplate.getTpl_key().equals("msg_register_subject_cn")) {
+                        mobileSubject = customerTemplate.getTpl_value();
                     }
                 }
             }
             if(customers.size()>0) {
                 StringBuffer mobileStr = new StringBuffer();
+                ReadWriteEmailAndMsgFile.creatTxtFile(ReadWriteEmailAndMsgFile.foshiMsgFileName);
                 for(int i=0;i<customers.size();i++) {
+                    TVisitorMsgLog visitorMsgLog = new TVisitorMsgLog();
                     TVisitorInfo customer = customers.get(i);
-                    log.info("======给境内手机号为：" + customer.getMobile() + "发短信======");
-                    String mobileContentTemp = mobileContent;
-                    mobileContent = mobileContent.replace("@@_CHECKINGNUMBER_@@",customer.getCheckingNo());
-                    sendMsgByAsynchronousMode(customer.getMobile(), mobileContent);
-                    mobileContent = mobileContentTemp;
+                    EmailPattern pattern = new EmailPattern();
+                    if(pattern.isMobileNO(customer.getMobile())) {
+                        SimpleDateFormat bartDateFormat = new SimpleDateFormat("yyyy年MM月dd日 EEE HH:mm:ss");
+                        Date date = new Date();
+                        String str = bartDateFormat.format(date);
+                        ReadWriteEmailAndMsgFile.setFileContentIsNull();
+                        ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.foshiMsgFileName);
+                        ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境内手机号为：" + customer.getMobile() + "发短信。", ReadWriteEmailAndMsgFile.foshiMsgFileName);
+                        //log.info("======给境内手机号为：" + customer.getMobile() + "发短信======");
+                        String mobileContentTemp = mobileContent;
+                        mobileContent = mobileContent.replace("@@_CHECKINGNUMBER_@@",customer.getCheckingNo());
+                        sendMsgByAsynchronousMode(customer.getMobile(), mobileContent);
+                        visitorMsgLog.setMsgContent(mobileContent);
+                        mobileContent = mobileContentTemp;
+                    }
+                    visitorMsgLog.setCreateTime(new Date());
+                    visitorMsgLog.setLogSubject("");
+                    visitorMsgLog.setReply(0);
+                    visitorMsgLog.setLogSubject("");
+                    visitorMsgLog.setLogContent("");
+                    visitorMsgLog.setGUID("");
+                    visitorMsgLog.setMsgSubject(mobileSubject);
+                    visitorMsgLog.setMsgFrom("");
+                    visitorMsgLog.setMsgTo(customer.getMobile());
+                    visitorMsgLog.setStatus(0);
+                    visitorMsgLog.setCustomerID(customer.getId());
+                    visitorLogMsgService.insertLogMsg(visitorMsgLog);
                 }
             } else {
                 throw new Exception("mobile can not found");

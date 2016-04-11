@@ -1,9 +1,10 @@
-package com.zhenhappy.ems.manager.entity;
+package com.zhenhappy.ems.entity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Email {
+	private Integer customerId;
 	private String name;
 	private String boothNumber;
 	private String company;
@@ -15,6 +16,78 @@ public class Email {
 	private int country; //0:表示中国；1：表示国外
 	private String followName; //随行人员
 	private String regID; //预登记编号
+
+	private String register_subject;
+	private String register_content;
+	private String invite_subject;
+	private String invite_content;
+	private Boolean isUseTemplate;
+	private String position;
+	private String policeDecare;
+
+	public Integer getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(Integer customerId) {
+		this.customerId = customerId;
+	}
+
+	public String getPoliceDecare() {
+		return policeDecare;
+	}
+
+	public void setPoliceDecare(String policeDecare) {
+		this.policeDecare = policeDecare;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	public Boolean getUseTemplate() {
+		return isUseTemplate;
+	}
+
+	public void setUseTemplate(Boolean useTemplate) {
+		isUseTemplate = useTemplate;
+	}
+
+	public String getRegister_subject() {
+		return register_subject;
+	}
+
+	public void setRegister_subject(String register_subject) {
+		this.register_subject = register_subject;
+	}
+
+	public String getRegister_content() {
+		return register_content;
+	}
+
+	public void setRegister_content(String register_content) {
+		this.register_content = register_content;
+	}
+
+	public String getInvite_subject() {
+		return invite_subject;
+	}
+
+	public void setInvite_subject(String invite_subject) {
+		this.invite_subject = invite_subject;
+	}
+
+	public String getInvite_content() {
+		return invite_content;
+	}
+
+	public void setInvite_content(String invite_content) {
+		this.invite_content = invite_content;
+	}
 
 	public Email() {
 		super();

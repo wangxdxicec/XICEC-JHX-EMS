@@ -13,7 +13,14 @@
     <groupId>com.zhenhappy.ems</groupId>
     <version>1.2-SNAPSHOT</version>
     <packaging>war</packaging>
-	
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>3.0.5.RELEASE</spring.version>
+        <framework.log.level>WARN</framework.log.level>
+        <system.log.level>DEBUG</system.log.level>
+    </properties>
+
 	<profiles>
         <profile>
             <id>local</id>

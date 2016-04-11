@@ -2,8 +2,11 @@ package com.zhenhappy.ems.manager.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import com.zhenhappy.ems.manager.dto.ModifyCustomerInfo;
+import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -33,6 +36,69 @@ public class CustomerInfoManagerService {
 
 	public void setHibernateTemplate(HibernateTemplate hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
+	}
+
+	/**
+	 * 分页获取客商列表
+	 * @param request
+	 * @return
+	 */
+	public QueryCustomerResponse queryCustomersByPage(QueryCustomerRequest request) {
+		List<String> conditions = new ArrayList<String>();
+		try {
+			if (StringUtils.isNotEmpty(request.getFirstName())) {
+				conditions.add(" e.firstName like '%" + new String(request.getFirstName().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getCompany())) {
+				conditions.add(" e.company like '%" +new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getCity())) {
+				conditions.add(" e.city like '%" + new String(request.getCity().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (request.getCountry() != null) {
+				conditions.add(" e.country = " + request.getCountry().intValue() + " ");
+			}
+			if (StringUtils.isNotEmpty(request.getAddress())) {
+				conditions.add(" e.address like '%" +new String(request.getAddress().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getMobilePhone())) {
+				conditions.add(" e.mobilePhone like '%" + new String(request.getMobilePhone().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (request.getTelephone() != null) {
+				conditions.add(" e.telephone like '%" + new String(request.getTelephone().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (request.getCreateTime() != null) {
+				conditions.add(" e.createTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (request.getEmail() != null) {
+				conditions.add(" e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		if(request.getInlandOrForeign() == 1) {
+			conditions.add("e.country=44 ");
+		} else {
+			conditions.add("e.country<>44 ");
+		}
+		String conditionsSql = StringUtils.join(conditions, " and ");
+		String conditionsSqlNoOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlNoOrder = " where " + conditionsSql;
+		}
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+		List<WCustomer> exhibitors = customerInfoDao.queryPageByHQL("select count(*) from WCustomer e" + conditionsSqlNoOrder,
+				"select new com.zhenhappy.ems.manager.dto.QueryCustomerInfo(e.id, e.firstName, e.company,"
+						+  (request.getInlandOrForeign() == 1 ? "e.city" : "e.country")
+						+ ", e.address, e.mobilePhone, e.telephone, e.email, e.createdTime) "
+						+ "from WCustomer e"  + conditionsSqlNoOrder, new Object[]{}, page);
+		QueryCustomerResponse response = new QueryCustomerResponse();
+		response.setResultCode(0);
+		response.setRows(exhibitors);
+		response.setTotal(page.getTotalCount());
+		return response;
 	}
 
 	/**
@@ -80,8 +146,8 @@ public class CustomerInfoManagerService {
 		if (StringUtils.isNotEmpty(request.getEmail())) {
 			conditions.add(" (email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"GBK") + "%' OR email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 		}
-		if (StringUtils.isNotEmpty(request.getCreatedTime())) {
-			conditions.add(" (createdTime like '%" + new String(request.getCreatedTime().getBytes("ISO-8859-1"),"GBK") + "%' OR createdTime like '%" + new String(request.getCreatedTime().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		if (StringUtils.isNotEmpty(request.getCreateTime())) {
+			conditions.add(" (createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"GBK") + "%' OR createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 		}
 		String conditionsSql = StringUtils.join(conditions, " and ");
 		String conditionsSqlNoOrder = "";
@@ -166,4 +232,70 @@ public class CustomerInfoManagerService {
     public void modifyCustomer(WCustomer customer) {
         getHibernateTemplate().update(customer);
     }
+
+	/**
+	 * 修改客商账号
+	 * @param request
+	 * @param adminId
+	 * @throws Exception
+	 */
+	@Transactional
+	public void modifyCustomerAccount(ModifyCustomerInfo request, Integer adminId) throws Exception {
+		WCustomer customer = customerInfoDao.query(request.getId());
+		if(customer != null){
+			customer.setFirstName(request.getUsername());
+			customer.setPassword(request.getPassword());
+			customer.setCompany(request.getCompany());
+			customer.setAddress(request.getAddress());
+			customer.setEmail(request.getEmail());
+			customer.setMobilePhone(request.getMobilePhone());
+			customer.setPosition(request.getPosition());
+			customer.setFax(request.getFax());
+			customer.setWebsite(request.getWebsite());
+			customer.setUpdateTime(new Date());
+			customerInfoDao.update(customer);
+		}
+	}
+
+	/**
+	 * 修改客商是否专业
+	 * @param request
+	 * @throws Exception
+	 */
+	@Transactional
+	public void modifyCustomerProfessional(QueryCustomerRequest request, Integer id) throws Exception {
+		WCustomer customer = customerInfoDao.query(id);
+		if(customer != null){
+			customer.setIsProfessional(!customer.getIsProfessional());
+			customerInfoDao.update(customer);
+		}
+	}
+
+	/**
+	 * 更新客商短信数量
+	 * @throws Exception
+	 */
+	@Transactional
+	public void updateCustomerMsgNum(Integer id) throws Exception {
+		WCustomer customer = customerInfoDao.query(id);
+		int oldMsgNum = customer.getSendMsgNum();
+		if(customer != null){
+			customer.setSendMsgNum(oldMsgNum+1);
+			customerInfoDao.update(customer);
+		}
+	}
+
+	/**
+	 * 更新客商邮件数量
+	 * @throws Exception
+	 */
+	@Transactional
+	public void updateCustomerEmailNum(Integer id) throws Exception {
+		WCustomer customer = customerInfoDao.query(id);
+		int oldEmailNum = customer.getSendEmailNum();
+		if(customer != null){
+			customer.setSendEmailNum(oldEmailNum+1);
+			customerInfoDao.update(customer);
+		}
+	}
 }

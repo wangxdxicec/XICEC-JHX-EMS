@@ -79,6 +79,10 @@
 	<form id="exportBoothNumAndMeipaiToExcel" action="${base}/user/exportBoothNumAndMeipaiToExcel" method="post">
 		<div id="eidParm3"></div>
 	</form>
+	<!-- 导出参展人员 -->
+	<form id="exportExhibitorJoinersToExcel" action="${base}/user/exportExhibitorJoinersToExcel" method="post">
+		<div id="eidParm4"></div>
+	</form>
 	</div>
 </div>
 <!-- 添加展商账号表单 -->
@@ -263,6 +267,9 @@
 		<div class="menu-sep"></div>
 		<div id="exportAllExhibitors" iconCls="icon-redo">所有展商基本信息到Excel</div>
 		<div id="exportSelectedExhibitors" iconCls="icon-redo">所选展商基本信息到Excel</div>
+		<div class="menu-sep"></div>
+		<div id="exportAllExhibitorJoiners" iconCls="icon-redo">所有参展人员信息</div>
+		<div id="exportSelectExhibitorJoiners" iconCls="icon-redo">所选参展人员信息</div>
 	</div>
 	<div id="import" style="width:100px;">
 		<div id="importExhibitor" iconCls="icon-undo">导入展商账号</div>
@@ -534,6 +541,29 @@
 //         	alert(eidParm3.innerHTML);
         	document.getElementById("exportBoothNumAndMeipaiToExcel").submit();
         	$.messager.alert('提示', '导出所选展商成功');
+		}else{
+			$.messager.alert('提示', '请至少选择一项展商再导出');
+		}
+	});
+	//导出所有参展人员
+	$('#exportAllExhibitorJoiners').click(function(){
+		eidParm4.innerHTML = "";
+		var node = "<input type='hidden' name='eids' value='-1'/>";
+		eidParm4.innerHTML += node;
+		document.getElementById("exportExhibitorJoinersToExcel").submit();
+		$.messager.alert('提示', '请勿关闭窗口,耐心等待1~2分钟后会提示下载');
+	});
+	$('#exportSelectExhibitorJoiners').click(function(){
+		eidParm4.innerHTML = "";
+//     	alert(eidParm3.innerHTML);
+		if(checkedItems.length > 0){
+			for (var i = 0; i < checkedItems.length; i++) {
+				var node = "<input type='hidden' name='eids' value='"+checkedItems[i]+"'/>";
+				eidParm4.innerHTML += node;
+			}
+//         	alert(eidParm4.innerHTML);
+			document.getElementById("exportExhibitorJoinersToExcel").submit();
+			$.messager.alert('提示', '导出所选参展人员信息成功');
 		}else{
 			$.messager.alert('提示', '请至少选择一项展商再导出');
 		}

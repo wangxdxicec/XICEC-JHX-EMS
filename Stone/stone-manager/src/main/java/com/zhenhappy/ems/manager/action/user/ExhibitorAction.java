@@ -508,5 +508,4 @@ public class ExhibitorAction extends BaseAction {
             e.printStackTrace();
         }
     }
-    
 }

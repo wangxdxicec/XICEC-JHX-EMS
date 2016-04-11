@@ -2,6 +2,8 @@ package com.zhenhappy.ems.manager.action.user;
 
 import java.util.Date;
 
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,11 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.TArticle;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.AddArticleRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyArticleRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerResponse;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 
 /**
@@ -35,6 +32,91 @@ public class CustomerAction extends BaseAction {
 
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
+
+    /**
+     * 显示客商详细页面
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "directToCustomerInfo")
+    public ModelAndView directToCustomerInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/customer/customerInfo");
+        modelAndView.addObject("id", id);
+        modelAndView.addObject("customer", customerInfoManagerService.loadCustomerInfoById(id));
+        /*modelAndView.addObject("exhibitor", exhibitorManagerService.loadExhibitorByEid(eid));
+        modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(eid));
+        modelAndView.addObject("booth", exhibitorManagerService.queryBoothByEid(eid));
+        modelAndView.addObject("currentTerm", exhibitorManagerService.queryCurrentTermNumber());
+        modelAndView.addObject("exhibitorInfo", exhibitorManagerService.loadExhibitorInfoByEid(eid));
+        *//*石材展需求开始*//*
+//        modelAndView.addObject("exhibitorMeipai", meipaiService.getMeiPaiByEid(eid));
+        *//*石材展需求结束*//*
+        modelAndView.addObject("invoice", invoiceService.getByEid(eid));*/
+        return modelAndView;
+    }
+
+    /**
+     * 修改客商账号
+     * @param request
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerInfo", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerAccount(@ModelAttribute ModifyCustomerInfo request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.modifyCustomerAccount(request, principle.getAdmin().getId());
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 修改客商是否专业
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerProfessional", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerProfessional(@ModelAttribute QueryCustomerRequest request, @RequestParam(value = "id", defaultValue = "")Integer id) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.modifyCustomerProfessional(request, id);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询客商
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryStoneCustomersByPage")
+    public QueryCustomerResponse queryStoneCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
 
 	/**
 	 * 分页查询国内客商

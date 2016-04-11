@@ -432,7 +432,7 @@
 				<td><textarea class="easyui-validatebox" type="text" name="mark" style="width:248px;height:100px;">${(exhibitorInfo.mark)!''}</textarea></td>
 			</tr>
 			<tr>
-				<td style="width: 90px;text-align: right">公司Logo：</td>
+				<td style="width: 90px;text-align: right">公司Logo<font color="#dc143c"> (不能超过1M)</font>：</td>
 				<td><input type="file" name="logoFile" id="logoFile" style="width:254px;" onchange="change()"/></td>
 			</tr>
 			<tr>
@@ -968,6 +968,10 @@ function change() {
     // gif在IE浏览器暂时无法显示
     if(ext!='png' && ext!='jpg' && ext!='jpeg' && ext!='gif'){
         alert("文件必须为图片！"); return;
+    }
+    if((file.offsetWidth * file.offsetHeight)/100 > 1024*1024){
+        alert("文件大小超过1M，请重新选择图片！");
+        return;
     }
     // IE浏览器
     if(document.all){
@@ -1963,7 +1967,7 @@ $(document).ready(function () {
         $("#sendMsgDlg").dialog("open")
     });
     $("#manageExhibitorInfo").click(function(){
-        $("#baseExhibitorInfoDlg").dialog("open");
+        $("#baseExhibitorInfoDlg").dialog("open")
     });
 });
 </script>

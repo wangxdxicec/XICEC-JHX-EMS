@@ -64,7 +64,7 @@
 				<span id="semail" class="sortable">邮箱</span><br/>
 				<input id="customerEmail" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 			</th>
-			<th data-options="field: 'createdTime', formatter:formatDatebox, width: $(this).width() / 8">
+			<th data-options="field: 'createTime', formatter:formatDatebox, width: $(this).width() / 8">
 				<span id="screatedTime" class="sortable">登记时间</span><br/>
 				<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 			</th>
@@ -105,35 +105,76 @@
 	//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
 	//群发所有客商邮件
 	$('#emailAllCustomers').click(function(){
-		cidParm1.innerHTML = "";
-		var node = "<input type='hidden' name='cids' value='-1'/>";
-		cidParm1.innerHTML += node;
-		$.ajax({
-			url: "${base}/user/emailAllForeignCustomers",
-			type: "post",
-			dataType: "json",
-			beforeSend:function(XMLHttpRequest){
-				$.messager.show({
-					title: '处理中...',
-					msg: '正在群发邮件，请稍等...',
-					timeout: 10000,
-					showType: 'slide'
+		$.messager.confirm('确认删除','你确定要群发所有客商邮件吗?',function(r){
+			if (r){
+				$.ajax({
+					url: "${base}/user/emailAllForeignCustomers",
+					type: "post",
+					data: {"cids": "-1"},
+					dataType: "json",
+					beforeSend:function(XMLHttpRequest){
+						$.messager.show({
+							title: '处理中...',
+							msg: '正在群发邮件，请稍等...',
+							timeout: 10000,
+							showType: 'slide'
+						});
+					},
+					success: function (data) {
+						if (data.resultCode == 0) {
+							$.messager.show({
+								title: '成功',
+								msg: '群发邮件成功',
+								timeout: 5000,
+								showType: 'slide'
+							});
+							$("#customers").datagrid("reload");
+						} else {
+							$.messager.alert('错误', '系统错误');
+						}
+					}
 				});
-			},
-			success: function (data) {
-				if (data.resultCode == 0) {
-					$.messager.show({
-						title: '成功',
-						msg: '群发邮件成功',
-						timeout: 5000,
-						showType: 'slide'
-					});
-					$("#customers").datagrid("reload");
-				} else {
-					$.messager.alert('错误', '系统错误');
-				}
 			}
 		});
+	});
+	//群发所选客商邮件
+	$('#emailSelectedCustomers').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认删除','你确定要群发所选客商邮件吗?',function(r){
+				if (r){
+					$.ajax({
+						url: "${base}/user/emailAllForeignCustomers",
+						type: "post",
+						data: {"cids": checkedItems},
+						dataType: "json",
+						traditional: true,
+						beforeSend:function(XMLHttpRequest){
+							$.messager.show({
+								title: '处理中...',
+								msg: '正在群发邮件，请稍等...',
+								timeout: 10000,
+								showType: 'slide'
+							});
+						},
+						success: function (data) {
+							if (data.resultCode == 0) {
+								$.messager.show({
+									title: '成功',
+									msg: '群发所选客商邮件成功',
+									timeout: 5000,
+									showType: 'slide'
+								});
+								$("#customers").datagrid("reload");
+							} else {
+								$.messager.alert('错误', '系统错误');
+							}
+						}
+					});
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项客商再操作');
+		}
 	});
 	//导出所有客商信息到Excel
 	$('#exportAllCustomers').click(function(){

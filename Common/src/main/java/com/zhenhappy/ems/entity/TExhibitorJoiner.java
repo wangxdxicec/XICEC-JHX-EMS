@@ -29,8 +29,8 @@ public class TExhibitorJoiner {
 	}
 
 	public TExhibitorJoiner(Integer eid, String name, String position,
-			String telphone, String email, Date createTime, Integer admin,
-			Date adminUpdateTime, Integer isDelete) {
+							String telphone, String email, Date createTime, Integer admin,
+							Date adminUpdateTime, Integer isDelete) {
 		super();
 		this.eid = eid;
 		this.name = name;

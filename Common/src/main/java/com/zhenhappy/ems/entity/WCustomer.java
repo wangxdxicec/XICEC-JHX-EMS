@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * WcustomerInfo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "WCustomerInfo", schema = "dbo")
+@Table(name = "visitor_Info", schema = "dbo")
 public class WCustomer implements java.io.Serializable {
 
 	/**
@@ -50,9 +50,13 @@ public class WCustomer implements java.io.Serializable {
 	private String updatedIp;
 	private Date updateTime;
 	private Integer sendEmailNum;
+	private Integer sendMsgNum;
 	private Date sendEmailDate;
 	private Boolean isDisabled;
 	private String guid;
+	private Boolean isProfessional;
+	private Boolean isjudged;
+	private Boolean isMobile;
 
 	// Constructors
 
@@ -65,17 +69,16 @@ public class WCustomer implements java.io.Serializable {
 		this.id = id;
 	}
 
-	/** full constructor */
 	public WCustomer(Integer id, String email, String checkingNo,
-			String password, String firstName, String lastName, String sex,
-			String company, String position, Integer country, String province,
-			String city, String address, String backupEmail,
-			String mobilePhoneCode, String mobilePhone, String telephoneCode,
-			String telephone, String telephoneCode2, String faxCode,
-			String fax, String faxCode2, String website, String remark,
-			String createdIp, Date createdTime, String updatedIp,
-			Date updateTime, Integer sendEmailNum,
-			Date sendEmailDate, Boolean isDisabled, String guid) {
+					 String password, String firstName, String lastName, String sex,
+					 String company, String position, Integer country, String province,
+					 String city, String address, String backupEmail,
+					 String mobilePhoneCode, String mobilePhone, String telephoneCode,
+					 String telephone, String telephoneCode2, String faxCode,
+					 String fax, String faxCode2, String website, String remark,
+					 String createdIp, Date createdTime, String updatedIp,
+					 Date updateTime, Integer sendEmailNum,Integer sendMsgNum,
+					 Date sendEmailDate, Boolean isDisabled, String guid, Boolean isProfessional, Boolean isjudged, Boolean isMobile) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -105,9 +108,13 @@ public class WCustomer implements java.io.Serializable {
 		this.updatedIp = updatedIp;
 		this.updateTime = updateTime;
 		this.sendEmailNum = sendEmailNum;
+		this.sendMsgNum = sendMsgNum;
 		this.sendEmailDate = sendEmailDate;
 		this.isDisabled = isDisabled;
 		this.guid = guid;
+		this.isProfessional = isProfessional;
+		this.isjudged = isjudged;
+		this.isMobile = isMobile;
 	}
 
 	// Property accessors
@@ -382,15 +389,6 @@ public class WCustomer implements java.io.Serializable {
 		this.sendEmailDate = sendEmailDate;
 	}
 
-	@Column(name = "IsDisabled")
-	public Boolean getIsDisabled() {
-		return this.isDisabled;
-	}
-
-	public void setIsDisabled(Boolean isDisabled) {
-		this.isDisabled = isDisabled;
-	}
-
 	@Column(name = "GUID")
 	public String getGuid() {
 		return this.guid;
@@ -398,6 +396,51 @@ public class WCustomer implements java.io.Serializable {
 
 	public void setGuid(String guid) {
 		this.guid = guid;
+	}
+
+	@Column(name = "Isjudged")
+	public Boolean getIsjudged() {
+		return isjudged;
+	}
+
+	public void setIsjudged(Boolean isjudged) {
+		this.isjudged = isjudged;
+	}
+
+	@Column(name = "IsDisabled")
+	public Boolean getIsDisabled() {
+		return isDisabled;
+	}
+
+	public void setIsDisabled(Boolean disabled) {
+		isDisabled = disabled;
+	}
+
+	@Column(name = "IsProfessional")
+	public Boolean getIsProfessional() {
+		return isProfessional;
+	}
+
+	public void setIsProfessional(Boolean professional) {
+		isProfessional = professional;
+	}
+
+	@Column(name = "IsMobile")
+	public Boolean getIsMobile() {
+		return isMobile;
+	}
+
+	public void setIsMobile(Boolean mobile) {
+		isMobile = mobile;
+	}
+
+	@Column(name = "SendMsgNum")
+	public Integer getSendMsgNum() {
+		return sendMsgNum;
+	}
+
+	public void setSendMsgNum(Integer sendMsgNum) {
+		this.sendMsgNum = sendMsgNum;
 	}
 
 }

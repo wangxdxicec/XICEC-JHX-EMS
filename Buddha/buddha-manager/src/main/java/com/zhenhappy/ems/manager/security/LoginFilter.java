@@ -20,6 +20,7 @@ public class LoginFilter implements Filter {
 		whiteList.add("/manager/user/exportBoothInfoToExcel_1");
 		whiteList.add("/manager/user/exportBoothInfoToExcel_2");
 		whiteList.add("/manager/user/showProductImg");
+        whiteList.add("/manager/user/showLogo");
     }
 
     @Override

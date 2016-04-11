@@ -110,7 +110,6 @@
 				<entry key="resource" value="/resource"/>
 			</map>
 		</property>
-
 	</bean>
 
 	<bean id="emailSenderPool" name="emailSenderPool"
@@ -125,8 +124,8 @@
 	<bean id="mailSender" name="mailSender"
 		class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host">
-			<!--<value>smtp.stonefair.org.cn</value>-->
-			<value>smtp.163.com</value>
+			<value>mail.buddhafair.com</value>
+			<!--<value>smtp.163.com</value>-->
 		</property>
 		<property name="javaMailProperties">
 			<props>
@@ -135,12 +134,12 @@
 			</props>
 		</property>
 		<property name="username">
-			<value>hxscsd@163.com</value>
-			<!--<value>service@stonefair.org.cn</value>-->
+			<value>info@buddhafair.com</value>
+			<!--<value>hxscsd@163.com</value>-->
 		</property>
 		<property name="password">
-			<value>dilimic120</value>
-			<!--<value>Sczsz.0209</value>-->
+			<value>jhx5959618</value>
+			<!--<value>dilimic120</value>-->
 		</property>
 	</bean>
 	<!--②异步线程执行器 -->

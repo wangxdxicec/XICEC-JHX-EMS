@@ -71,7 +71,6 @@ public class ContactManagerService extends ContactService {
     
     /**
      * 移除联系人
-     * @param tids
      */
     @Transactional
     public void removeContactByCIds(Integer[] cids) {
@@ -112,7 +111,7 @@ public class ContactManagerService extends ContactService {
 
 	/**
      * 删除联系人
-     * @param tids
+     * @param eids
      */
     @Transactional
     public void deleteContactsByEids(Integer[] eids) {

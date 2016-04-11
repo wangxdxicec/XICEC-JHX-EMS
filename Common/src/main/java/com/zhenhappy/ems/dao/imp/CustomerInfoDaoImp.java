@@ -16,7 +16,12 @@ public class CustomerInfoDaoImp extends BaseDaoHibernateImp<WCustomer> implement
 
 	@Override
 	public List<WCustomer> loadCustomersByIds(Integer[] ids) {
-		Query q = this.getSession().createQuery("select new WCustomer(a.id, a.email, a.checkingNo, a.password, a.firstName, a.lastName, a.sex, a.company, a.position, a.country, a.province, a.city, a.address, a.backupEmail, a.mobilePhoneCode, a.mobilePhone, a.telephoneCode, a.telephone, a.telephoneCode2, a.faxCode, a.fax, a.faxCode2, a.website, a.remark, a.createdIp, a.createdTime, a.updatedIp, a.updateTime, a.sendEmailNum, a.sendEmailDate, a.isDisabled, a.guid) from WCustomer a where a.id in (:ids)");
+		Query q = this.getSession().createQuery("select new WCustomer(a.id, a.email, a.checkingNo, a.password, " +
+				"a.firstName, a.lastName, a.sex, a.company, a.position, a.country, a.province, a.city, a.address," +
+				" a.backupEmail, a.mobilePhoneCode, a.mobilePhone, a.telephoneCode, a.telephone, a.telephoneCode2," +
+				" a.faxCode, a.fax, a.faxCode2, a.website, a.remark, a.createdIp, a.createdTime, a.updatedIp," +
+				" a.updateTime, a.sendEmailNum, a.sendMsgNum, a.sendEmailDate, a.isDisabled, a.guid, a.isProfessional, " +
+				"a.isjudged, a.isMobile) from WCustomer a where a.id in (:ids)");
 		q.setParameterList("ids", ids);
 		return q.list();
 	}

@@ -1,7 +1,7 @@
 package com.zhenhappy.ems.manager.service;
 
-import com.zhenhappy.ems.dao.WCustomerTemplateDao;
-import com.zhenhappy.ems.entity.WCustomerTemplate;
+import com.zhenhappy.ems.dao.TVisitorTemplateDao;
+import com.zhenhappy.ems.entity.TVisitorTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +14,10 @@ import java.util.List;
 public class CustomerTemplateServiceImp implements CustomerTemplateService {
 
     @Autowired
-    private WCustomerTemplateDao customerTemplateDao;
-    public List<WCustomerTemplate> loadAllCustomerTemplate(){
-        List<WCustomerTemplate> customerTemplatesList = null;
-        customerTemplatesList = customerTemplateDao.queryByHql("from WCustomerTemplate", new Object[]{});
+    private TVisitorTemplateDao customerTemplateDao;
+    public List<TVisitorTemplate> loadAllCustomerTemplate(){
+        List<TVisitorTemplate> customerTemplatesList = null;
+        customerTemplatesList = customerTemplateDao.queryByHql("from TVisitorTemplate", new Object[]{});
         return customerTemplatesList;
     }
 }

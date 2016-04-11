@@ -37,7 +37,7 @@ public class JoinerManagerService extends JoinerService {
         Page page = new Page();
         page.setPageSize(request.getRows());
         page.setPageIndex(request.getPage());
-        List<TExhibitorJoiner> joiners = getJoinerDao().queryPageByHQL("select count(*) from TExhibitorJoiner where " + conditionsSql, "from TExhibitorJoiner where " + conditionsSql + " and isDelete != 1", new Object[]{}, page);
+        List<TExhibitorJoiner> joiners = getJoinerDao().queryPageByHQL("select count(*) from TExhibitorJoiner where " + conditionsSql, "from TExhibitorJoiner t where " + conditionsSql + " and isDelete != 1", new Object[]{}, page);
         QueryJoinersResponse response = new QueryJoinersResponse();
         response.setResultCode(0);
         response.setRows(joiners);

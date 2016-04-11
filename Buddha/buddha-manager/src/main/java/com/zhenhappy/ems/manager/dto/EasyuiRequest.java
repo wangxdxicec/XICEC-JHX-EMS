@@ -6,7 +6,7 @@ package com.zhenhappy.ems.manager.dto;
 public class EasyuiRequest {
 
     private int page = 1;
-    private int rows = 10;
+    private int rows = 20;
     private String sort;
     private String order;
     

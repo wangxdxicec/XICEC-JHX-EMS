@@ -8,10 +8,10 @@ import static javax.persistence.GenerationType.IDENTITY;
  * TArticle entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "WCustomerTemplate"
+@Table(name = "visitor_Template"
 	, schema = "dbo"
 )
-public class WCustomerTemplate implements java.io.Serializable {
+public class TVisitorTemplate implements java.io.Serializable {
 
 	/**
 	 *
@@ -27,16 +27,16 @@ public class WCustomerTemplate implements java.io.Serializable {
 	// Constructors
 
 	/** default constructor */
-	public WCustomerTemplate() {
+	public TVisitorTemplate() {
 	}
 
 	/** minimal constructor */
-	public WCustomerTemplate(Integer id) {
+	public TVisitorTemplate(Integer id) {
 		this.id = id;
 	}
 
 	/** full constructor */
-	public WCustomerTemplate(String tpl_key, String tpl_value, String tpl_description) {
+	public TVisitorTemplate(String tpl_key, String tpl_value, String tpl_description) {
 		this.tpl_key = tpl_key;
 		this.tpl_value = tpl_value;
 		this.tpl_description = tpl_description;
@@ -83,7 +83,7 @@ public class WCustomerTemplate implements java.io.Serializable {
 
 	@Override
 	public String toString() {
-		return "TArticle [id=" + id + ", tpl_key=" + tpl_key + ", tpl_value="
+		return "TVisitorTemplate [id=" + id + ", tpl_key=" + tpl_key + ", tpl_value="
 				+ tpl_value + ", tpl_description=" + tpl_description + "]";
 	}
 	

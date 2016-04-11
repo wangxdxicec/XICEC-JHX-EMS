@@ -126,8 +126,9 @@ public class QueryVisitorInfo {
 		this.guid = guid;
 	}
 
-	public QueryVisitorInfo(String firstName, String company, String city, String address,
+	public QueryVisitorInfo(Integer id, String firstName, String company, String city, String address,
 							String mobile, String tel, String email, Date createTime) {
+		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
 		this.city = city;
@@ -138,8 +139,9 @@ public class QueryVisitorInfo {
 		this.createTime = createTime;
 	}
 
-	public QueryVisitorInfo(String firstName, String company, Integer country, String address,
+	public QueryVisitorInfo(Integer id, String firstName, String company, Integer country, String address,
 							String mobile, String tel, String email, Date createTime) {
+		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
 		this.country = country;

@@ -3,9 +3,12 @@
  */
 package com.zhenhappy.ems.manager.service;
 
-import com.zhenhappy.ems.manager.dao.SendMailDetailDao;
-import com.zhenhappy.ems.manager.entity.Email;
-import com.zhenhappy.ems.manager.entity.TEmailSendDetail;
+import com.zhenhappy.ems.dao.SendMailDetailDao;
+import com.zhenhappy.ems.entity.Email;
+import com.zhenhappy.ems.entity.TEmailSendDetail;
+import com.zhenhappy.ems.entity.TVisitorMailLog;
+import com.zhenhappy.ems.service.EmailMailService;
+import com.zhenhappy.ems.service.VisitorLogMailService;
 import com.zhenhappy.util.Page;
 import freemarker.template.Template;
 import org.slf4j.Logger;
@@ -22,13 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 封装 Spring 集成的邮件发送服务实现类
@@ -60,6 +61,8 @@ public class EmailMailServiceImpl implements EmailMailService {
 
     @Autowired
     private SendMailDetailDao sendMailDetailDao;
+    @Autowired
+    VisitorLogMailService visitorLogMailService;
 
     /**
      * 同步发送
@@ -71,17 +74,57 @@ public class EmailMailServiceImpl implements EmailMailService {
         // 建立邮件消息,发送简单邮件和html邮件的区别
         MimeMessage mailMessage = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, "utf-8");
+        TVisitorMailLog visitorMailLog = new TVisitorMailLog();
 
         try {
             String receivers = email.getReceivers().replaceAll("\\;", ",");
             // 设置收件人，寄件人
             InternetAddress[] toAddress = InternetAddress.parse(receivers);
             mailMessage.setRecipients(Message.RecipientType.TO, toAddress); // 发送给多个账号
-            messageHelper.setFrom("hxscsd@163.com"); // 发件人
+            //messageHelper.setFrom("hxscsd@163.com"); // 发件人
+            if(email.getUseTemplate()) {
+                messageHelper.setFrom("info@buddhafair.com");
+                visitorMailLog.setMailFrom("info@buddhafair.com");
+            } else {
+                messageHelper.setFrom("do-not-reply@stonefair.org.cn");
+                visitorMailLog.setMailFrom("do-not-reply@stonefair.org.cn");
+            }
+            visitorMailLog.setMailSubject(email.getSubject());
             messageHelper.setSubject(email.getSubject()); // 主题
             // true 表示启动HTML格式的邮件
-            messageHelper.setText(getMailText(email), true); // 邮件内容，注意加参数true，表示启用html格式
+            if(email.getUseTemplate()) {
+                visitorMailLog.setMailContent(getMailText(email));
+                messageHelper.setText(getMailText(email), true); // 邮件内容，注意加参数true，表示启用html格式
+            } else {
+                email.setRegister_content(email.getRegister_content().replace("@@_NAME_@@",email.getName()));
+                email.setRegister_content(email.getRegister_content().replace("@@_FAIRNAME_@@","第十七届中国厦门国际石材展览会"));
+                email.setRegister_content(email.getRegister_content().replace("@@_COMPANY_@@",email.getCompany()));
+                email.setRegister_content(email.getRegister_content().replace("@@_NAME_@@",email.getName()));
+                email.setRegister_content(email.getRegister_content().replace("@@_POSITION_@@",email.getPosition()));
+                email.setRegister_content(email.getRegister_content().replace("@@_CHECKINGNUMBER_@@",email.getRegID()));
+                email.setRegister_content(email.getRegister_content().replace("@@_YEAR_@@","2017"));
+                email.setRegister_content(email.getRegister_content().replace("@@_POLICY_DECLARE_@@",email.getPoliceDecare()));
+                visitorMailLog.setMailContent(email.getRegister_content());
+                messageHelper.setText(email.getRegister_content(), true); // 邮件内容，注意加参数true，表示启用html格式
+            }
 
+            visitorMailLog.setCustomerID(email.getCustomerId());
+            visitorMailLog.setCreateIP("");
+            visitorMailLog.setReply(0);
+            visitorMailLog.setStatus(0);
+            visitorMailLog.setGUID("");
+            visitorMailLog.setCreateTime(new Date());
+            visitorMailLog.setLogContent("");
+            visitorMailLog.setLogSubject("");
+
+            for(int i = 0; i < toAddress.length; ++i) {
+                Address address = toAddress[i];
+                visitorMailLog.setMailTo(address.toString());
+                visitorLogMailService.insertLogMail(visitorMailLog);
+            }
+
+            Properties props = System.getProperties();
+            props.put("mail.smtp.auth", "true");
             // 发送邮件
             mailSender.send(mailMessage);
 
@@ -183,7 +226,7 @@ public class EmailMailServiceImpl implements EmailMailService {
     private String getMailText(Email email) throws Exception {
         // 通过指定模板名获取FreeMarker模板实例
         Template template = null;
-        /*if (email.getFlag() == 1 && email.getCountry() == 0) {
+        if (email.getFlag() == 1 && email.getCountry() == 0) {
             template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay.html");
         }else if (email.getFlag() == 1 && email.getCountry() == 1){
             template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_eng.html");
@@ -191,8 +234,7 @@ public class EmailMailServiceImpl implements EmailMailService {
             template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro.html");
         }else if (email.getFlag() == 0 && email.getCountry() == 1){
             template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro_eng.html");
-        }*/
-        template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay.html");
+        }
 
         // FreeMarker通过Map传递动态数据
         Map<Object, Object> model = new HashMap<Object, Object>();

@@ -20,7 +20,10 @@ import com.zhenhappy.ems.dao.VisitorInfoDao;
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
+import com.zhenhappy.ems.service.ExhibitorService;
+import com.zhenhappy.ems.service.JoinerService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -70,7 +73,9 @@ public class ImportExportAction extends BaseAction {
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
     @Autowired
-    private VisitorInfoDao visitorInfoDao;
+    private JoinerService joinerService;
+    @Autowired
+    private ExhibitorService exhibitorService;
 
     /**
      * 导出展商列表到Excel
@@ -208,6 +213,56 @@ public class ImportExportAction extends BaseAction {
 		model.put("sheetName", "展位号+企业楣牌");
 		return new ModelAndView(new JXLExcelView(), model);
 	}
+
+    /**
+     * 导出参展人员到Excel
+     * @param eids
+     * @return
+     */
+    @RequestMapping(value = "exportExhibitorJoinersToExcel", method = RequestMethod.POST)
+    public ModelAndView exportExhibitorJoinersToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+        Map model = new HashMap();
+        log.info("====eid.length: " + eids.length);
+        List<TExhibitorJoinerEx> exhibitorJoiners = new ArrayList<TExhibitorJoinerEx>();
+        if(eids[0] == -1)
+            exhibitorJoiners = joinerService.queryAllJoiners();
+        else {
+            List<TExhibitorJoiner> exhibitorJoinerInfo = joinerService.queryAllJoinersByEids(eids);
+            for(TExhibitorJoiner joinerInfo:exhibitorJoinerInfo){
+                TExhibitor exhibitor = exhibitorManagerService.loadExhibitorByEid(joinerInfo.getEid());
+                TExhibitorBooth exhibitorBooth = exhibitorManagerService.queryBoothByEid(joinerInfo.getEid());
+                TExhibitorJoinerEx exhibitorJoinerEx = new TExhibitorJoinerEx();
+                log.info("====name: " + joinerInfo.getName() + "  tel: " + joinerInfo.getTelphone() + "  email: " + joinerInfo.getEmail() + "  pos: " + joinerInfo.getPosition());
+                exhibitorJoinerEx.setName(joinerInfo.getName());
+                exhibitorJoinerEx.setTelphone(joinerInfo.getTelphone());
+                exhibitorJoinerEx.setEmail(joinerInfo.getEmail());
+                exhibitorJoinerEx.setPosition(joinerInfo.getPosition());
+                if(exhibitor != null) {
+                    log.info("====company: " + exhibitor.getCompany());
+                    exhibitorJoinerEx.setCompany(exhibitor.getCompany());
+                }else{
+                    exhibitorJoinerEx.setCompany("");
+                }
+                if(exhibitorBooth != null){
+                    log.info("====boothNum: " + exhibitorBooth.getBoothNumber());
+                    exhibitorJoinerEx.setExhibitorPosition(exhibitorBooth.getBoothNumber());
+                }else {
+                    exhibitorJoinerEx.setExhibitorPosition("");
+                }
+                exhibitorJoiners.add(exhibitorJoinerEx);
+            }
+        }
+        model.put("list", exhibitorJoiners);
+        String[] titles = new String[] { "公司", "展位号", "姓名", "职位", "手机", "邮件" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "company", "exhibitorPosition", "name", "position", "telphone", "email" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{50,20,20,20,20,20};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "参展人员.xls");
+        model.put("sheetName", "参展人员信息");
+        return new ModelAndView(new JXLExcelView(), model);
+    }
 
     /**
      * 导入展商账号
@@ -403,11 +458,11 @@ public class ImportExportAction extends BaseAction {
         else customers = customerInfoManagerService.loadSelectedCustomers(cids);
         List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
         model.put("list", exportCustomer);
-        String[] titles = new String[] { "公司中文名", "姓名", "性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
+        String[] titles = new String[] { "ID","注册编号", "公司", "姓名", "性别", "职位","国家","城市","邮箱","手机", "传真","电话", "网址", "地址","登记时间","随行人员","随行人员联系方式", "感兴趣产品" };
         model.put("titles", titles);
-        String[] columns = new String[] { "company", "name", "sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "remark" };
+        String[] columns = new String[] { "id","checkingNo", "company", "name", "sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "createdTime","accompanyName", "accompanyContact", "tmp_Interest" };
         model.put("columns", columns);
-        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20};
+        Integer[] columnWidths = new Integer[]{10,20,50,20,20,20,20,20,20,20,20,20,20,50,20,60,60,20};
         model.put("columnWidths", columnWidths);
         model.put("fileName", "客商基本信息.xls");
         model.put("sheetName", "客商基本信息");
@@ -427,11 +482,11 @@ public class ImportExportAction extends BaseAction {
         else customers = customerInfoManagerService.loadSelectedCustomers(cids);
         List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
         model.put("list", exportCustomer);
-        String[] titles = new String[] { "公司中文名", "姓名", "性别", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
+        String[] titles = new String[] { "ID","注册编号", "公司", "姓名", "性别","电话", "国家", "城市", "邮箱", "手机", "传真", "网址", "地址", "登记时间","随行人员","随行人员联系方式","感兴趣产品" };
         model.put("titles", titles);
-        String[] columns = new String[] { "company", "name", "sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "remark" };
+        String[] columns = new String[] { "id","checkingNo", "company", "name",  "sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "createdTime","accompanyName", "accompanyContact","tmp_Interest" };
         model.put("columns", columns);
-        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20};
+        Integer[] columnWidths = new Integer[]{10,20,50,20,20,20,20,20,20,20,20,20,20,50,60,60,20};
         model.put("columnWidths", columnWidths);
         model.put("fileName", "客商基本信息.xls");
         model.put("sheetName", "客商基本信息");

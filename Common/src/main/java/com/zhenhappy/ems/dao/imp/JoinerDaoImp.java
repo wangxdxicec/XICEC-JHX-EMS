@@ -5,6 +5,7 @@ import java.util.List;
 import com.zhenhappy.ems.dao.JoinerDao;
 import com.zhenhappy.ems.entity.TExhibitorJoiner;
 
+import com.zhenhappy.ems.entity.TExhibitorJoinerEx;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 

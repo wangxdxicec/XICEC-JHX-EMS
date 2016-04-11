@@ -355,6 +355,44 @@ public class ImportExportService extends ExhibitorService {
 				}else{
 					exportCustomerInfo.setCountryString("");
 				}
+				StringBuffer accompanyName = new StringBuffer();
+				StringBuffer accompanyContact = new StringBuffer();
+				if(StringUtils.isNotEmpty(customer.getTmp_V_name1()) && !"null".equals(customer.getTmp_V_name1())) {
+					accompanyName.append("人员1：" + customer.getTmp_V_name1());
+				} else {
+					accompanyName.append("人员1：无");
+				}
+				if(StringUtils.isNotEmpty(customer.getTmp_V_name2()) && !"null".equals(customer.getTmp_V_name2())) {
+					accompanyName.append(", 人员2：" + customer.getTmp_V_name2());
+				} else {
+					accompanyName.append(", 人员2：无");
+				}
+				if(StringUtils.isNotEmpty(customer.getTmp_V_name3()) && !"null".equals(customer.getTmp_V_name3())) {
+					accompanyName.append(", 人员3：" + customer.getTmp_V_name3());
+				} else {
+					accompanyName.append(", 人员3：无");
+				}
+				if(StringUtils.isNotEmpty(customer.getTmp_V_contact1()) && !"null".equals(customer.getTmp_V_contact1())) {
+					accompanyContact.append("人员联系1：" + customer.getTmp_V_contact1());
+				} else {
+					accompanyContact.append("人员联系1：无");
+				}
+				if(StringUtils.isNotEmpty(customer.getTmp_V_contact2()) && !"null".equals(customer.getTmp_V_contact2())) {
+					accompanyContact.append(", 人员联系2：" + customer.getTmp_V_contact2());
+				} else {
+					accompanyContact.append(", 人员联系2：无");
+				}
+				if(StringUtils.isNotEmpty(customer.getTmp_V_contact3()) && !"null".equals(customer.getTmp_V_contact3())) {
+					accompanyContact.append(", 人员联系3：" + customer.getTmp_V_contact3());
+				} else {
+					accompanyContact.append(", 人员联系3：无");
+				}
+				exportCustomerInfo.setId(customer.getId());
+				exportCustomerInfo.setTmp_Interest(customer.getTmp_Interest());
+				exportCustomerInfo.setCheckingNo(customer.getCheckingNo());
+				exportCustomerInfo.setAccompanyName(accompanyName.toString());
+				exportCustomerInfo.setAccompanyContact(accompanyContact.toString());
+				exportCustomerInfo.setCreatedTime(customer.getCreateTime());
 				BeanUtils.copyProperties(customer, exportCustomerInfo);
 				exportCustomerInfos.add(exportCustomerInfo);
 			}

@@ -250,7 +250,7 @@
 			filterParm += '&contentEn=' + document.getElementById("articleContentEn").value;
 		}
 		$('#articles').datagrid('options').url = '${base}/user/queryArticlesByPage' + filterParm;
-	    $('#articles').datagrid('reload'); 
+	    $('#articles').datagrid('reload');
 	}
 //----------------------------------------------------自定义函数结束--------------------------------------------------------//
 
@@ -301,11 +301,11 @@
 	        	document.modifyArticleForm.digestEn.value = field.digestEn;
 	        	$("#modifyArticleDlg").dialog("open");
             }
-        }).datagrid('getPager').pagination({  
-            pageSize: 20,//每页显示的记录条数，默认为10  
-            pageList: [10,20,30,40,50],//可以设置每页记录条数的列表  
-            beforePageText: '第',//页数文本框前显示的汉字  
-            afterPageText: '页    共 {pages} 页',  
+        }).datagrid('getPager').pagination({
+            pageSize: 20,//每页显示的记录条数，默认为10
+            pageList: [10,20,30,40,50],//可以设置每页记录条数的列表
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
             displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
         });
         function findCheckedItem(id) {
@@ -314,7 +314,7 @@
 			}
 			return -1;
 		}
-    	
+
      	// 添加公告弹出框
         $('#addArticleDlg').dialog({
             title: '添加公告',
@@ -332,7 +332,7 @@
                     	var addContentEn = CKEDITOR.instances.addContentEn.getData();
                     	document.getElementById("addContent").value = addContent;
                     	document.getElementById("addContentEn").value = addContentEn;
-                    	
+
                     	if ($("#addArticleForm").form("validate")) {
                     		if(document.addArticleForm.title.value.trim() != ""){
                     			if(document.addArticleForm.digest.value.trim() != ""){
@@ -424,7 +424,7 @@
                     	var modifyContentEn = CKEDITOR.instances.modifyContentEn.getData();
                     	document.getElementById("modifyContent").value = modifyContent;
                     	document.getElementById("modifyContentEn").value = modifyContentEn;
-                    	
+
                     	if ($("#modifyArticleForm").form("validate")) {
                     		if(document.modifyArticleForm.title.value.trim() != ""){
                     			if(document.modifyArticleForm.digest.value.trim() != ""){
