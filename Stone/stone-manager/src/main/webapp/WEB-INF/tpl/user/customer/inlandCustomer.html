@@ -39,37 +39,45 @@
 			<thead>
 			<tr>
 				<th data-options="field:'ck',checkbox:true"></th>
-				<th data-options="field: 'firstName', width: $(this).width() / 8">
+				<th data-options="field: 'firstName', width: $(this).width() / 7">
 					姓名<br/>
 					<input id="customerFirstName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'company', width: $(this).width() / 8">
+				<th data-options="field: 'company', width: $(this).width() / 7">
 					公司名称<br/>
 					<input id="customerCompany" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'city', width: $(this).width() / 8">
+				<th data-options="field: 'city', width: $(this).width() / 7">
 					城市<br/>
 					<input id="customerCity" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'address', width: $(this).width() / 8">
+				<th data-options="field: 'address', width: $(this).width() / 7">
 					地址<br/>
 					<input id="customerAddress" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'mobilePhone', width: $(this).width() / 8">
+				<th data-options="field: 'mobilePhone', width: $(this).width() / 7">
 					手机<br/>
 					<input id="customerMobilePhone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'telephone', width: $(this).width() / 8">
+				<th data-options="field: 'telephone', width: $(this).width() / 7">
 					电话<br/>
 					<input id="customerTelephone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'email', width: $(this).width() / 8">
+				<th data-options="field: 'email', width: $(this).width() / 7">
 					邮箱<br/>
 					<input id="customerEmail" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'createdTime', formatter:formatDatebox, width: $(this).width() / 8">
+				<th data-options="field: 'createdTime', formatter:formatDatebox, width: $(this).width() / 7">
 					登记时间<br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'isProfessional', formatter: formatStatus, width: $(this).width() / 7">
+					<span id="sisProfessional" class="sortable">状态</span><br/>
+					<select id="customerIsProfessional" style="width:104%;height:21px;" onchange="filter();">
+						<option selected value="">全部</option>
+						<option value="0">普通</option>
+						<option value="1">专业</option>
+					</select>
 				</th>
 			</tr>
 			</thead>
@@ -79,6 +87,9 @@
 <!-- 导出展商到Excel -->
 <form id="exportInlandCustomersToExcel" action="${base}/user/exportInlandCustomersToExcel" method="post">
 	<div id="cidParm3"></div>
+</form>
+<form id="exportInlandCustomerSurveyToExcel" action="${base}/user/exportAllCustomerSurveyToExcel" method="post">
+	<div id="cidParm4"></div>
 </form>
 <!-- 工具栏 -->
 <div id="customerbar">
@@ -102,6 +113,8 @@
 	<div id="export" style="width:180px;">
 		<div id="exportAllCustomers" iconCls="icon-redo">所有客商信息到Excel</div>
 		<div id="exportSelectedCustomers" iconCls="icon-redo">所选客商信息到Excel</div>
+		<div class="menu-sep"></div>
+		<div id="exportAllCustomerSurvey" iconCls="icon-redo">导出所有客商问卷调查</div>
 	</div>
 </div>
 
@@ -278,6 +291,14 @@
 			$.messager.alert('提示', '请至少选择一项客商再导出');
 		}
 	});
+	//导出所有客商问卷调查
+	$('#exportAllCustomerSurvey').click(function(){
+		cidParm4.innerHTML = "";
+		var node = "<input type='hidden' name='cids' value='-1'/>";
+		cidParm4.innerHTML += node;
+		document.getElementById("exportInlandCustomerSurveyToExcel").submit();
+		$.messager.alert('提示', '导出所有客商问卷调查成功');
+	});
 	//----------------------------------------------------工具栏函数结束--------------------------------------------------------//
 	//----------------------------------------------------自定义函数开始--------------------------------------------------------//
 	//日期时间格式转换
@@ -299,6 +320,14 @@
 		}
 
 		return dt.format("yyyy-MM-dd h:m");   //这里用到一个javascript的Date类型的拓展方法，这个是自己添加的拓展方法，在后面的步骤3定义
+	}
+
+	function formatStatus(val, row) {
+		if (val == 0) {
+			return '普通';
+		} else {
+			return '专业';
+		}
 	}
 
 	Date.prototype.format = function (format)
@@ -346,6 +375,9 @@
 		}
 		if(document.getElementById("createdTime").value != ""){
 			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
+		}
+		if(document.getElementById("customerIsProfessional").value != ""){
+			filterParm += '&isProfessional=' + document.getElementById("customerIsProfessional").value;
 		}
 		filterParm += '&inlandOrForeign=1';
 		$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;

@@ -54,7 +54,7 @@ public class WCustomer implements java.io.Serializable {
 	private Date sendEmailDate;
 	private Boolean isDisabled;
 	private String guid;
-	private Boolean isProfessional;
+	private Integer isProfessional;
 	private Boolean isjudged;
 	private Boolean isMobile;
 
@@ -78,7 +78,7 @@ public class WCustomer implements java.io.Serializable {
 					 String fax, String faxCode2, String website, String remark,
 					 String createdIp, Date createdTime, String updatedIp,
 					 Date updateTime, Integer sendEmailNum,Integer sendMsgNum,
-					 Date sendEmailDate, Boolean isDisabled, String guid, Boolean isProfessional, Boolean isjudged, Boolean isMobile) {
+					 Date sendEmailDate, Boolean isDisabled, String guid, Integer isProfessional, Boolean isjudged, Boolean isMobile) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -335,7 +335,7 @@ public class WCustomer implements java.io.Serializable {
 		this.remark = remark;
 	}
 
-	@Column(name = "CreatedIP")
+	@Column(name = "CreateIP")
 	public String getCreatedIp() {
 		return this.createdIp;
 	}
@@ -344,7 +344,7 @@ public class WCustomer implements java.io.Serializable {
 		this.createdIp = createdIp;
 	}
 
-	@Column(name = "CreatedTime", length = 23)
+	@Column(name = "CreateTime", length = 23)
 	public Date getCreatedTime() {
 		return this.createdTime;
 	}
@@ -353,7 +353,7 @@ public class WCustomer implements java.io.Serializable {
 		this.createdTime = createdTime;
 	}
 
-	@Column(name = "UpdatedIP")
+	@Column(name = "UpdateIP")
 	public String getUpdatedIp() {
 		return this.updatedIp;
 	}
@@ -417,11 +417,11 @@ public class WCustomer implements java.io.Serializable {
 	}
 
 	@Column(name = "IsProfessional")
-	public Boolean getIsProfessional() {
+	public Integer getIsProfessional() {
 		return isProfessional;
 	}
 
-	public void setIsProfessional(Boolean professional) {
+	public void setIsProfessional(Integer professional) {
 		isProfessional = professional;
 	}
 

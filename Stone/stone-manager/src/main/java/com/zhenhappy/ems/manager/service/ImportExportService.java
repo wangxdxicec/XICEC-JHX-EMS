@@ -4,6 +4,7 @@ import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
+import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
 import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.ems.service.ExhibitorService;
@@ -102,8 +103,8 @@ public class ImportExportService extends ExhibitorService {
 				}else{
 					QueryExhibitorInfo queryExhibitorInfo = new QueryExhibitorInfo();
 					queryExhibitorInfo.setBoothNumber(exhibitorManagerService.loadBoothNum(exhibitor.getEid()));
-					queryExhibitorInfo.setCompany(exhibitor.getCompany());
-					queryExhibitorInfo.setCompanyEn(exhibitor.getCompanye());
+					queryExhibitorInfo.setCompany(exhibitorInfo.getCompany());
+					queryExhibitorInfo.setCompanyEn(exhibitorInfo.getCompanyEn());
 					queryExhibitorInfos.add(queryExhibitorInfo);
 				}
 			}
@@ -163,6 +164,7 @@ public class ImportExportService extends ExhibitorService {
         List<ExportContact> exportContacts = new ArrayList<ExportContact>();
         if(exhibitors != null){
             for(TExhibitor exhibitor:exhibitors){
+				TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(exhibitor.getEid());
                 List<TContact> contacts = contactManagerService.loadContactByEid(exhibitor.getEid());
                 String booth_number = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
                 if(contacts != null){
@@ -170,8 +172,8 @@ public class ImportExportService extends ExhibitorService {
                         ExportContact exportContact = new ExportContact();
                         BeanUtils.copyProperties(contact,exportContact);
                         exportContact.setBoothNumber(booth_number);
-                        exportContact.setCompany(exhibitor.getCompany());
-                        exportContact.setCompanye(exhibitor.getCompanye());
+                        exportContact.setCompany(exhibitorInfo.getCompany());
+                        exportContact.setCompanye(exhibitorInfo.getCompanyEn());
                         exportContacts.add(exportContact);
                     }
                 }
@@ -189,6 +191,7 @@ public class ImportExportService extends ExhibitorService {
 		List<ExportExhibitorJoiner> exportExhibitorJoiners = new ArrayList<ExportExhibitorJoiner>();
 		if(exhibitors != null){
 			for(TExhibitor exhibitor:exhibitors){
+				TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(exhibitor.getEid());
 				List<TExhibitorJoiner> joiners = joinerManagerService.loadExhibitorJoinerByEid(exhibitor.getEid());
 				String booth_number = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
 				if(joiners != null){
@@ -196,8 +199,8 @@ public class ImportExportService extends ExhibitorService {
 						ExportExhibitorJoiner exportExhibitorJoiner = new ExportExhibitorJoiner();
 						BeanUtils.copyProperties(joiner,exportExhibitorJoiner);
 						exportExhibitorJoiner.setBoothNumber(booth_number);
-						exportExhibitorJoiner.setCompany(exhibitor.getCompany());
-						exportExhibitorJoiner.setCompanye(exhibitor.getCompanye());
+						exportExhibitorJoiner.setCompany(exhibitorInfo.getCompany());
+						exportExhibitorJoiner.setCompanye(exhibitorInfo.getCompanyEn());
 						exportExhibitorJoiners.add(exportExhibitorJoiner);
 					}
 				}
@@ -216,10 +219,15 @@ public class ImportExportService extends ExhibitorService {
 		List<ExportTVisa> queryExportTVisas = new ArrayList<ExportTVisa>();
 		if(tVisas != null){
 			for(TVisa tVisa:tVisas){
+				TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(tVisa.getEid());
 				TExhibitor exhibitor = exhibitorManagerService.loadExhibitorByEid(tVisa.getEid());
 				if(exhibitor != null){
 					ExportTVisa queryExportTVisa = new ExportTVisa();
-					queryExportTVisa.setExhibitor(exhibitor.getCompanye());
+					if(exhibitorInfo != null){
+						queryExportTVisa.setExhibitor(exhibitorInfo.getCompanyEn());
+					} else {
+						queryExportTVisa.setExhibitor("");
+					}
 					queryExportTVisa.setPassportName(tVisa.getPassportName());
 					queryExportTVisa.setPassportNo(tVisa.getPassportNo());
 					queryExportTVisa.setNationality(tVisa.getNationality());
@@ -255,7 +263,6 @@ public class ImportExportService extends ExhibitorService {
 							queryExportTVisa.setTel("");
 						}
 					}
-					TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(tVisa.getEid());
 					if(exhibitorInfo != null){
 						if(StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())){
 							queryExportTVisa.setCompanyName(exhibitorInfo.getCompanyEn());
@@ -524,11 +531,12 @@ public class ImportExportService extends ExhibitorService {
 					report.add("第" + (j+1) + "行有问题,原因:公司中文名"+ company +"或英文名"+ companye +"存在重复");
 					continue;//公司中文名或英文名存在重复
 				}
-				exhibitor.setCompany(company);
+				//exhibitor.setCompany(company);
 				exhibitorInfo.setCompany(company);
-				exhibitor.setCompanye(companye);
+				//exhibitor.setCompanye(companye);
 				exhibitorInfo.setCompanyEn(companye);
-				exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
+				//exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
+				exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(company.trim()));
 				if(request.getCountry() != null) exhibitor.setCountry(request.getCountry());
 				if(request.getProvince() != null) exhibitor.setProvince(request.getProvince());
 				if(request.getArea() != null) exhibitor.setArea(request.getArea());
@@ -586,10 +594,10 @@ public class ImportExportService extends ExhibitorService {
 					File srcFile = new File(exhibitorInfo.getLogo().replaceAll("\\\\\\\\", "\\\\").replaceAll("/", "\\\\"));
 					if (srcFile.exists() == false) continue;
 					File destFile = null;
-					if(StringUtils.isNotEmpty(exhibitor.getCompanye())){
-						destFile = new File(destDir + "\\" + exhibitor.getCompanye().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
+					if(StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())){
+						destFile = new File(destDir + "\\" + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
 					}else{
-						destFile = new File(destDir + "\\" + exhibitor.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
+						destFile = new File(destDir + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
 					}
 					if(destFile != null) FileUtils.copyFile(srcFile, destFile);
 				}
@@ -606,5 +614,51 @@ public class ImportExportService extends ExhibitorService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 导出客商问卷调查数据
+	 * @param customers
+	 * @return
+	 */
+	public List<ExportCustomerSurvey> exportCustomerSurvey(List<TVisitor_Info_Survey> customers) {
+		List<ExportCustomerSurvey> exportCustomerInfos = new ArrayList<ExportCustomerSurvey>();
+		if(customers.size() > 0){
+			for(TVisitor_Info_Survey customer:customers){
+				ExportCustomerSurvey exportCustomerInfo = new ExportCustomerSurvey();
+				WCustomer customerInfo = customerInfoManagerService.loadCustomerInfoById(customer.getwCustomerInfoID());
+				if(customerInfo != null){
+					exportCustomerInfo.setCustomerName(customerInfo.getFirstName());
+					exportCustomerInfo.setCompany(customerInfo.getCompany());
+					exportCustomerInfo.setEmail(customerInfo.getEmail());
+					exportCustomerInfo.setTelphone(customerInfo.getMobilePhone());
+				}
+				exportCustomerInfo.setId(customer.getwCustomerInfoID());
+				exportCustomerInfo.setCreatedTime(customer.getCreatedTime());
+				exportCustomerInfo.setCreatedIP(customer.getCreatedIP());
+				exportCustomerInfo.setDisabled(customer.getDisabledFlag());
+				exportCustomerInfo.setEmailSubject(customer.getEmailSubject());
+				exportCustomerInfo.setInviterEmail(customer.getInviterEmail());
+				exportCustomerInfo.setInviterName(customer.getInviterName());
+				exportCustomerInfo.setRemark1(customer.getRemark1());
+				exportCustomerInfo.setRemark2(customer.getRemark2());
+				exportCustomerInfo.setQ1(customer.getQ1());
+				exportCustomerInfo.setQ2(customer.getQ2());
+				exportCustomerInfo.setQ3(customer.getQ3());
+				exportCustomerInfo.setQ4(customer.getQ4());
+				exportCustomerInfo.setQ5(customer.getQ5());
+				exportCustomerInfo.setQ6(customer.getQ6());
+				exportCustomerInfo.setQ7(customer.getQ7());
+				exportCustomerInfo.setQ8(customer.getQ8());
+				exportCustomerInfo.setQ9(customer.getQ9());
+				exportCustomerInfo.setQ10(customer.getQ10());
+				exportCustomerInfo.setUpdatedIP(customer.getUpdatedIP());
+				exportCustomerInfo.setUpdateTime(customer.getUpdateTime());
+				exportCustomerInfo.setWsc(customer.getWsc());
+				BeanUtils.copyProperties(customer, exportCustomerInfo);
+				exportCustomerInfos.add(exportCustomerInfo);
+			}
+		}
+		return exportCustomerInfos;
 	}
 }

@@ -19,6 +19,7 @@ public class TExhibitorInfo implements java.io.Serializable {
 	private String organizationCode;
 	private String company;
 	private String companyEn;
+    private String companyT;
 	private String phone;
 	private String fax;
 	private String email;
@@ -59,12 +60,13 @@ public class TExhibitorInfo implements java.io.Serializable {
     /**
      * full constructor
      */
-    public TExhibitorInfo(Integer einfoid, Integer eid, String organizationCode, String company, String companyEn, String phone, String fax, String email, String website, String address, String addressEn, String zipcode, String mainProduct, String mainProductEn, String logo, String mark, String emark, String meipai, String meipaiEn, Integer isDelete, Date createTime, Date updateTime, Integer adminUser, Date adminUpdateTime, String classjson, String brandsData) {
+    public TExhibitorInfo(Integer einfoid, Integer eid, String organizationCode, String company, String companyEn, String companyT,String phone, String fax, String email, String website, String address, String addressEn, String zipcode, String mainProduct, String mainProductEn, String logo, String mark, String emark, String meipai, String meipaiEn, Integer isDelete, Date createTime, Date updateTime, Integer adminUser, Date adminUpdateTime, String classjson, String brandsData) {
         this.einfoid = einfoid;
         this.eid = eid;
         this.organizationCode = organizationCode;
         this.company = company;
         this.companyEn = companyEn;
+        this.companyT = companyT;
         this.phone = phone;
         this.fax = fax;
         this.email = email;
@@ -160,6 +162,15 @@ public class TExhibitorInfo implements java.io.Serializable {
 
     public void setCompanyEn(String companyEn) {
         this.companyEn = companyEn;
+    }
+
+    @Column(name = "company_t", length = 500)
+    public String getCompanyT() {
+        return companyT;
+    }
+
+    public void setCompanyT(String companyT) {
+        this.companyT = companyT;
     }
 
 	@Column(name = "create_time", length = 23)

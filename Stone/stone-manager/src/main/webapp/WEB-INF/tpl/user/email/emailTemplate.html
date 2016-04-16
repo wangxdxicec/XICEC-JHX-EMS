@@ -66,6 +66,24 @@
 					</td>
 				</tr>
 				<tr>
+					<td style="width: 130px;text-align: left">普通客商信息未完整标题中文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="2" name="mail_register_subject_cn_unpro" id="mail_register_subject_cn_unpro"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 130px;text-align: left">普通客商信息未完整内容中文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="15" name="mail_register_content_cn_unpro" id="mail_register_content_cn_unpro"></textarea>
+					</td>
+				</tr>
+				<tr>
 					<td style="width: 130px;text-align: left">邮箱注册声明中文：</td>
 					<td></td>
 				</tr>
@@ -115,6 +133,24 @@
 					</td>
 				</tr>
 				<tr>
+					<td style="width: 130px;text-align: left">普通客商信息未完整标题英文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="2" name="mail_register_subject_en_unpro" id="mail_register_subject_en_unpro"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 130px;text-align: left">普通客商信息未完整内容英文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="15" name="mail_register_content_en_unpro" id="mail_register_content_en_unpro"></textarea>
+					</td>
+				</tr>
+				<tr>
 					<td style="width: 130px;text-align: left">邮箱注册声明英文：</td>
 					<td></td>
 				</tr>
@@ -135,6 +171,10 @@
 	<button type="button" class="btn btn-primary" onclick="preMailChineseInviteTemplate()">中文版邀请预览</button>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<button type="button" class="btn btn-primary" onclick="preMailEnglishInviteTemplate()">英文版邀请预览</button>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<button type="button" class="btn btn-primary" onclick="preMailChineseNormalCustomerTemplate()">中文版普通客商预览</button>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<button type="button" class="btn btn-primary" onclick="preMailEnglishNormalCustomerTemplate()">英文版普通客商预览</button>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<button type="button" class="btn btn-primary" id="savemail">确认修改</button>
 </div>
@@ -181,6 +221,22 @@
 		newwin.document.close();
 	}
 
+	function preMailChineseNormalCustomerTemplate() {
+		var code = document.getElementById("mail_register_content_cn_unpro").value;//即要运行的代码。
+		var newwin = window.open('','','');  //打开一个窗口并赋给变量newwin。
+		newwin.opener = null // 防止代码对论谈页面修改
+		newwin.document.write(code);  //向这个打开的窗口中写入代码code，这样就实现了运行代码功能。
+		newwin.document.close();
+	}
+
+	function preMailEnglishNormalCustomerTemplate() {
+		var code = document.getElementById("mail_register_content_en_unpro").value;//即要运行的代码。
+		var newwin = window.open('','','');  //打开一个窗口并赋给变量newwin。
+		newwin.opener = null // 防止代码对论谈页面修改
+		newwin.document.write(code);  //向这个打开的窗口中写入代码code，这样就实现了运行代码功能。
+		newwin.document.close();
+	}
+
 	function queryEmailManagerTemplateByPage() {
 		$.ajax({
 			url: "${base}/user/queryEmailManagerTemplateByPage",
@@ -208,7 +264,18 @@
 								document.getElementById("mail_invite_content_cn").value = map["tpl_value"];
 							}else if(equalsIgnoreCase(map[key],"mail_invite_content_en")){
 								document.getElementById("mail_invite_content_en").value = map["tpl_value"];
-							}else if(equalsIgnoreCase(map[key],"mail_register_policyDeclare_cn")){
+							}
+							else if(equalsIgnoreCase(map[key],"mail_register_subject_cn_unpro")){
+								document.getElementById("mail_register_subject_cn_unpro").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"mail_register_content_cn_unpro")){
+								document.getElementById("mail_register_content_cn_unpro").value = map["tpl_value"];
+							}
+							else if(equalsIgnoreCase(map[key],"mail_register_subject_en_unpro")){
+								document.getElementById("mail_register_subject_en_unpro").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"mail_register_content_en_unpro")){
+								document.getElementById("mail_register_content_en_unpro").value = map["tpl_value"];
+							}
+							else if(equalsIgnoreCase(map[key],"mail_register_policyDeclare_cn")){
 								document.getElementById("mail_register_policyDeclare_cn").value = map["tpl_value"];
 							}else if(equalsIgnoreCase(map[key],"mail_register_policyDeclare_en")){
 								document.getElementById("mail_register_policyDeclare_en").value = map["tpl_value"];
@@ -237,6 +304,10 @@
 							"mail_invite_subject_en": $("#mail_invite_subject_en").val(),
 							"mail_invite_content_cn": $("#mail_invite_content_cn").val(),
 							"mail_invite_content_en": $("#mail_invite_content_en").val(),
+							"mail_register_subject_cn_unpro": $("#mail_register_subject_cn_unpro").val(),
+							"mail_register_content_cn_unpro": $("#mail_register_content_cn_unpro").val(),
+							"mail_register_subject_en_unpro": $("#mail_register_subject_en_unpro").val(),
+							"mail_register_content_en_unpro": $("#mail_register_content_en_unpro").val(),
 							"mail_register_policyDeclare_cn": $("#mail_register_policyDeclare_cn").val(),
 							"mail_register_policyDeclare_en": $("#mail_register_policyDeclare_en").val()},
 						success: function (data) {

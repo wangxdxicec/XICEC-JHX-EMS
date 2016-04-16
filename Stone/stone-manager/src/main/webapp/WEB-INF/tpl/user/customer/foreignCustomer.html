@@ -70,6 +70,14 @@
 					<span id="screatedTime" class="sortable">登记时间</span><br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
+				<th data-options="field: 'isProfessional', formatter: formatStatus, width: $(this).width() / 7">
+					<span id="sisProfessional" class="sortable">状态</span><br/>
+					<select id="customerIsProfessional" style="width:104%;height:21px;" onchange="filter();">
+						<option selected value="">全部</option>
+						<option value="0">普通</option>
+						<option value="1">专业</option>
+					</select>
+				</th>
 			</tr>
 			</thead>
 		</table>
@@ -233,8 +241,15 @@
 				dt.setTime(value);
 			}
 		}
-
 		return dt.format("yyyy-MM-dd h:m");   //这里用到一个javascript的Date类型的拓展方法，这个是自己添加的拓展方法，在后面的步骤3定义
+	}
+
+	function formatStatus(val, row) {
+		if (val == 0) {
+			return '普通';
+		} else {
+			return '专业';
+		}
 	}
 
 	Date.prototype.format = function (format)
@@ -297,6 +312,9 @@
 		}
 		if(document.getElementById("createdTime").value != ""){
 			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
+		}
+		if(document.getElementById("customerIsProfessional").value != ""){
+			filterParm += '&isProfessional=' + document.getElementById("customerIsProfessional").value;
 		}
 		filterParm += '&inlandOrForeign=2';
 		$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;

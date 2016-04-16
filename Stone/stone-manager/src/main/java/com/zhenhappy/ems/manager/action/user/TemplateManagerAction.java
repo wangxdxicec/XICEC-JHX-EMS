@@ -61,21 +61,26 @@ public class TemplateManagerAction extends BaseAction {
     @ResponseBody
     @RequestMapping(value = "updateEmailManagerTemplateByPage")
     public BaseResponse updateEmailManagerTemplateByPage(@ModelAttribute QueryEmailTemplateRequest request,
-                                                                 @RequestParam(value = "mail_register_subject_cn", defaultValue = "") String mail_register_subject_cn,
-                                                                 @RequestParam(value = "mail_register_subject_en", defaultValue = "") String mail_register_subject_en,
-                                                                 @RequestParam(value = "mail_register_content_cn", defaultValue = "") String mail_register_content_cn,
-                                                                 @RequestParam(value = "mail_register_content_en", defaultValue = "") String mail_register_content_en,
-                                                                 @RequestParam(value = "mail_invite_subject_cn", defaultValue = "") String mail_invite_subject_cn,
-                                                                 @RequestParam(value = "mail_invite_subject_en", defaultValue = "") String mail_invite_subject_en,
-                                                                 @RequestParam(value = "mail_invite_content_cn", defaultValue = "") String mail_invite_content_cn,
-                                                                 @RequestParam(value = "mail_invite_content_en", defaultValue = "") String mail_invite_content_en,
-                                                                 @RequestParam(value = "mail_register_policyDeclare_cn", defaultValue = "") String mail_register_policyDeclare_cn,
-                                                                 @RequestParam(value = "mail_register_policyDeclare_en", defaultValue = "") String mail_register_policyDeclare_en) {
+                                                         @RequestParam(value = "mail_register_subject_cn", defaultValue = "") String mail_register_subject_cn,
+                                                         @RequestParam(value = "mail_register_subject_en", defaultValue = "") String mail_register_subject_en,
+                                                         @RequestParam(value = "mail_register_content_cn", defaultValue = "") String mail_register_content_cn,
+                                                         @RequestParam(value = "mail_register_content_en", defaultValue = "") String mail_register_content_en,
+                                                         @RequestParam(value = "mail_invite_subject_cn", defaultValue = "") String mail_invite_subject_cn,
+                                                         @RequestParam(value = "mail_invite_subject_en", defaultValue = "") String mail_invite_subject_en,
+                                                         @RequestParam(value = "mail_invite_content_cn", defaultValue = "") String mail_invite_content_cn,
+                                                         @RequestParam(value = "mail_invite_content_en", defaultValue = "") String mail_invite_content_en,
+                                                         @RequestParam(value = "mail_register_subject_cn_unpro", defaultValue = "") String mail_register_subject_cn_unpro,
+                                                         @RequestParam(value = "mail_register_content_cn_unpro", defaultValue = "") String mail_register_content_cn_unpro,
+                                                         @RequestParam(value = "mail_register_subject_en_unpro", defaultValue = "") String mail_register_subject_en_unpro,
+                                                         @RequestParam(value = "mail_register_content_en_unpro", defaultValue = "") String mail_register_content_en_unpro,
+                                                         @RequestParam(value = "mail_register_policyDeclare_cn", defaultValue = "") String mail_register_policyDeclare_cn,
+                                                         @RequestParam(value = "mail_register_policyDeclare_en", defaultValue = "") String mail_register_policyDeclare_en) {
         BaseResponse response = new BaseResponse();
         try {
             customerTemplaeService.modifyEmailManagerTemplate(mail_register_subject_cn,mail_register_subject_en,mail_register_content_cn,
                     mail_register_content_en,mail_invite_subject_cn,mail_invite_subject_en,mail_invite_content_cn,mail_invite_content_en,
-                    mail_register_policyDeclare_cn,mail_register_policyDeclare_en);
+                    mail_register_subject_cn_unpro,mail_register_content_cn_unpro,mail_register_subject_en_unpro,
+                    mail_register_content_en_unpro,mail_register_policyDeclare_cn,mail_register_policyDeclare_en);
             response.setResultCode(0);
         } catch (Exception e) {
             log.error("modify exhibitor group error.", e);

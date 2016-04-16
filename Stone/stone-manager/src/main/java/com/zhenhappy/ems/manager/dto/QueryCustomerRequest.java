@@ -18,6 +18,7 @@ public class QueryCustomerRequest extends EasyuiRequest {
 	private String createTime;
 	private String website;
 	private String fax;
+	private Integer isProfessional;
 	private Integer inlandOrForeign;  //1:表示国内客商  2：表示国外客商
 
 	public Integer getId() {
@@ -138,5 +139,13 @@ public class QueryCustomerRequest extends EasyuiRequest {
 
 	public void setCreateTime(String createdTime) {
 		this.createTime = createdTime;
+	}
+
+	public Integer getIsProfessional() {
+		return isProfessional;
+	}
+
+	public void setIsProfessional(Integer isProfessional) {
+		this.isProfessional = isProfessional;
 	}
 }

@@ -1,9 +1,13 @@
 package com.zhenhappy.ems.manager.action.user;
 
 import java.util.Date;
+import java.util.List;
 
+import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
+import com.zhenhappy.ems.entity.WCustomer;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.util.EmailPattern;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,6 +48,7 @@ public class CustomerAction extends BaseAction {
         ModelAndView modelAndView = new ModelAndView("user/customer/customerInfo");
         modelAndView.addObject("id", id);
         modelAndView.addObject("customer", customerInfoManagerService.loadCustomerInfoById(id));
+        modelAndView.addObject("customerSurvey", customerInfoManagerService.loadCustomerSurveyInfoById(id));
         /*modelAndView.addObject("exhibitor", exhibitorManagerService.loadExhibitorByEid(eid));
         modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(eid));
         modelAndView.addObject("booth", exhibitorManagerService.queryBoothByEid(eid));
@@ -57,6 +62,25 @@ public class CustomerAction extends BaseAction {
     }
 
     /**
+     * 根据客商ID获取公司名称
+     *
+     * @param id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "getCompanyByCustomerId", method = RequestMethod.POST)
+    public BaseResponse getCompanyByCustomerId(@RequestParam("id") Integer id) {
+        BaseResponse response = new BaseResponse();
+        WCustomer customer = customerInfoManagerService.loadCustomerInfoById(id);
+        if(customer != null) {
+            response.setDescription(customer.getCompany());
+        } else {
+            response.setDescription("");
+        }
+        return response;
+    }
+
+    /**
      * 修改客商账号
      * @param request
      * @param principle
@@ -67,7 +91,23 @@ public class CustomerAction extends BaseAction {
     public BaseResponse modifyCustomerAccount(@ModelAttribute ModifyCustomerInfo request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
-            customerInfoManagerService.modifyCustomerAccount(request, principle.getAdmin().getId());
+            EmailPattern pattern = new EmailPattern();
+            if(pattern.isEmailPattern(request.getEmail())) {
+                List<WCustomer> wCustomers = customerInfoManagerService.loadCustomerByEmail(request.getEmail());
+                if(wCustomers == null){
+                    customerInfoManagerService.modifyCustomerAccount(request, principle.getAdmin().getId());
+                } else {
+                    response.setDescription("邮箱不能重复");
+                    response.setResultCode(3);
+                }
+            } else {
+                response.setResultCode(2);
+                response.setDescription("请输入有效的邮箱格式");
+            }
+            if(!pattern.isMobileNO(request.getMobilePhone())) {
+                response.setResultCode(2);
+                response.setDescription("请输入有效的手机号码");
+            }
         } catch (DuplicateUsernameException e) {
             response.setResultCode(2);
             response.setDescription(e.getMessage());
@@ -167,6 +207,94 @@ public class CustomerAction extends BaseAction {
 		ModelAndView modelAndView = new ModelAndView("user/customer/foreignCustomer");
 		return modelAndView;
 	}
+
+    @RequestMapping(value = "emailApplyPage")
+    public ModelAndView directToEmailApplyPage() {
+        ModelAndView modelAndView = new ModelAndView("user/customer/emailApplyPage");
+        return modelAndView;
+    }
+
+    /**
+     * 分页查询邮件申请记录
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "loadEmailApplyByPage")
+    public QueryCustomerResponse loadEmailApplyByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.loadEmailApplyByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query email apply error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询邮件申请记录
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryEmailApplyByPage")
+    public QueryCustomerResponse queryEmailApplyByPage(@ModelAttribute QueryEmailOrMsgRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryEmailOrMsgApplyByPage(request, 1);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query email apply error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询短信申请记录
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryMsgApplyByPage")
+    public QueryCustomerResponse queryMsgApplyByPage(@ModelAttribute QueryEmailOrMsgRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryEmailOrMsgApplyByPage(request, 2);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query msg apply error.", e);
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "msgApplyPage")
+    public ModelAndView directToMmailApplyPage() {
+        ModelAndView modelAndView = new ModelAndView("user/customer/msgApplyPage");
+        return modelAndView;
+    }
+
+    /**
+     * 分页查询短信申请记录
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "loadMsgApplyByPage")
+    public QueryCustomerResponse loadMsgApplyByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.loadMsgApplyByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query msg apply error.", e);
+        }
+        return response;
+    }
     
     @ResponseBody
     @RequestMapping(value = "addCustomer", method = RequestMethod.POST)

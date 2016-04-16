@@ -84,10 +84,10 @@ public class ExhibitorManagerService extends ExhibitorService {
 			conditions.add(" e.eid in (select eid from TExhibitorBooth where boothNumber like '%" + new String(request.getBoothNumber().getBytes("ISO-8859-1"),"GBK") + "%') ");
         }
         if (StringUtils.isNotEmpty(request.getCompany())) {
-        	conditions.add(" (e.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"GBK") + "%' OR e.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+            conditions.add(" (i.company like '%" + request.getCompany() + "%' OR i.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"GBK") + "%' OR i.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%') ");
         }
         if (StringUtils.isNotEmpty(request.getCompanye())) {
-            conditions.add(" (e.companye like '%" + new String(request.getCompanye().getBytes("ISO-8859-1"),"GBK") + "%' OR e.companye like '%" + new String(request.getCompanye().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+            conditions.add(" (i.companyEn like '%" + request.getCompanye() + "%' OR i.companyEn like '%" + new String(request.getCompanye().getBytes("ISO-8859-1"),"GBK") + "%' OR i.companyEn like '%" + new String(request.getCompanye().getBytes("ISO-8859-1"),"utf-8") + "%') ");
         }
         if (request.getArea() != null) {
 			conditions.add(" e.area = " + request.getArea().intValue() + " ");
@@ -106,24 +106,30 @@ public class ExhibitorManagerService extends ExhibitorService {
         if(StringUtils.isNotEmpty(conditionsSql)){
         	conditionsSqlNoOrder = " where " + conditionsSql;
         }
-        conditions.add(" e.eid=b.eid ");
+        conditions.add(" e.eid=b.eid and e.eid=i.eid ");
         conditionsSql = StringUtils.join(conditions, " and ");
         String conditionsSqlOrder = "";
         if(StringUtils.isNotEmpty(request.getSort()) && StringUtils.isNotEmpty(request.getOrder())){
-        	if("boothNumber".equals(request.getSort())){
-        		conditionsSqlOrder = " where " + conditionsSql + " order by b." + request.getSort() + " " + request.getOrder() + " ";
-        	}else{
-        		conditionsSqlOrder = " where " + conditionsSql + " order by e." + request.getSort() + " " + request.getOrder() + " ";
-        	}
+            if(!"null".equals(request.getOrder())){
+                if("boothNumber".equals(request.getSort())){
+                    conditionsSqlOrder = " where " + conditionsSql + " order by b." + request.getSort() + " " + request.getOrder() + " ";
+                }else{
+                    //conditionsSqlOrder = " where " + conditionsSql + " order by e." + request.getSort() + " " + request.getOrder() + " ";
+                    //排序空值任何情况下都最后
+                    conditionsSqlOrder = " where " + conditionsSql + " order by case when (e." + request.getSort() + "='' or e." + request.getSort() + " is null) then 1 else 0 end , e." + request.getSort() + " " + request.getOrder() + " ";
+                }
+            }else{
+                conditionsSqlOrder = " where " + conditionsSql + " order by e.createTime ASC ";
+            }
         }else{
         	conditionsSqlOrder = " where " + conditionsSql + " order by e.createTime ASC ";
         }
         Page page = new Page();
         page.setPageSize(request.getRows());
         page.setPageIndex(request.getPage());
-        List<QueryExhibitor> exhibitors = exhibitorDao.queryPageByHQL("select count(*) from TExhibitor e " + conditionsSqlNoOrder,
-        		"select new com.zhenhappy.ems.manager.dto.QueryExhibitor(e.eid, e.username, e.password, e.area, e.company, e.companye, e.country, e.province, e.isLogout, e.tag, e.group, b.boothNumber, e.exhibitionArea) "
-        		+ "from TExhibitor e, TExhibitorBooth b " + conditionsSqlOrder, new Object[]{}, page);
+        List<QueryExhibitor> exhibitors = exhibitorDao.queryPageByHQL("select count(*) from TExhibitor e, TExhibitorInfo i " + conditionsSqlNoOrder,
+        		"select new com.zhenhappy.ems.manager.dto.QueryExhibitor(e.eid, e.username, e.password, e.area, i.company, i.companyEn, e.country, e.province, e.isLogout, e.tag, e.group, b.boothNumber, e.exhibitionArea) "
+        		+ "from TExhibitor e, TExhibitorBooth b, TExhibitorInfo i " + conditionsSqlOrder, new Object[]{}, page);
         for(QueryExhibitor exhibitor:exhibitors){
         	TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
     		if(exhibitorInfo != null){
@@ -225,9 +231,9 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @return
      */
     @Transactional
-    public TExhibitor loadAllExhibitorByCompany(String company) {
+    public TExhibitorInfo loadAllExhibitorByCompany(String company) {
 		if(StringUtils.isNotEmpty(company)){
-			List<TExhibitor> exhibitors = getHibernateTemplate().find("from TExhibitor where company = ?", new Object[]{company});
+			List<TExhibitorInfo> exhibitors = getHibernateTemplate().find("from TExhibitorInfo where company = ?", new Object[]{company});
     		return exhibitors.size() > 0 ? exhibitors.get(0) : null;
     	}else return null;
     }
@@ -239,13 +245,13 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @return
      */
     @Transactional
-    public TExhibitor loadAllExhibitorByCompany(String company, Integer exceptEid) {
+    public TExhibitorInfo loadAllExhibitorByCompany(String company, Integer exceptEid) {
 		if(StringUtils.isNotEmpty(company)){
-			List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
+			List<TExhibitorInfo> exhibitors = new ArrayList<TExhibitorInfo>();
 			if(exceptEid != null){
-				exhibitors = getHibernateTemplate().find("from TExhibitor where company = ? and eid <> ?", new Object[]{company, exceptEid.intValue()});
+				exhibitors = getHibernateTemplate().find("from TExhibitorInfo where company = ? and eid <> ?", new Object[]{company, exceptEid.intValue()});
 			}else{
-				exhibitors = getHibernateTemplate().find("from TExhibitor where company = ?", new Object[]{company});
+				exhibitors = getHibernateTemplate().find("from TExhibitorInfo where company = ?", new Object[]{company});
 			}
     		return exhibitors.size() > 0 ? exhibitors.get(0) : null;
     	}else return null;
@@ -257,9 +263,9 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @return
      */
     @Transactional
-    public TExhibitor loadAllExhibitorByCompanye(String companye) {
+    public TExhibitorInfo loadAllExhibitorByCompanye(String companye) {
     	if(StringUtils.isNotEmpty(companye)){
-			List<TExhibitor> exhibitors = getHibernateTemplate().find("from TExhibitor where companye = ?", new Object[]{companye});
+			List<TExhibitorInfo> exhibitors = getHibernateTemplate().find("from TExhibitorInfo where companyEn = ?", new Object[]{companye});
     		return exhibitors.size() > 0 ? exhibitors.get(0) : null;
     	}else return null;
     }
@@ -271,13 +277,13 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @return
      */
     @Transactional
-    public TExhibitor loadAllExhibitorByCompanye(String companye, Integer exceptEid) {
+    public TExhibitorInfo loadAllExhibitorByCompanye(String companye, Integer exceptEid) {
     	if(StringUtils.isNotEmpty(companye)){
-			List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
+			List<TExhibitorInfo> exhibitors = new ArrayList<TExhibitorInfo>();
 			if(exceptEid != null){
-				exhibitors = getHibernateTemplate().find("from TExhibitor where companye = ? and eid <> ?", new Object[]{companye, exceptEid.intValue()});
+				exhibitors = getHibernateTemplate().find("from TExhibitorInfo where companyEn = ? and eid <> ?", new Object[]{companye, exceptEid.intValue()});
 			}else{
-				exhibitors = getHibernateTemplate().find("from TExhibitor where companye = ?", new Object[]{companye});
+				exhibitors = getHibernateTemplate().find("from TExhibitorInfo where companyEn = ?", new Object[]{companye});
 			}
     		return exhibitors.size() > 0 ? exhibitors.get(0) : null;
     	}else return null;
@@ -308,8 +314,8 @@ public class ExhibitorManagerService extends ExhibitorService {
         	for(TExhibitor exhibitor:exhibitors){
         		TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
         		if(exhibitorInfo != null){
-        			exhibitorInfo.setCompany(exhibitor.getCompany());
-            		exhibitorInfo.setCompanyEn(exhibitor.getCompanye());
+        			/*exhibitorInfo.setCompany(exhibitor.getCompany());
+            		exhibitorInfo.setCompanyEn(exhibitor.getCompanye());*/
             		exhibitorInfos.add(exhibitorInfo);
         		}
         	}
@@ -493,9 +499,13 @@ public class ExhibitorManagerService extends ExhibitorService {
     		if(queryBoothByBoothNum(request.getBoothNumber()) != null) throw new DuplicateUsernameException("展位号重复");
     	}
     	TExhibitor exhibitor = new TExhibitor();
-        exhibitor.setCompany(request.getCompanyName().trim());
+        TExhibitorInfo exhibitorInfo = new TExhibitorInfo();
+        exhibitorInfo.setCompany(request.getCompanyName().trim());
+        exhibitorInfo.setCompanyEn(request.getCompanyNameE().trim());
+        exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(request.getCompanyName().trim()));
+        /*exhibitor.setCompany(request.getCompanyName().trim());
         exhibitor.setCompanye(request.getCompanyNameE().trim());
-        exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(request.getCompanyName().trim()));
+        exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(request.getCompanyName().trim()));*/
         exhibitor.setCountry(request.getCountry());
         exhibitor.setProvince(request.getProvince());
         exhibitor.setLevel(request.getLevel());
@@ -513,10 +523,16 @@ public class ExhibitorManagerService extends ExhibitorService {
         exhibitor.setCreateUser(adminId);
         exhibitor.setCreateTime(new Date());
         Integer eid = (Integer) getHibernateTemplate().save(exhibitor);
+        //---add by wangxd, begin---
+        exhibitorInfo.setEid(eid);
+        getHibernateTemplate().save(exhibitorInfo);
+        //---add by wangxd, end---
         ModifyExhibitorInfoRequest modifyExhibitorInfoRequest = new ModifyExhibitorInfoRequest();
         modifyExhibitorInfoRequest.setEid(eid);
-        modifyExhibitorInfoRequest.setCompany(exhibitor.getCompany());
-        modifyExhibitorInfoRequest.setCompanyEn(exhibitor.getCompanye());
+        /*modifyExhibitorInfoRequest.setCompany(exhibitor.getCompany());
+        modifyExhibitorInfoRequest.setCompanyEn(exhibitor.getCompanye());*/
+        modifyExhibitorInfoRequest.setCompany(exhibitorInfo.getCompany());
+        modifyExhibitorInfoRequest.setCompanyEn(exhibitorInfo.getCompanyEn());
         modifyExhibitorInfo(modifyExhibitorInfoRequest, eid, adminId);
     	if(eid != null){
     		TExhibitorBooth booth = new TExhibitorBooth();
@@ -546,6 +562,7 @@ public class ExhibitorManagerService extends ExhibitorService {
     	if(loadAllExhibitorByCompany(request.getCompanyName().trim(), request.getEid()) != null) throw new DuplicateUsernameException("公司中文名重复");
     	if(loadAllExhibitorByCompanye(request.getCompanyNameE().trim(), request.getEid()) != null) throw new DuplicateUsernameException("公司英文名重复");
     	TExhibitor exhibitor = exhibitorDao.query(request.getEid());
+        TExhibitorInfo exhibitorInfo = exhibitorInfoDao.query(request.getEid());
     	if(exhibitor != null){
     		if(StringUtils.isNotEmpty(request.getUsername())){
     			if(loadAllExhibitorByUsername(request.getUsername(), request.getEid()) != null) throw new DuplicateUsernameException("用户名重复");
@@ -559,8 +576,10 @@ public class ExhibitorManagerService extends ExhibitorService {
 	    	}
 	        exhibitor.setUpdateTime(new Date());
 	        exhibitor.setUpdateUser(adminId);
-	        exhibitor.setCompany(request.getCompanyName());
-	        exhibitor.setCompanye(request.getCompanyNameE());
+            exhibitorInfo.setCompany(request.getCompanyName().trim());
+            exhibitorInfo.setCompanyEn(request.getCompanyNameE().trim());
+	        /*exhibitor.setCompany(request.getCompanyName());
+	        exhibitor.setCompanye(request.getCompanyNameE());*/
 	        exhibitor.setCountry(request.getCountry());
 	        exhibitor.setProvince(request.getProvince());
 	        exhibitor.setTag(request.getTag());

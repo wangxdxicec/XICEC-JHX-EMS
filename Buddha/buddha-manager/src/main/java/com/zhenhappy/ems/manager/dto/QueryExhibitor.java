@@ -27,21 +27,22 @@ public class QueryExhibitor {
 	private Integer infoFlag;
 	private Integer area;
 	private Integer group;
+	private String contractId;
 
 	public QueryExhibitor() {
 		super();
 	}
 
-	public QueryExhibitor(Integer eid, 
-						  String username, 
-						  String password, 
+	public QueryExhibitor(Integer eid,
+						  String username,
+						  String password,
 						  Integer area,
-						  String company, 
+						  String company,
 						  String companye,
 						  Integer country,
-						  Integer province, 
-						  Integer isLogout, 
-						  Integer tag, 
+						  Integer province,
+						  Integer isLogout,
+						  Integer tag,
 						  Integer group,
 						  String boothNumber,
 						  String exhibitionArea) {
@@ -229,4 +230,11 @@ public class QueryExhibitor {
 		this.group = group;
 	}
 
+	public String getContractId() {
+		return contractId;
+	}
+
+	public void setContractId(String contractId) {
+		this.contractId = contractId;
+	}
 }

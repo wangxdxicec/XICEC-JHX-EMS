@@ -47,7 +47,8 @@ public class CustomerTemplateServiceImp implements CustomerTemplateService {
 
     @Transactional
     public void modifyEmailManagerTemplate(String value1, String value2, String value3, String value4, String value5,
-                                                   String value6, String value7, String value8, String value9, String value10) throws Exception{
+                                           String value6, String value7, String value8, String value9, String value10,
+                                           String value11, String value12, String value13, String value14) throws Exception{
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_subject_cn'", new Object[]{value1});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_subject_en'", new Object[]{value2});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_content_cn'", new Object[]{value3});
@@ -56,8 +57,12 @@ public class CustomerTemplateServiceImp implements CustomerTemplateService {
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_invite_subject_en'", new Object[]{value6});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_invite_content_cn'", new Object[]{value7});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_invite_content_en'", new Object[]{value8});
-        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_policyDeclare_cn'", new Object[]{value9});
-        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_policyDeclare_en'", new Object[]{value10});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_subject_cn_unpro'", new Object[]{value9});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_content_cn_unpro'", new Object[]{value10});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_subject_en_unpro'", new Object[]{value11});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_content_en_unpro'", new Object[]{value12});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_policyDeclare_cn'", new Object[]{value13});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'mail_register_policyDeclare_en'", new Object[]{value14});
     }
 
     @Transactional

@@ -5,7 +5,6 @@ import java.util.*;
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.entity.TExhibitorJoiner;
-import com.zhenhappy.ems.entity.TVisitorInfo;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;

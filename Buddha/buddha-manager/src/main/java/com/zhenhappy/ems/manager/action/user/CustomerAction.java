@@ -138,7 +138,7 @@ public class CustomerAction extends BaseAction {
             response = customerInfoManagerService.queryInlandCustomersByPage(request);
         } catch (Exception e) {
             response.setResultCode(1);
-            log.error("query queryInlandCustomersByPage error.", e);
+            log.error("query queryInland CustomersByPage error.", e);
         }
         return response;
     }
@@ -157,7 +157,7 @@ public class CustomerAction extends BaseAction {
             response = customerInfoManagerService.queryForeignCustomersByPage(request);
         } catch (Exception e) {
             response.setResultCode(1);
-            log.error("query queryForeignCustomersByPage error.", e);
+            log.error("query queryForeign CustomersByPage error.", e);
         }
         return response;
     }

@@ -19,9 +19,9 @@ public class TExhibitor implements java.io.Serializable {
 	private String username;
 	private String password;
 	private Integer level;
-	private String company;
+	/*private String company;
 	private String companye;
-	private String companyt;
+	private String companyt;*/
 	private Integer area;
 	private Date lastLoginTime;
 	private String lastLoginIp;
@@ -51,14 +51,14 @@ public class TExhibitor implements java.io.Serializable {
 	/**
 	 * full constructor
 	 */
-	public TExhibitor(Integer eid, String username, String password, Integer level, String company, String companye, String companyt, Integer area, Date lastLoginTime, String lastLoginIp, Integer isLogout, Integer createUser, Date createTime, Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country, Integer group, String contractId, String exhibitionArea) {
+	public TExhibitor(Integer eid, String username, String password, Integer level, /*String company, String companye, String companyt,*/ Integer area, Date lastLoginTime, String lastLoginIp, Integer isLogout, Integer createUser, Date createTime, Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country, Integer group, String contractId, String exhibitionArea) {
 		this.eid = eid;
 		this.username = username;
 		this.password = password;
 		this.level = level;
-		this.company = company;
+		/*this.company = company;
 		this.companye = companye;
-		this.companyt = companyt;
+		this.companyt = companyt;*/
 		this.area = area;
 		this.lastLoginTime = lastLoginTime;
 		this.lastLoginIp = lastLoginIp;
@@ -75,13 +75,13 @@ public class TExhibitor implements java.io.Serializable {
 		this.exhibitionArea = exhibitionArea;
 	}
 
-	public TExhibitor(Integer eid, String username, String password, Integer level, String company, String companye, Integer area, Date lastLoginTime, String lastLoginIp, Integer isLogout, Integer createUser, Date createTime, Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country, Integer group, String contractId) {
+	public TExhibitor(Integer eid, String username, String password, Integer level, /*String company, String companye,*/ Integer area, Date lastLoginTime, String lastLoginIp, Integer isLogout, Integer createUser, Date createTime, Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country, Integer group, String contractId) {
 		this.eid = eid;
 		this.username = username;
 		this.password = password;
 		this.level = level;
-		this.company = company;
-		this.companye = companye;
+		/*this.company = company;
+		this.companye = companye;*/
 		this.area = area;
 		this.lastLoginTime = lastLoginTime;
 		this.lastLoginIp = lastLoginIp;
@@ -137,7 +137,7 @@ public class TExhibitor implements java.io.Serializable {
 		this.level = level;
 	}
 
-	@Column(name = "company", length = 200)
+	/*@Column(name = "company", length = 200)
 	public String getCompany() {
 		return this.company;
 	}
@@ -162,7 +162,7 @@ public class TExhibitor implements java.io.Serializable {
 
 	public void setCompanyt(String companyt) {
 		this.companyt = companyt;
-	}
+	}*/
 
 	@Column(name = "area")
 	public Integer getArea() {
@@ -297,9 +297,9 @@ public class TExhibitor implements java.io.Serializable {
 				", username='" + username + '\'' +
 				", password='" + password + '\'' +
 				", level=" + level +
-				", company='" + company + '\'' +
+				/*", company='" + company + '\'' +
 				", companye='" + companye + '\'' +
-				", companyt='" + companyt + '\'' +
+				", companyt='" + companyt + '\'' +*/
 				", area=" + area +
 				", lastLoginTime=" + lastLoginTime +
 				", lastLoginIp='" + lastLoginIp + '\'' +

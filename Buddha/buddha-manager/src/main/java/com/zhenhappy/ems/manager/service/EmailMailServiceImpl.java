@@ -89,65 +89,15 @@ public class EmailMailServiceImpl implements EmailMailService {
                 messageHelper.setFrom("do-not-reply@stonefair.org.cn");
                 visitorMailLog.setMailFrom("do-not-reply@stonefair.org.cn");
             }
-            if(email.getEmailType() ==0){
-                if(email.getCountry() == 0){
-                    visitorMailLog.setMailSubject(email.getMail_register_subject_cn_unpro());
-                    messageHelper.setSubject(email.getMail_register_subject_cn_unpro()); // 主题
-                }else {
-                    visitorMailLog.setMailSubject(email.getMail_register_subject_en_unpro());
-                    messageHelper.setSubject(email.getMail_register_subject_en_unpro()); // 主题
-                }
-            } else {
-                if(email.getCountry() == 0){
-                    visitorMailLog.setMailSubject(email.getRegister_subject_cn());
-                    messageHelper.setSubject(email.getRegister_subject_cn()); // 主题
-                }else {
-                    visitorMailLog.setMailSubject(email.getRegister_subject_en());
-                    messageHelper.setSubject(email.getRegister_subject_en()); // 主题
-                }
-            }
+            messageHelper.setSubject(email.getSubject()); // 主题
             // true 表示启动HTML格式的邮件
+            visitorMailLog.setMailSubject(email.getSubject());
             if(email.getUseTemplate()) {
                 visitorMailLog.setMailContent(getMailText(email));
                 messageHelper.setText(getMailText(email), true); // 邮件内容，注意加参数true，表示启用html格式
             } else {
-                if(email.getEmailType() ==0){
-                    if(email.getCountry() == 0){
-                        email.setMail_register_content_cn_unpro(email.getMail_register_content_cn_unpro().replace("@@_NAME_@@",email.getName()));
-                        visitorMailLog.setMailContent(email.getMail_register_content_cn_unpro());
-                        messageHelper.setText(email.getMail_register_content_cn_unpro(), true); // 邮件内容，注意加参数true，表示启用html格式
-                    } else {
-                        email.setMail_register_content_en_unpro(email.getMail_register_content_en_unpro().replace("@@_NAME_@@",email.getName()));
-                        visitorMailLog.setMailContent(email.getMail_register_content_en_unpro());
-                        messageHelper.setText(email.getMail_register_content_en_unpro(), true); // 邮件内容，注意加参数true，表示启用html格式
-                    }
-                } else {
-                    if(email.getCountry() == 0){
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_NAME_@@",email.getName()));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_FAIRNAME_@@","第十七届中国厦门国际石材展览会"));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_COMPANY_@@",email.getCompany()));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_NAME_@@",email.getName()));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_POSITION_@@",email.getPosition()));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_QRCODEURL_@@","http://www.stonefair.org.cn/UploadFile/QRCode/" + email.getCheckingNo() + ".jpg"));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_CHECKINGNUMBER_@@",email.getRegID()));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_YEAR_@@","2017"));
-                        email.setRegister_content_cn(email.getRegister_content_cn().replace("@@_POLICY_DECLARE_@@",email.getPoliceDecareCn()));
-                        visitorMailLog.setMailContent(email.getRegister_content_cn());
-                        messageHelper.setText(email.getRegister_content_cn(), true); // 邮件内容，注意加参数true，表示启用html格式
-                    } else {
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_NAME_@@",email.getName()));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_FAIRNAME_@@","Xiamen Stone Fair 2017"));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_COMPANY_@@",email.getCompany()));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_NAME_@@",email.getName()));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_POSITION_@@",email.getPosition()));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_QRCODEURL_@@","http://www.stonefair.org.cn/UploadFile/QRCode/" + email.getCheckingNo() + ".jpg"));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_CHECKINGNUMBER_@@",email.getRegID()));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_YEAR_@@","2017"));
-                        email.setRegister_content_en(email.getRegister_content_en().replace("@@_POLICY_DECLARE_@@",email.getPoliceDecareEn()));
-                        visitorMailLog.setMailContent(email.getRegister_content_en());
-                        messageHelper.setText(email.getRegister_content_en(), true); // 邮件内容，注意加参数true，表示启用html格式
-                    }
-                }
+                visitorMailLog.setMailContent(email.getRegister_content());
+                messageHelper.setText(email.getRegister_content(), true); // 邮件内容，注意加参数true，表示启用html格式
             }
 
             visitorMailLog.setCustomerID(email.getCustomerId());
@@ -164,7 +114,6 @@ public class EmailMailServiceImpl implements EmailMailService {
                 visitorMailLog.setMailTo(address.toString());
                 visitorLogMailService.insertLogMail(visitorMailLog);
             }
-
             Properties props = System.getProperties();
             props.put("mail.smtp.auth", "true");
             // 发送邮件

@@ -33,7 +33,7 @@
                 <a id="modifyBaseInfo" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">修改账号信息</a>
                 <a id="sendEmail" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" style="margin-left: 10px">发送邮件</a>
                 <a id="sendMsg" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">发送短信</a>
-                <a id="setProfessional" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-redo'"><#if customer.isProfessional?exists && customer.isProfessional>设为普通客商<#else>设为专业客商</#if></a>
+                <a id="setProfessional" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-redo'"><#if customer.isProfessional?exists && customer.isProfessional==1>设为普通客商<#else>设为专业客商</#if></a>
             </td>
             <td style="width: 200px"></td>
             <td style="width: 100px"></td>
@@ -64,10 +64,12 @@
             <td style="width: 10%;"><#if customer.address?exists>${customer.address}</#if></td>
             <td style="width: 6%;text-align: right">手机号：</td>
             <td style="width: 7%;"><#if customer.mobilePhone?exists>${customer.mobilePhone}</#if></td>
-            <td style="width: 6%;text-align: right">传真：</td>
-            <td style="width: 8%;"><#if customer.fax?exists>${customer.fax}</#if></td>
             <td style="width: 8%;text-align: right">公司网址：</td>
-            <td style="width: 13.4%;"><#if customer.website?exists>${customer.website}</#if></td>
+            <td style="width: 12%;" id="websitehref1"><a id="openWebsite1" href="#"><#if customer.website?exists>${customer.website}</#if></a></td>
+            <td style="width: 8%;text-align: left">最近邮件发送时间：</td>
+            <td style="width: 10%;"><font color="blue"><#if customer.sendEmailDate?exists>${customer.sendEmailDate}</#if></font></td>
+            <td style="width: 6%;text-align: left">传真：</td>
+            <td style="width: 8%;"><#if customer.fax?exists>${customer.fax}</#if></td>
         </tr>
     </table>
 </div>
@@ -96,13 +98,13 @@
                 <td style="width: 3%;text-align: right">手机：</td>
                 <td style="width: 6%;"><#if customer.mobilePhone?exists>${customer.mobilePhone}</#if></td>
                 <td style="width: 6%;text-align: right">是否专业：</td>
-                <td style="width: 6%;"><#if customer.isProfessional>专业<#else>普通</#if></td>
+                <td style="width: 6%;"><font color="blue"><#if customer.isProfessional==1>专业<#else>普通</#if></font></td>
             </tr>
             <tr style="height: 30px">
                 <td style="width: 6%;text-align: right">地址：</td>
                 <td style="width: 10%;"><#if customer.address?exists>${customer.address}</#if></td>
                 <td style="width: 6%;text-align: right">网址：</td>
-                <td style="width: 12%;"><#if customer.website?exists>${customer.website}</#if></td>
+                <td style="width: 12%;" id="websitehref2"><a id="openWebsite2" href="#"><#if customer.website?exists>${customer.website}</#if></a></td>
                 <td style="width: 8%;text-align: right">登记时间：</td>
                 <td style="width: 10%;"><#if customer.createdTime?exists>${customer.createdTime}</#if></td>
             	<td style="width: 10%;text-align: right">是否激活：</td>
@@ -111,6 +113,54 @@
                 <td style="width: 6%;"><#if customer.sendEmailNum?exists>${customer.sendEmailNum}</#if></td>
                 <td style="width: 9%;text-align: right">短信数量：</td>
                 <td style="width: 6%;"><#if customer.sendMsgNum?exists>${customer.sendMsgNum}</#if></td>
+            </tr>
+        </table>
+    </#if>
+</div>
+<!-- 客商问卷调查 -->
+<div style="height: auto;" class="easyui-panel" title="客商问卷调查">
+    <!-- 客商问卷调查 -->
+    <#if customerSurvey?exists>
+        <table id="customerSurveyTable" name="customerSurveyTable" class="customerSurveyTable" border="0" style="width: 100%;table-layout：fixed;">
+            <tr style="height: 30px">
+                <td style="width: 6%;text-align: right">问卷一：</td>
+                <td style="width: 10%;"><#if customerSurvey.q1?exists>${customerSurvey.q1}</#if></td>
+                <td style="width: 6%;text-align: right">问卷二：</td>
+                <td style="width: 12%;"><#if customerSurvey.q2?exists>${customerSurvey.q2}</#if></a></td>
+                <td style="width: 5%;text-align: right">问卷三：</td>
+                <td style="width: 3%;"><#if customerSurvey.q3?exists>${customerSurvey.q3}</#if></td>
+                <td style="width: 5%;text-align: right">问卷四：</td>
+                <td style="width: 8%;"><#if customerSurvey.q4?exists>${customerSurvey.q4}</#if></td>
+                <td style="width: 3%;text-align: right">问卷五：</td>
+                <td style="width: 6%;"><#if customerSurvey.q5?exists>${customerSurvey.q5}</#if></td>
+                <td style="width: 6%;text-align: right">邀请邮件：</td>
+                <td style="width: 6%;"><#if customerSurvey.inviterEmail?exists>${customerSurvey.inviterEmail}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 6%;text-align: right">问卷六：</td>
+                <td style="width: 10%;"><#if customerSurvey.q6?exists>${customerSurvey.q6}</#if></td>
+                <td style="width: 6%;text-align: right">问卷七：</td>
+                <td style="width: 12%;"><#if customerSurvey.q7?exists>${customerSurvey.q7}</#if></td>
+                <td style="width: 8%;text-align: right">问卷八：</td>
+                <td style="width: 10%;"><#if customerSurvey.q8?exists>${customerSurvey.q8}</#if></td>
+                <td style="width: 10%;text-align: right">问卷九：</td>
+                <td style="width: 6%;"><#if customerSurvey.q9?exists>${customerSurvey.q9}</#if></td>
+                <td style="width: 9%;text-align: right">问卷十：</td>
+                <td style="width: 6%;"><#if customerSurvey.q10?exists>${customerSurvey.q10}</#if></td>
+                <td style="width: 9%;text-align: right">邀请人：</td>
+                <td style="width: 6%;"><#if customerSurvey.inviterName?exists>${customerSurvey.inviterName}</#if></td>
+            </tr>
+        </table>
+    </#if>
+</div>
+<!-- 客商世界石材大会 -->
+<div style="height: auto;" class="easyui-panel" title="客商世界石材大会">
+    <!-- 客商世界石材大会 -->
+    <#if customerInfoYear?exists>
+        <table id="customerInfoYearTable" name="customerInfoYearTable" class="customerInfoYearTable" border="0" style="width: 100%;table-layout：fixed;">
+            <tr style="height: 30px">
+                <td style="width: 5%;text-align: left">SWC：</td>
+                <td style="width: 90%;text-align: left"><#if customerInfoYear.wSC?exists>${customerInfoYear.wSC}</#if></td>
             </tr>
         </table>
     </#if>
@@ -160,6 +210,22 @@
     </form>
 </div>
 
+<!-- 短信选择表单 -->
+<div id="customerSelectEmailTypeDlg" data-options="iconCls:'icon-edit',modal:true">
+    <form id="customerSelectEmailTypeForm"  name="customerSelectEmailTypeForm">
+        <table style="width: 250px;margin: 20px auto">
+            <tr>
+                <td style="text-align: center"><a id="sendNormalMsg" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">给普通客商发<font color="#dc143c">信息完善</font>邮件</a></td>
+            </tr>
+            <tr></tr><tr></tr><tr></tr>
+            <tr>
+                <td style="text-align: center"><a id="sendProfessionalMsg" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">给专业客商发<font color="#006400">邀请参加</font>邮件</a></td>
+            </tr>
+            <input type="hidden" value="${id}" name="id">
+        </table>
+    </form>
+</div>
+
 <script>
 var country = [];
 var province = [];
@@ -202,8 +268,8 @@ function refreshAccountInfo(){
     var tabCell1 = tabRow[1].cells;
     tabCell1[3].innerText = document.accountInfoManageForm.address.value;
     tabCell1[5].innerText = document.accountInfoManageForm.mobilePhone.value;
-    tabCell1[7].innerText = document.accountInfoManageForm.fax.value;
-    tabCell1[9].innerText = document.accountInfoManageForm.website.value;
+    tabCell1[7].innerText = document.accountInfoManageForm.website.value;
+    tabCell1[11].innerText = document.accountInfoManageForm.fax.value;
 }
 
 $(document).ready(function () {
@@ -258,6 +324,8 @@ $(document).ready(function () {
                                         timeout: 5000,
                                         showType: 'slide'
                                     });
+                                } else if (data.resultCode == 3) {
+                                    $.messager.alert('错误', data.description);
                                 } else if (data.resultCode == 2) {
                                     $.messager.alert('错误', data.description);
                                 } else {
@@ -272,6 +340,24 @@ $(document).ready(function () {
                 text: '取消',
                 handler: function () {
                     $("#customerInfoManageDlg").dialog("close")
+                }
+            }
+        ]
+    });
+
+    //邮件选择框
+    $('#customerSelectEmailTypeDlg').dialog({
+        title: '选择邮件种类',
+        width: 300,
+        height: 200,
+        closed: true,
+        cache: false,
+        modal: true,
+        buttons: [
+            {
+                text: '取消',
+                handler: function () {
+                    $("#customerSelectEmailTypeDlg").dialog("close");
                 }
             }
         ]
@@ -307,9 +393,29 @@ $(document).ready(function () {
         });
     });
 
-    //发送邮件
-    $("#sendEmail").click(function () {
-        $.messager.confirm('确认发送','你确定要给客商发邮件吗?',function(r){
+    $("#openWebsite1").click(function () {
+        var href = document.getElementById("websitehref1").innerText;
+        if(href.indexOf("http://") >= 0 ){
+            window.open(href);
+        }else {
+            href = "http://" + href;
+            window.open(href);
+        }
+    });
+
+    $("#openWebsite2").click(function () {
+        var href = document.getElementById("websitehref2").innerText;
+        if(href.indexOf("http://") >= 0 ){
+            window.open(href);
+        }else {
+            href = "http://" + href;
+            window.open(href);
+        }
+    });
+
+    $("#sendNormalMsg").click(function () {
+        $("#customerSelectEmailTypeDlg").dialog("close");
+        $.messager.confirm('确认发送','你确定要给普通客商发邮件吗?',function(r){
             if (r){
                 $.ajax({
                     url: "${base}/user/emailAllInlandStoneCustomers",
@@ -328,11 +434,11 @@ $(document).ready(function () {
                         if (data.resultCode == 0) {
                             $.messager.show({
                                 title: '成功',
-                                msg: '给客商发送邮件成功',
+                                msg: '给普通客商发送邮件成功',
                                 timeout: 5000,
                                 showType: 'slide'
                             });
-                            alert('给客商发送邮件成功');
+                            alert('给普通客商发送邮件成功');
                             window.location.href=window.location.href;
                         } else if (data.resultCode == 2) {
                             $.messager.alert('错误', data.description);
@@ -343,6 +449,49 @@ $(document).ready(function () {
                 });
             }
         });
+    });
+
+    $("#sendProfessionalMsg").click(function () {
+        $("#customerSelectEmailTypeDlg").dialog("close");
+        $.messager.confirm('确认发送','你确定要给专业客商发邮件吗?',function(r){
+            if (r){
+                $.ajax({
+                    url: "${base}/user/emailAllInlandStoneCustomers",
+                    type: "post",
+                    dataType: "json",
+                    data: {"cids": ${id}},
+                    beforeSend:function(XMLHttpRequest){
+                        $.messager.show({
+                            title: '处理中...',
+                            msg: '正在发送邮件，请稍等...',
+                            timeout: 3000,
+                            showType: 'slide'
+                        });
+                    },
+                    success: function (data) {
+                        if (data.resultCode == 0) {
+                            $.messager.show({
+                                title: '成功',
+                                msg: '给专业客商发送邮件成功',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+                            alert('给专业客商发送邮件成功');
+                            window.location.href=window.location.href;
+                        } else if (data.resultCode == 2) {
+                            $.messager.alert('错误', data.description);
+                        } else {
+                            $.messager.alert('错误', '系统错误');
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    //发送邮件
+    $("#sendEmail").click(function () {
+        $("#customerSelectEmailTypeDlg").dialog("open");
     });
 
     //发送短信

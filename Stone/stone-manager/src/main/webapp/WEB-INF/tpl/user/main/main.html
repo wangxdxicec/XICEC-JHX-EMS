@@ -46,6 +46,8 @@
 		<div title="客商管理" style="padding-left:10px;padding-top:5px;padding-right:5px;"><!--石材展需求开始-->
 			<div id="inlandCustomerList" class="exhibitors">国内客商</div>
 			<div id="foreignCustomerList" class="exhibitors">国外客商</div>
+            <div id="emailApplyList" class="exhibitors">邮件申请列表</div>
+            <div id="msgApplyList" class="exhibitors">短信申请列表</div>
 		</div><!--石材展需求结束-->
 		<div title="VISA管理" style="padding-left:10px;padding-top:5px;padding-right:5px;"><!--石材展需求开始-->
 			<div id="tVisaList" class="exhibitors">展商VISA列表</div>
@@ -96,6 +98,14 @@ $('#inlandCustomerList').click(function(){
 //打开国外客商
 $('#foreignCustomerList').click(function(){
 	addTab("国外客商","${base}/user/foreignCustomer");
+});
+//打开邮件申请列表
+$('#emailApplyList').click(function(){
+    addTab("邮件申请列表","${base}/user/emailApplyPage");
+});
+//打开短信申请列表
+$('#msgApplyList').click(function(){
+    addTab("短信申请列表","${base}/user/msgApplyPage");
 });
 //打开展商VISA
 $('#tVisaList').click(function(){

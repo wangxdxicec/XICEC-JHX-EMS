@@ -47,17 +47,19 @@ public class MailAction {
 
             List<Email> emails = JSONArray.parseArray(context, Email.class);
             String booth = exhibitorService.loadBoothNum(principle.getExhibitor().getEid());
-            String company = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompany();
-            String companye = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompanye();
+            String company = exhibitorService.query(principle.getExhibitor().getEid()).getCompany();
+            String companye = exhibitorService.query(principle.getExhibitor().getEid()).getCompanyEn();
+            /*String company = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompany();
+            String companye = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompanye();*/
             for (Email email : emails) {
                 if (email.getFlag() == 1) {
                     email.setSubject(company + "邀请函");
                     email.setBoothNumber(booth);
-                    email.setCompany(principle.getExhibitor().getCompany());
+                    email.setCompany(company);
                 } else {
                     email.setSubject("The invitation Of " + companye);
                     email.setBoothNumber(booth);
-                    email.setCompany(principle.getExhibitor().getCompanye());
+                    email.setCompany(companye);
                 }
                 mailService.sendMailByAsynchronousMode(email, principle.getExhibitor().getEid());
             }
@@ -77,15 +79,17 @@ public class MailAction {
             if(sendDetail==null){
                 throw new Exception("Mail can not found");
             }
-            String company = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompany();
-            String companye = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompanye();
+            String company = exhibitorService.query(principle.getExhibitor().getEid()).getCompany();
+            String companye = exhibitorService.query(principle.getExhibitor().getEid()).getCompanyEn();
+            /*String company = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompany();
+            String companye = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid()).getCompanye();*/
             email.setFlag(sendDetail.getLanguage());
             if (email.getFlag() == 1) {
                 email.setSubject(company + "邀请函");
-                email.setCompany(principle.getExhibitor().getCompany());
+                email.setCompany(company);
             } else {
                 email.setSubject("The invitation Of " + companye);
-                email.setCompany(principle.getExhibitor().getCompanye());
+                email.setCompany(companye);
             }
             email.setGender(sendDetail.getGender());
             email.setName(sendDetail.getCompanyName());
@@ -121,16 +125,18 @@ public class MailAction {
     public ModelAndView previewMail(@ModelAttribute("mail") Email email, @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         ModelAndView modelAndView = new ModelAndView();
         String booth = exhibitorService.loadBoothNum(principle.getExhibitor().getEid());
+        String company = exhibitorService.query(principle.getExhibitor().getEid()).getCompany();
+        String companye = exhibitorService.query(principle.getExhibitor().getEid()).getCompanyEn();
         if (email.getFlag() == 1) {
             modelAndView.setViewName("/user/mail/mailTemplate1");
             email.setSubject("厦门国际石材展邀请函");
             email.setBoothNumber(booth);
-            email.setCompany(principle.getExhibitor().getCompany());
+            email.setCompany(company);
         } else {
             modelAndView.setViewName("/user/mail/mailTemplate2");
             email.setSubject("The invitation Of China Xiamen International Stone Fair");
             email.setBoothNumber(booth);
-            email.setCompany(principle.getExhibitor().getCompanye());
+            email.setCompany(companye);
         }
         modelAndView.addObject("email", email);
         return modelAndView;

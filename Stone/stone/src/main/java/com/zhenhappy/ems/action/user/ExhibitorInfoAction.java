@@ -181,8 +181,8 @@ public class ExhibitorInfoAction extends BaseAction {
                 exhibitorInfo.setLogo(fileName);
             }
             TExhibitorInfo info = exhibitorService.loadExhibitorInfoByEid(exhibitorInfo.getEid());
-            exhibitorInfo.setCompany(exhibitor.getCompany());
-            exhibitorInfo.setCompanyEn(exhibitor.getCompanye());
+            /*exhibitorInfo.setCompany(exhibitor.getCompany());
+            exhibitorInfo.setCompanyEn(exhibitor.getCompanye());*/
             exhibitorInfo.setCreateTime(info.getCreateTime());
             exhibitorInfo.setIsDelete(info.getIsDelete());
             exhibitorInfo.setAdminUpdateTime(info.getAdminUpdateTime());

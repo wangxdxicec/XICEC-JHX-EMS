@@ -38,7 +38,7 @@ public class QueryCustomerInfo {
 	private Date sendEmailDate;
 	private Boolean isDisabled;
 	private String guid;
-	private Boolean isProfessional;
+	private Integer isProfessional;
 	private Boolean isjudged;
 
 	// Constructors
@@ -98,7 +98,7 @@ public class QueryCustomerInfo {
 	}
 
 	public QueryCustomerInfo(Integer id, String firstName, String company, String city, String address,
-							String mobile, String tel, String email, Date createTime) {
+							String mobile, String tel, String email, Date createTime, Integer isProfessional) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -108,10 +108,11 @@ public class QueryCustomerInfo {
 		this.telephone = tel;
 		this.email = email;
 		this.createdTime = createTime;
+		this.isProfessional = isProfessional;
 	}
 
 	public QueryCustomerInfo(Integer id, String firstName, String company, Integer country, String address,
-							String mobile, String tel, String email, Date createTime) {
+							String mobile, String tel, String email, Date createTime, Integer isProfessional) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -121,6 +122,7 @@ public class QueryCustomerInfo {
 		this.telephone = tel;
 		this.email = email;
 		this.createdTime = createTime;
+		this.isProfessional = isProfessional;
 	}
 
 	public QueryCustomerInfo(Integer id, String email, String checkingNo,
@@ -132,7 +134,7 @@ public class QueryCustomerInfo {
 					 String fax, String faxCode2, String website, String remark,
 					 String createdIp, Date createdTime, String updatedIp,
 					 Date updateTime, Integer sendEmailNum,
-					 Date sendEmailDate, Boolean isDisabled, String guid, Boolean isProfessional, Boolean isjudged) {
+					 Date sendEmailDate, Boolean isDisabled, String guid, Integer isProfessional, Boolean isjudged) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -433,11 +435,11 @@ public class QueryCustomerInfo {
 		isDisabled = disabled;
 	}
 
-	public Boolean getIsProfessional() {
+	public Integer getIsProfessional() {
 		return isProfessional;
 	}
 
-	public void setIsProfessional(Boolean professional) {
+	public void setIsProfessional(Integer professional) {
 		isProfessional = professional;
 	}
 }

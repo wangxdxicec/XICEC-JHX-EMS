@@ -90,8 +90,8 @@ public class ImportExportService extends ExhibitorService {
 				}else{
 					QueryExhibitorInfo queryExhibitorInfo = new QueryExhibitorInfo();
 					queryExhibitorInfo.setBoothNumber(exhibitorManagerService.loadBoothNum(exhibitor.getEid()));
-					queryExhibitorInfo.setCompany(exhibitor.getCompany());
-					queryExhibitorInfo.setCompanyEn(exhibitor.getCompanye());
+					queryExhibitorInfo.setCompany(exhibitorInfo.getCompany());
+					queryExhibitorInfo.setCompanyEn(exhibitorInfo.getCompanyEn());
 					queryExhibitorInfos.add(queryExhibitorInfo);
 				}
 			}
@@ -233,11 +233,12 @@ public class ImportExportService extends ExhibitorService {
 					report.add("第" + (j+1) + "行有问题,原因:公司中文名"+ company +"或英文名"+ companye +"存在重复");
 					continue;//公司中文名或英文名存在重复
 				}
-				exhibitor.setCompany(company);
+				//exhibitor.setCompany(company);
 				exhibitorInfo.setCompany(company);
-				exhibitor.setCompanye(companye);
+				//exhibitor.setCompanye(companye);
 				exhibitorInfo.setCompanyEn(companye);
-				exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
+				//exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
+				exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(company.trim()));
 				if(request.getCountry() != null) exhibitor.setCountry(request.getCountry());
 				if(request.getProvince() != null) exhibitor.setProvince(request.getProvince());
 				if(request.getArea() != null) exhibitor.setArea(request.getArea());
@@ -296,10 +297,10 @@ public class ImportExportService extends ExhibitorService {
 					File srcFile = new File(exhibitorInfo.getLogo().replaceAll("\\\\\\\\", "\\\\").replaceAll("/", "\\\\"));
 					if (srcFile.exists() == false) continue;
 					File destFile = null;
-					if(StringUtils.isNotEmpty(exhibitor.getCompany())){
-						destFile = new File(destDir + "\\" + exhibitor.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
+					if(StringUtils.isNotEmpty(exhibitorInfo.getCompany())){
+						destFile = new File(destDir + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
 					}else{
-						destFile = new File(destDir + "\\" + exhibitor.getCompanye().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
+						destFile = new File(destDir + "\\" + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
 					}
 					if(destFile != null) FileUtils.copyFile(srcFile, destFile);
 				}

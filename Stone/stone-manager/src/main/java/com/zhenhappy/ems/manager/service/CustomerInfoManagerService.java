@@ -1,12 +1,18 @@
 package com.zhenhappy.ems.manager.service;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
+import com.zhenhappy.ems.entity.VApplyEmail;
+import com.zhenhappy.ems.entity.VApplyMsg;
+import com.zhenhappy.ems.manager.dao.CustomerSurveyDao;
 import com.zhenhappy.ems.manager.dto.ModifyCustomerInfo;
-import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
+import com.zhenhappy.util.EmailPattern;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -27,6 +33,8 @@ import com.zhenhappy.util.Page;
 public class CustomerInfoManagerService {
 	@Autowired
 	private CustomerInfoDao customerInfoDao;
+	@Autowired
+	private CustomerSurveyDao customerSurveyDao;
 	@Autowired
 	private HibernateTemplate hibernateTemplate;
 
@@ -73,6 +81,13 @@ public class CustomerInfoManagerService {
 			if (request.getEmail() != null) {
 				conditions.add(" e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%'");
 			}
+			if(request.getIsProfessional() != null){
+				if (request.getIsProfessional() == 1) {
+					conditions.add(" e.isProfessional=1 ");
+				} else if(request.getIsProfessional() == 0) {
+					conditions.add(" e.isProfessional=0 ");
+				}
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -92,13 +107,75 @@ public class CustomerInfoManagerService {
 		List<WCustomer> exhibitors = customerInfoDao.queryPageByHQL("select count(*) from WCustomer e" + conditionsSqlNoOrder,
 				"select new com.zhenhappy.ems.manager.dto.QueryCustomerInfo(e.id, e.firstName, e.company,"
 						+  (request.getInlandOrForeign() == 1 ? "e.city" : "e.country")
-						+ ", e.address, e.mobilePhone, e.telephone, e.email, e.createdTime) "
+						+ ", e.address, e.mobilePhone, e.telephone, e.email, e.createdTime, e.isProfessional) "
 						+ "from WCustomer e"  + conditionsSqlNoOrder, new Object[]{}, page);
 		QueryCustomerResponse response = new QueryCustomerResponse();
 		response.setResultCode(0);
 		response.setRows(exhibitors);
 		response.setTotal(page.getTotalCount());
 		return response;
+	}
+
+	/**
+	 * 分页邮件申请记录
+	 * @param request
+	 * @param flag 1:表示查询邮件  2：表示查询短信
+	 * @return
+	 */
+	public QueryCustomerResponse queryEmailOrMsgApplyByPage(QueryEmailOrMsgRequest request, int flag) {
+		List<String> conditions = new ArrayList<String>();
+		try {
+			if(request.getCustomerID() != null) {
+				conditions.add(" e.customerID like '%" + request.getCustomerID().intValue() + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getCreateTime())) {
+				conditions.add(" e.createTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getCreateIP())) {
+				conditions.add(" e.createIP like '%" + new String(request.getCreateIP().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getConfirmTime())) {
+				conditions.add(" e.confirmTime like '%" + new String(request.getConfirmTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getConfirmIP())) {
+				conditions.add(" e.confirmIP like '%" + new String(request.getConfirmIP().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if(request.getStatus() != null) {
+				conditions.add(" e.status '%" + request.getStatus().intValue() + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getAdmin())) {
+				conditions.add(" e.admin like '%" + new String(request.getAdmin().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String conditionsSql = StringUtils.join(conditions, " and ");
+		String conditionsSqlNoOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlNoOrder = " where " + conditionsSql;
+		}
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+		if(flag == 1){
+			List<VApplyEmail> exhibitors = customerInfoDao.queryPageByHQL("select count(*) from VApplyEmail e" + conditionsSqlNoOrder,
+					"select new com.zhenhappy.ems.dto.QueryEmailOrMsgInfo(e.customerID, e.createTime, e.createIP, e.confirmTime, " +
+							"e.confirmIP, e.status, e.admin) from VApplyEmail e"  + conditionsSqlNoOrder, new Object[]{}, page);
+			QueryCustomerResponse response = new QueryCustomerResponse();
+			response.setResultCode(0);
+			response.setRows(exhibitors);
+			response.setTotal(page.getTotalCount());
+			return response;
+		} else {
+			List<VApplyMsg> exhibitors = customerInfoDao.queryPageByHQL("select count(*) from VApplyMsg e" + conditionsSqlNoOrder,
+					"select new com.zhenhappy.ems.dto.QueryEmailOrMsgInfo(e.customerID, e.createTime, e.createIP, e.confirmTime, " +
+							"e.confirmIP, e.status, e.admin) from VApplyMsg e"  + conditionsSqlNoOrder, new Object[]{}, page);
+			QueryCustomerResponse response = new QueryCustomerResponse();
+			response.setResultCode(0);
+			response.setRows(exhibitors);
+			response.setTotal(page.getTotalCount());
+			return response;
+		}
 	}
 
 	/**
@@ -114,6 +191,66 @@ public class CustomerInfoManagerService {
 		QueryCustomerResponse response = new QueryCustomerResponse();
 		response.setResultCode(0);
 		response.setRows(customers);
+		response.setTotal(page.getTotalCount());
+		return response;
+	}
+
+	/**
+	 * 分页获取邮件申请列表
+	 * @param request
+	 * @return
+	 */
+	public QueryCustomerResponse loadEmailApplyByPage(QueryCustomerRequest request) {
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+		EmailPattern pattern = new EmailPattern();
+		List<VApplyEmail> customers = customerInfoDao.queryPageByHQL("select count(*) from VApplyEmail", "from VApplyEmail where Status = 0 order by CreateTime DESC", new Object[]{}, page);
+		List<VApplyEmail> customerList = new ArrayList<VApplyEmail>();
+		if(customers != null && customers.size()>0){
+			for(int k=0;k<customers.size();k++){
+				VApplyEmail applyEmail = customers.get(k);
+				if(applyEmail != null){
+					WCustomer customer = loadCustomerInfoById(applyEmail.getCustomerID());
+					if(pattern.isEmailPattern(customer.getEmail())){
+						customerList.add(applyEmail);
+					}
+				}
+			}
+		}
+		QueryCustomerResponse response = new QueryCustomerResponse();
+		response.setResultCode(0);
+		response.setRows(customers);
+		response.setTotal(page.getTotalCount());
+		return response;
+	}
+
+	/**
+	 * 分页获取短信申请列表
+	 * @param request
+	 * @return
+	 */
+	public QueryCustomerResponse loadMsgApplyByPage(QueryCustomerRequest request) {
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+		EmailPattern pattern = new EmailPattern();
+		List<VApplyMsg> customers = customerInfoDao.queryPageByHQL("select count(*) from VApplyMsg", "from VApplyMsg  where Status = 0 order by CreateTime DESC", new Object[]{}, page);
+		List<VApplyMsg> customerList = new ArrayList<VApplyMsg>();
+		if(customers != null && customers.size()>0){
+			for(int k=0;k<customers.size();k++){
+				VApplyMsg applyMsg = customers.get(k);
+				if(applyMsg != null){
+					WCustomer customer = loadCustomerInfoById(applyMsg.getCustomerID());
+					if(pattern.isMobileNO(customer.getMobilePhone())){
+						customerList.add(applyMsg);
+					}
+				}
+			}
+		}
+		QueryCustomerResponse response = new QueryCustomerResponse();
+		response.setResultCode(0);
+		response.setRows(customerList);
 		response.setTotal(page.getTotalCount());
 		return response;
 	}
@@ -258,6 +395,17 @@ public class CustomerInfoManagerService {
 	}
 
 	/**
+	 * 根据邮箱查询客商
+	 * @param email
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadCustomerByEmail(String email) {
+		List<WCustomer> wCustomers = customerInfoDao.queryByHql("from WCustomer where email=?", new Object[]{email});
+		return wCustomers.size() > 0 ? wCustomers : null;
+	}
+
+	/**
 	 * 修改客商是否专业
 	 * @param request
 	 * @throws Exception
@@ -266,7 +414,11 @@ public class CustomerInfoManagerService {
 	public void modifyCustomerProfessional(QueryCustomerRequest request, Integer id) throws Exception {
 		WCustomer customer = customerInfoDao.query(id);
 		if(customer != null){
-			customer.setIsProfessional(!customer.getIsProfessional());
+			if(customer.getIsProfessional() == 1) {
+				customer.setIsProfessional(0);
+			} else {
+				customer.setIsProfessional(1);
+			}
 			customerInfoDao.update(customer);
 		}
 	}
@@ -294,8 +446,41 @@ public class CustomerInfoManagerService {
 		WCustomer customer = customerInfoDao.query(id);
 		int oldEmailNum = customer.getSendEmailNum();
 		if(customer != null){
+			customer.setSendEmailDate(new Date());
 			customer.setSendEmailNum(oldEmailNum+1);
 			customerInfoDao.update(customer);
 		}
+	}
+
+	/**
+	 * 根据id查询客商问卷调查
+	 * @param id
+	 * @return
+	 */
+	@Transactional
+	public TVisitor_Info_Survey loadCustomerSurveyInfoById(Integer id) {
+		List<TVisitor_Info_Survey> customerSurvey = customerSurveyDao.queryByHql("from TVisitor_Info_Survey where CustomerID=? order by UpdateTime desc", new Object[]{id});
+		return customerSurvey.size() > 0 ? customerSurvey.get(0) : null;
+	}
+
+	public static void main(String[] args) throws IOException {
+		String[] wscList = "GLOBAL FORUM OF MASTER ARCHITECTS;LAUNCH OUT @Xiamen Stone Fair – NEW QUARRYCOLLECTION 2016;LAUNCH OUT @Xiamen Stone Fair – MECHANICAL INNOVATION 2016;STONE DESIGN DAY;EDUCATIONAL SESSIONS".split("–");
+		if(wscList != null && wscList.length>0){
+			StringBuffer reslut = new StringBuffer();
+			for (int i=0; i<wscList.length;i++){
+				reslut.append(wscList[i] + "        ");
+			}
+			System.out.println(reslut.toString());
+		}
+	}
+
+	/**
+	 * 查询所有客商问卷调查
+	 * @return
+	 */
+	@Transactional
+	public List<TVisitor_Info_Survey> loadAllCustomerSurvey() {
+		List<TVisitor_Info_Survey> customerSurvey = customerSurveyDao.queryByHql("from TVisitor_Info_Survey order by createdTime desc", new Object[]{});
+		return customerSurvey.size() > 0 ? customerSurvey : null;
 	}
 }
