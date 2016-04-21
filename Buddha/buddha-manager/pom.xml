@@ -41,9 +41,6 @@
 				<db.password>123456</db.password>
 				<appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/buddha/manager</appendix>
 			</properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
 		</profile>
 		<profile>
 			<id>product</id>
@@ -54,6 +51,9 @@
 				<db.password>gogo03Jhx</db.password>
 				<appendix>C:\Program Files\Apache Software Foundation\appendix\foshi</appendix>
 			</properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
 		</profile>
 	</profiles>
 

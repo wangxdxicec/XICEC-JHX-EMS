@@ -34,6 +34,7 @@ public class CustomerTemplateServiceImp implements CustomerTemplateService {
     @Transactional
     public QueryEmailTemplateResponse queryEmailManagerTemplate(QueryEmailTemplateRequest request){
         Page page = new Page();
+        request.setRows(30);
         page.setPageSize(request.getRows());
         page.setPageIndex(request.getPage());
         List<TVisitorTemplate> customerTemplates = customerTemplateDao.queryPageByHQL("select count(*) from TVisitorTemplate",

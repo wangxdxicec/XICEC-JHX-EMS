@@ -60,6 +60,10 @@
             <div id="emailTemplate" class="exhibitors">邮件模板</div>
             <div id="msgTemplate" class="exhibitors">短信模板</div>
         </div>
+        <div title="数据报表" style="padding-left:10px;padding-top:5px;padding-right:5px;">
+            <div id="dataReport" class="exhibitors">数据报表</div>
+            <div id="dataDistribute" class="exhibitors">数据分布</div>
+        </div>
         <!--石材展需求结束-->
     </div>
 </div>
@@ -122,6 +126,14 @@ $('#emailTemplate').click(function(){
 //打开模板管理
 $('#msgTemplate').click(function(){
     addTab("短信模板","${base}/user/tMsg");
+});
+//打开数据报表
+$('#dataReport').click(function(){
+    addTab("数据报表","${base}/user/tReport");
+});
+//打开数据分布
+$('#dataDistribute').click(function(){
+    addTab("数据分布","${base}/user/tDistribute");
 });
 //----------------------------------------------------------折叠面板按钮开始-----------------------------------------------------------//
 </script>

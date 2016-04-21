@@ -2,25 +2,27 @@ package com.zhenhappy.ems.manager.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
-import com.zhenhappy.ems.entity.VApplyEmail;
-import com.zhenhappy.ems.entity.VApplyMsg;
+import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.CustomerSurveyDao;
 import com.zhenhappy.ems.manager.dto.ModifyCustomerInfo;
 import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
+import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.util.EmailPattern;
+import com.zhenhappy.util.report.EchartMapResponse;
+import com.zhenhappy.util.report.JsonDataForReport;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zhenhappy.ems.dao.CustomerInfoDao;
-import com.zhenhappy.ems.entity.WCustomer;
 import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
 import com.zhenhappy.ems.manager.dto.QueryCustomerResponse;
 import com.zhenhappy.ems.manager.exception.DuplicateCustomerException;
@@ -37,6 +39,8 @@ public class CustomerInfoManagerService {
 	private CustomerSurveyDao customerSurveyDao;
 	@Autowired
 	private HibernateTemplate hibernateTemplate;
+	@Autowired
+	private CountryProvinceService countryProvinceService;
 
 	public HibernateTemplate getHibernateTemplate() {
 		return hibernateTemplate;
@@ -193,6 +197,63 @@ public class CustomerInfoManagerService {
 		response.setRows(customers);
 		response.setTotal(page.getTotalCount());
 		return response;
+	}
+
+	/**
+	 * 分页获取国内客商列表用于报表
+	 * @param request
+	 * @return
+	 */
+	public EchartMapResponse queryExhibitorForReport(QueryCustomerRequest request, Integer flag) {
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+
+		EchartMapResponse mapResponse = new EchartMapResponse();
+
+		List<JsonDataForReport> jsonList = new ArrayList<JsonDataForReport>();
+		List<String> provinceList = new ArrayList<String>();
+		if(flag == 0){
+			mapResponse.setLegend("国内展商");
+			List<WProvince> provinces = countryProvinceService.loadAllProvince();
+			if(provinces != null && provinces.size()>0){
+				for (int i=0;i<provinces.size();i++){
+					WProvince province = provinces.get(i);
+					provinceList.add(province.getChineseName());
+					List<TExhibitor>groups = getHibernateTemplate().find("from TExhibitor where province = ?", new Object[]{province.getId()});
+					int provinceCount = groups.size();
+					JsonDataForReport json = new JsonDataForReport();
+					json.setName(province.getChineseName());
+					json.setValue(provinceCount);
+					jsonList.add(json);
+				}
+			}
+		} else{
+			mapResponse.setLegend("全球展商");
+			List<WCountry> countries = countryProvinceService.loadAllCountry();
+			if(countries != null && countries.size()>0){
+				for (int i=0;i<countries.size();i++){
+					WCountry country = countries.get(i);
+					provinceList.add(country.getChineseName());
+					List<TExhibitor> groups = getHibernateTemplate().find("from TExhibitor where country = ?", new Object[]{country.getId()});
+					int provinceCount = groups.size();
+					JsonDataForReport json = new JsonDataForReport();
+					json.setName(country.getChineseName());
+					json.setValue(provinceCount);
+					jsonList.add(json);
+				}
+			}
+		}
+
+		mapResponse.setCategory(provinceList);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
+		JSONArray jsonArray = JSONArray.fromObject(jsonList);
+		System.out.println("--result: " + jsonArray.toString());
+		mapResponse.setData(jsonArray.toString());
+		mapResponse.setResultCode(0);
+		return mapResponse;
 	}
 
 	/**

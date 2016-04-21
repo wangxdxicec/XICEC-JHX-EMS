@@ -23,6 +23,10 @@ public class QueryEmailTemplateRequest extends EasyuiRequest {
 	private String msg_invite_content_en;
 	private String mail_register_policyDeclare_cn;
 	private String mail_register_policyDeclare_en;
+	private String mail_register_subject_cn_unpro;
+	private String mail_register_content_cn_unpro;
+	private String mail_register_subject_en_unpro;
+	private String mail_register_content_en_unpro;
 
 	public String getMail_register_policyDeclare_en() {
 		return mail_register_policyDeclare_en;
@@ -168,4 +172,35 @@ public class QueryEmailTemplateRequest extends EasyuiRequest {
 		this.mail_register_policyDeclare_cn = mail_register_policyDeclare_cn;
 	}
 
+	public String getMail_register_subject_cn_unpro() {
+		return mail_register_subject_cn_unpro;
+	}
+
+	public void setMail_register_subject_cn_unpro(String mail_register_subject_cn_unpro) {
+		this.mail_register_subject_cn_unpro = mail_register_subject_cn_unpro;
+	}
+
+	public String getMail_register_content_cn_unpro() {
+		return mail_register_content_cn_unpro;
+	}
+
+	public void setMail_register_content_cn_unpro(String mail_register_content_cn_unpro) {
+		this.mail_register_content_cn_unpro = mail_register_content_cn_unpro;
+	}
+
+	public String getMail_register_subject_en_unpro() {
+		return mail_register_subject_en_unpro;
+	}
+
+	public void setMail_register_subject_en_unpro(String mail_register_subject_en_unpro) {
+		this.mail_register_subject_en_unpro = mail_register_subject_en_unpro;
+	}
+
+	public String getMail_register_content_en_unpro() {
+		return mail_register_content_en_unpro;
+	}
+
+	public void setMail_register_content_en_unpro(String mail_register_content_en_unpro) {
+		this.mail_register_content_en_unpro = mail_register_content_en_unpro;
+	}
 }
