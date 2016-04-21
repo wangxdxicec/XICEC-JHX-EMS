@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>金泓信展商管理后台</title>
+	<script src="${base}/resource/ckeditor/ckeditor.js"></script>
+	<link rel="stylesheet" href="${base}/resource/ckeditor/samples/sample.css">
+	<link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
+	<link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
+	<script type="text/javascript" src="${base}/resource/jquery.min.js"></script>
+	<script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="${base}/resource/common.js"></script>
+	<script type="text/javascript" src="${base}/resource/date.js"></script>
+	<script src="js/esl.js"></script>
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+		}
+
+		input {
+			width: 200px;
+			height: 20px;
+		}
+	</style>
+</head>
+<body>
+<!-- 公告列表 -->
+<table id="emailTemplate" style="width: 100%;height: 100%;">
+	<HR style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="96%" color=#987cb9 size=3>
+	<table style="width: 100%;height: 100%;" align="center" valign="middle">
+		<tr>
+			<td style="text-align: right">数据对象：</td>
+			<td data-options="field: 'dataTable', formatter: formatGroup, width:$(this).width() * 0.3">
+				<select id="dataTablesGroup" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
+				</select>
+			</td>
+
+			<td style="text-align: right">显示类型：</td>
+			<td data-options ="width: $(this).width() * 0.06">
+				<select id="dataReportType" style="width:100%;height:21px;" onchange="filter();">
+					<option value="0">折线图</option>
+					<option value="1">柱状图</option>
+					<option value="2">饼状图</option>
+				</select>
+			</td>
+
+			<td style="text-align: right">维度类型：</td>
+			<td data-options ="width: $(this).width() * 0.06">
+				<select id="dimenType" style="width:100%;height:21px;" onchange="filter();">
+					<option value="0">按月份</option>
+					<option value="1">按天数</option>
+				</select>
+			</td>
+
+			<td style="text-align: right">日期：</td>
+			<td>
+				<input type="text" value="请选择日期" style="border:1px solid #999;width:40%" onclick="fPopCalendar(event,this,this)" onfocus="this.select()" readonly="readonly" />
+			</td>
+
+			<td align="center"><button type="button" class="btn btn-primary" id="showReport">生成报表</button></td>
+		</tr>
+	</table>
+	<HR style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="96%" color=#987cb9 size=3>
+</table>
+
+<script>
+	$(document).ready(function () {
+		//加载报表对象数据
+		$.ajax({
+			type:"POST",
+			dataType:"json",
+			url:"${base}/user/queryDataReportTable",
+			success : function(result) {
+				if(result){
+					$("#dataTablesGroup").html('');
+					$("#dataTablesGroup").append('<option value="">全部</option>');
+					for(var i=0,a;a=result.rows[i++];){
+						groups[a.id] = a.groupName;
+						$("#dataTablesGroup").append('<option value="'+a.id+'">'+a.groupName+'</option>');
+					}
+				}
+			}
+		});
+
+		$("#showReport").click(function () {
+
+		});
+	});
+
+	function filter(){
+		var filterParm = "?";
+		if(document.getElementById("dataReportType").value != ""){
+			filterParm += '&dataReportType=' + document.getElementById("dataReportType").value;
+		}
+		//$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;
+		$('#customers').datagrid('reload');
+	}
+</script>
+</body>
+</html>
