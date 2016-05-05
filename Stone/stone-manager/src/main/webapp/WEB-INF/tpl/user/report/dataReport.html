@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html>
 <head>
 	<title>金泓信展商管理后台</title>
 	<script src="${base}/resource/ckeditor/ckeditor.js"></script>
@@ -10,93 +9,443 @@
 	<script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="${base}/resource/common.js"></script>
 	<script type="text/javascript" src="${base}/resource/date.js"></script>
-	<script src="js/esl.js"></script>
+	<script type="text/javascript" src="${base}/resource/echarts/esl.js"></script>
 	<style>
 		body {
 			margin: 0px;
 			padding: 0px;
 			width: 100%;
 			height: 100%;
-		}
+		}/*
 
 		input {
-			width: 200px;
-			height: 20px;
-		}
+			width: 100px;
+			height: 30px;
+		}*/
 	</style>
 </head>
 <body>
 <!-- 公告列表 -->
 <table id="emailTemplate" style="width: 100%;height: 100%;">
 	<HR style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="96%" color=#987cb9 size=3>
-	<table style="width: 100%;height: 100%;" align="center" valign="middle">
+	<table style="width: 100%;height: 100%;" align="center;" valign="middle">
 		<tr>
 			<td style="text-align: right">数据对象：</td>
-			<td data-options="field: 'dataTable', formatter: formatGroup, width:$(this).width() * 0.3">
-				<select id="dataTablesGroup" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
+			<td data-options ="width: $(this).width() * 0.07">
+				<select id="dataSource" onchange="setOwnerEnableOrUnabled();"/>
+					<option selected="true" value='0'>展商</option>
+					<option value='1'>客商</option>
 				</select>
 			</td>
-
-			<td style="text-align: right">显示类型：</td>
-			<td data-options ="width: $(this).width() * 0.06">
-				<select id="dataReportType" style="width:100%;height:21px;" onchange="filter();">
-					<option value="0">折线图</option>
-					<option value="1">柱状图</option>
-					<option value="2">饼状图</option>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td style="text-align: right">所属人：</td>
+			<td data-options="field: 'tag', formatter: formatTag, width: $(this).width() * 0.07">
+				<select id="exhibitorsTag">
 				</select>
 			</td>
-
+			<!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td style="text-align: right">区域：</td>
+			<td data-options ="width: $(this).width() * 0.07">
+				<select id="dataRegion">
+					<option selected="true" value='0'>国内</option>
+					<option value='1'>全球</option>
+				</select>
+			</td>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<td style="text-align: right">维度类型：</td>
-			<td data-options ="width: $(this).width() * 0.06">
-				<select id="dimenType" style="width:100%;height:21px;" onchange="filter();">
+			<td data-options ="width: $(this).width() * 0.07">
+				<select id="dimenType" style="width:100%;height:21px;" onchange="changeDimen();">
 					<option value="0">按月份</option>
 					<option value="1">按天数</option>
 				</select>
+			</td>-->
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td style="text-align: right">起始日期：</td>
+			<td style="width:100px;text-align: left;">
+				<input id="dataOfBeginDate" type="text" value="请选择日期" style="border:1px solid #999;"
+					   onclick="setday(this)" readonly="readonly" />
+			</td>
+			<td style="text-align: right">截止日期：</td>
+			<td style="width:100px;text-align: left;">
+				<input id="dataOfEndDate" type="text" value="请选择日期" style="border:1px solid #999;"
+					   onclick="setday(this)" readonly="readonly" />
 			</td>
 
-			<td style="text-align: right">日期：</td>
-			<td>
-				<input type="text" value="请选择日期" style="border:1px solid #999;width:40%" onclick="fPopCalendar(event,this,this)" onfocus="this.select()" readonly="readonly" />
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td data-options ="width: $(this).width() * 0.07">
+				<button type="button" class="btn btn-primary" id="showReport" onclick="showReport();">生成报表</button>
 			</td>
-
-			<td align="center"><button type="button" class="btn btn-primary" id="showReport">生成报表</button></td>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td data-options ="width: $(this).width() * 0.07">
+				<button type="button" class="btn btn-primary" id="exportDataDetail">导出详细数据</button>
+			</td>
 		</tr>
 	</table>
+	<form id="exportInlandCustomersToExcel" action="${base}/user/exportDataReportInfo" method="post">
+		<div id="cidParm3"></div>
+	</form>
 	<HR style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="96%" color=#987cb9 size=3>
 </table>
 
-<script>
+<div>
+	<div id="dataReportRegin" style="height: 520px;padding:10px;border:1px solid #ccc;"></div>
+	<div align="center" style="padding:10px;border:1px solid #ccc;">
+		<button type="button" class="btn btn-sm btn-success" onclick="refresh(true)">刷 新</button>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<span class="text-primary">切换主题</span>
+		<select id="theme-select" onchange="modifyTheme();">
+			<option selected="true" value='default'>default</option>
+			<option value='infographic'>infographic</option>
+			<option value='macarons'>macarons</option>
+			<option value='shine'>shine</option>
+			<option value='dark'>dark</option>
+			<option value='blue'>blue</option>
+		</select>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+	var mapChart;
+	var owner;
+	var dataSource;
+	var xAxisValue;
+	var yAxisValue;
+	var yAxisValueEx;
+	var dataRegion;
+	var tags = {};
+
 	$(document).ready(function () {
-		//加载报表对象数据
+		var myDate=new Date();
+		var year = myDate.getFullYear();
+		var month = myDate.getMonth() + 1;
+		var day = myDate.getDay() + 1;
+		var nowStr = myDate.format("yyyy-MM-dd");
+		var beginStr = (year - 1) + "-" + month + "-" + day;
+
+		document.getElementById("dataOfBeginDate").value = beginStr;
+		document.getElementById("dataOfEndDate").value = nowStr;
+
+		//加载所属人列表
 		$.ajax({
 			type:"POST",
 			dataType:"json",
-			url:"${base}/user/queryDataReportTable",
+			url:"${base}/user/queryTags?rows=50",
 			success : function(result) {
 				if(result){
-					$("#dataTablesGroup").html('');
-					$("#dataTablesGroup").append('<option value="">全部</option>');
+					$("#exhibitorsTag").html('');
+					$("#exhibitorsTag").append('<option value="">全部</option>');
 					for(var i=0,a;a=result.rows[i++];){
-						groups[a.id] = a.groupName;
-						$("#dataTablesGroup").append('<option value="'+a.id+'">'+a.groupName+'</option>');
+						tags[a.id] = a.name;
+						$("#exhibitorsTag").append('<option value="'+a.id+'">'+a.name+'</option>');
 					}
 				}
 			}
 		});
-
-		$("#showReport").click(function () {
-
-		});
 	});
 
-	function filter(){
-		var filterParm = "?";
-		if(document.getElementById("dataReportType").value != ""){
-			filterParm += '&dataReportType=' + document.getElementById("dataReportType").value;
+	function formatTag(val, row) {
+		if (val != null) {
+			return tags[val];
+		} else {
+			return null;
 		}
-		//$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;
-		$('#customers').datagrid('reload');
+	}
+
+	function setOwnerEnableOrUnabled() {
+		var source = document.getElementById("dataSource").value;
+		if(source == 0){
+			$("#exhibitorsTag").removeAttr("disabled");
+		} else {
+			$("#exhibitorsTag").attr("disabled","disabled");
+		}
+	}
+
+	function filter(countryId) {
+		var filterParm = "?";
+		alert("countryId: " + countryId);
+		if(document.getElementById("exhibitorsTag").value != ""){
+			filterParm += '&tag=' + document.getElementById("exhibitorsTag").value;
+		}
+		$('#exhibitors').datagrid('options').url = '${base}/user/queryExhibitorsByPage' + filterParm;
+		$('#exhibitors').datagrid('reload');
+	}
+
+	function modifyTheme(){
+		var themeValue = document.getElementById("theme-select").value;
+		initChartInfo(dataSource, xAxisValue,yAxisValue, yAxisValueEx,themeValue, dataRegion);
+	}
+
+	$('#exportDataDetail').click(function(){
+		var source = document.getElementById("dataSource").value;
+		var beginDate = document.getElementById("dataOfBeginDate").value;
+		var endDate = document.getElementById("dataOfEndDate").value;
+		var owner = document.getElementById("exhibitorsTag").value;
+		if(beginDate != '' && endDate != ''){
+			var a1 = beginDate.split("-");
+			var b1 = endDate.split("-");
+			if (parseInt(a1[0]) > parseInt(b1[0])){
+				alert("开始时间不能大于结束时间!");
+				return;
+			} else if (parseInt(a1[0]) == parseInt(b1[0])){
+				if (parseInt(a1[1]) > parseInt(b1[1])){
+					alert("开始时间不能大于结束时间");
+					return;
+				} else if (parseInt(a1[1]) == parseInt(b1[1])) {
+					alert("开始时间不能等于结束时间");
+					return;
+				} else{
+					cidParm3.innerHTML = "";
+					var node1 = "<input type='hidden' name='source' value='" + source + "'/>";
+					cidParm3.innerHTML += node1;
+					var node2 = "<input type='hidden' name='startdate' value='" + beginDate + "'/>";
+					cidParm3.innerHTML += node2;
+					var node3 = "<input type='hidden' name='enddate' value='" + endDate + "'/>";
+					cidParm3.innerHTML += node3;
+					var node4 = "<input type='hidden' name='owner' value='" + owner + "'/>";
+					cidParm3.innerHTML += node4;
+					document.getElementById("exportInlandCustomersToExcel").submit();
+					$.messager.alert('提示', '导出所有客商成功');
+				}
+			} else{
+				cidParm3.innerHTML = "";
+				var node1 = "<input type='hidden' name='source' value='" + source + "'/>";
+				cidParm3.innerHTML += node1;
+				var node2 = "<input type='hidden' name='startdate' value='" + beginDate + "'/>";
+				cidParm3.innerHTML += node2;
+				var node3 = "<input type='hidden' name='enddate' value='" + endDate + "'/>";
+				cidParm3.innerHTML += node3;
+				var node4 = "<input type='hidden' name='owner' value='" + owner + "'/>";
+				cidParm3.innerHTML += node4;
+				document.getElementById("exportInlandCustomersToExcel").submit();
+				$.messager.alert('提示', '导出所有客商成功');
+			}
+		}
+	});
+
+	function showReport() {
+		dataSource = document.getElementById("dataSource").value;
+		dataRegion = 0;
+		var dimenType = 0;
+		var beginDate = document.getElementById("dataOfBeginDate").value;
+		var endDate = document.getElementById("dataOfEndDate").value;
+		owner = document.getElementById("exhibitorsTag").value;
+		if(beginDate != '' && endDate != ''){
+			var a1 = beginDate.split("-");
+			var b1 = endDate.split("-");
+			if (parseInt(a1[0]) > parseInt(b1[0])){
+				alert("开始时间不能大于结束时间!");
+				return;
+			} else if (parseInt(a1[0]) == parseInt(b1[0])){
+				if (parseInt(a1[1]) > parseInt(b1[1])){
+					alert("开始时间不能大于结束时间");
+					return;
+				} else if (parseInt(a1[1]) == parseInt(b1[1])) {
+					alert("开始时间不能等于结束时间");
+					return;
+				} else{
+					showDataReport(dataSource, owner, dataRegion, dimenType, beginDate, endDate);
+				}
+			} else{
+				showDataReport(dataSource, owner, dataRegion, dimenType, beginDate, endDate);
+			}
+		}
+	}
+
+	function changeDimen() {
+		var dimenType = document.getElementById("dimenType").value;
+		if(dimenType != "" && dimenType == 0){
+			document.getElementById('dataOfBeginDate').onclick = function () {
+				setmonth(this);
+			}
+			document.getElementById('dataOfEndDate').onclick = function () {
+				setmonth(this);
+			}
+		} else {
+			document.getElementById('dataOfBeginDate').onclick = function () {
+				setday(this);
+			}
+			document.getElementById('dataOfEndDate').onclick = function () {
+				setday(this);
+			}
+		}
+	}
+
+	function showDataReport(dataSource, owner, dataRegion, dimenType, beginDate, endDate) {
+		$.ajax({
+			url: "${base}/user/queryDataReportEx",
+			type: "post",
+			async : false, //同步执行
+			data: {"source":dataSource, "owner": owner, "region": dataRegion, 'dimen': dimenType, "startdate": beginDate, "enddate": endDate},
+			dataType: "json",
+			success: function (mapValue) {
+				if (mapValue.resultCode == 0) {
+					xAxisValue = [];
+					yAxisValue = [];
+					yAxisValueEx = [];
+					var str = JSON.parse(mapValue.mapData);
+					var strEx = JSON.parse(mapValue.mapDataEx);
+					if(str != null && str.length > 0) {
+						for(var i = 0;i < str.length;i ++){
+							xAxisValue.push(str[i].yearMonth);
+							yAxisValue.push(parseInt(str[i].total));
+						}
+						for(var i = 0;i < strEx.length;i ++){
+							yAxisValueEx.push(parseInt(strEx[i].total));
+						}
+						initChartInfo(dataSource, xAxisValue,yAxisValue,yAxisValueEx, 'default', dataRegion);
+					} else {
+						$.messager.alert('错误', '没有找到合适的数据，请重新设定查询条件');
+					}
+				} else {
+					$.messager.alert('错误', '数据报表获取失败');
+				}
+			}
+		});
+	}
+
+	function initChartInfo(dataSource, xValue,yValue,yValueEx,themeInfo, flag) {
+		var mapType = 'bar';
+		var titleText = '';
+		var label1 = '国内展商';
+		var label2 = '国外展商';
+		if(dataSource == 0){
+			titleText = '展商数据报表';
+			label1 = '国内展商';
+			label2 = '国外展商';
+		} else {
+			titleText = '客商数据报表';
+			label1 = '国内客商';
+			label2 = '国外客商';
+		}
+
+		require.config({
+			paths: {
+				echarts: '${base}/resource/echarts/echarts',
+				'echarts/chart/bar': '${base}/resource/echarts/echarts',
+				'echarts/chart/line': '${base}/resource/echarts/echarts'
+			}
+		});
+
+		var def,infographic,macarons,shine,dark, blue,green,red,gray,helianthus;
+		require(['${base}/resource/echarts/theme/default'], function(theme) {
+			def = theme;
+		});
+		require(['${base}/resource/echarts/theme/infographic'], function(theme) {
+			infographic = theme;
+		});
+		require(['${base}/resource/echarts/theme/macarons'], function(theme) {
+			macarons = theme;
+		});
+		require(['${base}/resource/echarts/theme/shine'], function(theme) {
+			shine = theme;
+		});
+		require(['${base}/resource/echarts/theme/dark'], function(theme) {
+			dark = theme;
+		});
+		require(['${base}/resource/echarts/theme/blue'], function(theme) {
+			blue = theme;
+		});
+		require(['${base}/resource/echarts/theme/green'], function(theme) {
+			green = theme;
+		});
+		require(['${base}/resource/echarts/theme/red'], function(theme) {
+			red = theme;
+		});
+		require(['${base}/resource/echarts/theme/gray'], function(theme) {
+			gray = theme;
+		});
+		require(['${base}/resource/echarts/theme/helianthus'], function(theme) {
+			helianthus = theme;
+		});
+
+		require(['echarts','echarts/chart/bar','echarts/chart/line'],DrawEChart);
+		function DrawEChart(ec) {
+			if(themeInfo.toLowerCase() == 'default'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), def);
+			} else if(themeInfo.toLowerCase() == 'infographic'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), infographic);
+			} else if(themeInfo.toLowerCase() == 'macarons'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), macarons);
+			} else if(themeInfo.toLowerCase() == 'shine'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), shine);
+			} else if(themeInfo.toLowerCase() == 'dark'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), dark);
+			} else if(themeInfo.toLowerCase() == 'blue'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), blue);
+			} else if(curTheme.toLowerCase() == 'green'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), green);
+			} else if(themeInfo.toLowerCase() == 'red'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), red);
+			} else if(themeInfo.toLowerCase() == 'gray'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), gray);
+			} else if(themeInfo.toLowerCase() == 'helianthus'){
+				mapChart = ec.init(document.getElementById('dataReportRegin'), helianthus);
+			} else {
+				mapChart = ec.init(document.getElementById('dataReportRegin'), def);
+			}
+			mapChart.showLoading({text : "图表数据正在努力加载..."});
+			//定义图表options
+			var option = {
+				title: {
+					text: titleText,
+					x: 'center'
+				},
+				// 提示框
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: [label1,label2],
+					x: 'left'
+				},
+				toolbox: {
+					show: true,
+					feature: {
+						mark: {show: true},
+						dataView: {show: true, readOnly: false},
+						magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+						restore: {show: true},
+						saveAsImage: {show: true}
+					}
+				},
+				calculable : true,
+				xAxis : [
+					{
+						type : 'category',
+						data : xValue
+					}
+				],
+				yAxis : [
+					{
+						type : 'value',
+						axisLabel : {
+							formatter : '{value}位'
+						}
+					}
+				],
+				series: [
+					{
+						name: label1,
+						type: mapType,
+						data: yValue
+					},
+					{
+						name: label2,
+						type: mapType,
+						data: yValueEx
+					}
+				]
+			};
+			mapChart.setOption(option);
+			mapChart.hideLoading();
+		}
 	}
 </script>
-</body>
-</html>
+
+<script type="text/javascript" src="${base}/resource/echarts/theme/blue.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/dark.min.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/default.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/infographic.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/macarons.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/shine.js"></script>
+</script>

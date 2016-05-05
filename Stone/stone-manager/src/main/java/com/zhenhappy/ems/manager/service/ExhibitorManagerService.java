@@ -218,6 +218,21 @@ public class ExhibitorManagerService extends ExhibitorService {
     }
 
     /**
+     * 根据日期范围查询展商列表
+     * @return
+     */
+    @Transactional
+    public List<TExhibitor> loadAllExhibitorsByDate(Integer owner, Date begDate, Date endDate) {
+        List<TExhibitor> exhibitors;
+        if(!String.valueOf(owner).equals("")) {
+            exhibitors = exhibitorDao.queryByHql("from TExhibitor where tag = ? and createTime between ? and ?", new Object[]{owner, begDate, endDate});
+        } else {
+            exhibitors = exhibitorDao.queryByHql("from TExhibitor where createTime between ? and ?", new Object[]{begDate, endDate});
+        }
+        return exhibitors.size() > 0 ? exhibitors : null;
+    }
+
+    /**
      * 根据eids查询展商列表
      * @return
      */

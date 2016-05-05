@@ -3,12 +3,13 @@ package com.zhenhappy.ems.manager.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
-
 import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
+import com.zhenhappy.ems.dto.QueryExhibitorDataReport;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.CustomerSurveyDao;
 import com.zhenhappy.ems.manager.dto.ModifyCustomerInfo;
 import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
+import com.zhenhappy.ems.manager.util.DiffListOperate;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.util.EmailPattern;
 import com.zhenhappy.util.report.EchartMapResponse;
@@ -18,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,8 @@ import com.zhenhappy.util.Page;
 public class CustomerInfoManagerService {
 	@Autowired
 	private CustomerInfoDao customerInfoDao;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private CustomerSurveyDao customerSurveyDao;
 	@Autowired
@@ -234,11 +238,11 @@ public class CustomerInfoManagerService {
 			if(countries != null && countries.size()>0){
 				for (int i=0;i<countries.size();i++){
 					WCountry country = countries.get(i);
-					provinceList.add(country.getChineseName());
+					provinceList.add(country.getCountryValue());
 					List<TExhibitor> groups = getHibernateTemplate().find("from TExhibitor where country = ?", new Object[]{country.getId()});
 					int provinceCount = groups.size();
 					JsonDataForReport json = new JsonDataForReport();
-					json.setName(country.getChineseName());
+					json.setName(country.getCountryValue());
 					json.setValue(provinceCount);
 					jsonList.add(json);
 				}
@@ -250,8 +254,150 @@ public class CustomerInfoManagerService {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
 		JSONArray jsonArray = JSONArray.fromObject(jsonList);
-		System.out.println("--result: " + jsonArray.toString());
+		//System.out.println("--result: " + jsonArray.toString());
 		mapResponse.setData(jsonArray.toString());
+		mapResponse.setResultCode(0);
+		return mapResponse;
+	}
+
+	/**
+	 * 分页查询展商/客商用于报表
+	 * @param source 0表示：展商，   1表示：客商
+	 * @param owner 空表示：全部，   数字表示：对应所属者
+	 * @param region  0表示：国内    1表示：全球
+	 * @param dimen  0表示：月份    1表示：天数
+	 * @param begindate   起始日期
+	 * @param enddate   截止日期
+	 * @param request
+	 */
+	public EchartMapResponse queryDataReportEx(QueryCustomerRequest request, String owner, Integer source, Integer region, Integer dimen,
+													   String begindate, String enddate) {
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+
+		EchartMapResponse mapResponse = new EchartMapResponse();
+		String beginDay = "";
+		String endDay = "";
+		if(dimen == 0){
+			beginDay = begindate;
+			endDay = enddate;
+		} else {
+			StringBuffer sb = new StringBuffer();
+			sb.append(begindate + "-01");
+			beginDay = sb.toString();
+			sb = new StringBuffer();
+			sb.append(enddate + "-01");
+			endDay = sb.toString();
+		}
+
+		List<QueryExhibitorDataReport> resultList = new ArrayList<QueryExhibitorDataReport>();
+		List<QueryExhibitorDataReport> resultListEx = new ArrayList<QueryExhibitorDataReport>();
+
+		List<QueryExhibitorDataReport> inlandResultList = new ArrayList<QueryExhibitorDataReport>();
+		List<QueryExhibitorDataReport> outlandResultList = new ArrayList<QueryExhibitorDataReport>();
+		List xInlandList = new ArrayList();
+		List xOutLandList = new ArrayList();
+		String inlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
+				"from t_exhibitor where country = 44 and create_time between \'" + beginDay + "\' and \'" + endDay  +
+				"\' group by convert(char(7) ,create_time , 120)" +
+				" order by convert(char(7) ,create_time , 120)";
+		if(owner != null && !owner.equalsIgnoreCase("")){
+			inlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
+					"from t_exhibitor where country = 44 and tag = " + owner + " and create_time between \'" + beginDay + "\' and \'" + endDay  +
+					"\' group by convert(char(7) ,create_time , 120)" +
+					" order by convert(char(7) ,create_time , 120)";
+		}
+		if(source == 1){
+			inlandSqlStr = "select convert(char(7) ,CreateTime , 120) as yearMonth, count(*) as total " +
+					"from visitor_Info where country = 44 and CreateTime between \'" + beginDay + "\' and \'" + endDay  +
+					"\' group by convert(char(7) ,CreateTime , 120)" +
+					" order by convert(char(7) ,CreateTime , 120)";
+		}
+		List<Map<String, Object>> inlandQueryList = jdbcTemplate.queryForList(inlandSqlStr);
+		for (int i = 0; i < inlandQueryList.size(); i++) {
+			Map exhibitorMap = inlandQueryList.get(i);
+			QueryExhibitorDataReport temp = new QueryExhibitorDataReport();
+			Iterator it = exhibitorMap.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry entry = (Map.Entry) it.next();
+				Object key = entry.getKey();
+				Object value = entry.getValue();
+				if("yearMonth".equalsIgnoreCase(key.toString())) {
+					temp.setYearMonth(value.toString());
+					xInlandList.add(value.toString());
+				}
+				if("total".equalsIgnoreCase(key.toString())) {
+					temp.setTotal(value.toString());
+				}
+			}
+			inlandResultList.add(temp);
+		}
+
+		String outlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
+				"from t_exhibitor where country <> 44 and create_time between \'" + beginDay + "\' and \'" + endDay  +
+				"\' group by convert(char(7) ,create_time , 120)" +
+				" order by convert(char(7) ,create_time , 120)";
+		if(owner != null && !owner.equalsIgnoreCase("")){
+			outlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
+					"from t_exhibitor where country <> 44 and tag = " + owner + " and create_time between \'" + beginDay + "\' and \'" + endDay  +
+					"\' group by convert(char(7) ,create_time , 120)" +
+					" order by convert(char(7) ,create_time , 120)";
+		}
+		if(source == 1){
+			outlandSqlStr = "select convert(char(7) ,CreateTime , 120) as yearMonth, count(*) as total " +
+					"from visitor_Info where country <> 44 and CreateTime between \'" + beginDay + "\' and \'" + endDay  +
+					"\' group by convert(char(7) ,CreateTime , 120)" +
+					" order by convert(char(7) ,CreateTime , 120)";
+		}
+		List<Map<String, Object>> outlandQueryList = jdbcTemplate.queryForList(outlandSqlStr);
+		for (int i = 0; i < outlandQueryList.size(); i++) {
+			Map exhibitorMap = outlandQueryList.get(i);
+			QueryExhibitorDataReport temp = new QueryExhibitorDataReport();
+			Iterator it = exhibitorMap.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry entry = (Map.Entry) it.next();
+				Object key = entry.getKey();
+				Object value = entry.getValue();
+				if("yearMonth".equalsIgnoreCase(key.toString())) {
+					temp.setYearMonth(value.toString());
+					xOutLandList.add(value.toString());
+				}
+				if("total".equalsIgnoreCase(key.toString())) {
+					temp.setTotal(value.toString());
+				}
+			}
+			outlandResultList.add(temp);
+		}
+
+		DiffListOperate opt = new DiffListOperate();
+		List diffListResult = opt.diff(xInlandList, xOutLandList);
+		if(diffListResult != null && diffListResult.size()>0) {
+			for(int i=0;i<diffListResult.size();i++){
+				QueryExhibitorDataReport temp = new QueryExhibitorDataReport();
+				temp.setYearMonth(diffListResult.get(i).toString());
+				temp.setTotal("0");
+				outlandResultList.add(temp);
+			}
+		}
+		diffListResult = opt.diff(xOutLandList, xInlandList);
+		if(diffListResult != null && diffListResult.size()>0) {
+			for(int i=0;i<diffListResult.size();i++){
+				QueryExhibitorDataReport temp = new QueryExhibitorDataReport();
+				temp.setYearMonth(diffListResult.get(i).toString());
+				temp.setTotal("0");
+				inlandResultList.add(temp);
+			}
+		}
+		resultList.addAll(inlandResultList);
+		resultListEx.addAll(outlandResultList);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
+		JSONArray jsonArray = JSONArray.fromObject(resultList);
+		mapResponse.setData(jsonArray.toString());
+		JSONArray jsonArrayEx = JSONArray.fromObject(resultListEx);
+		mapResponse.setMapDataEx(jsonArrayEx.toString());
 		mapResponse.setResultCode(0);
 		return mapResponse;
 	}
@@ -377,6 +523,16 @@ public class CustomerInfoManagerService {
 	@Transactional
 	public List<WCustomer> loadAllInlandCustomer() {
 		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country = 44 order by createdTime desc", new Object[]{});
+		return customers.size() > 0 ? customers : null;
+	}
+
+	/**
+	 * 根据日期范围查询客商列表
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadAllExhibitorsByDate(Date begDate, Date endDate) {
+		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where createdTime between ? and ?", new Object[]{begDate, endDate});
 		return customers.size() > 0 ? customers : null;
 	}
 

@@ -12,14 +12,16 @@ public class EchartMapResponse extends BaseResponse {
     public String legend;//数据分组
     public List<String> mapProvince = new ArrayList<String>();//横坐标
     public String mapData;//纵坐标
+    public String mapDataEx;//纵坐标
 
     public EchartMapResponse() {
     }
 
-    public EchartMapResponse(String legend, List<String> categoryList, String data) {
+    public EchartMapResponse(String legend, List<String> categoryList, String data, String dataEx) {
         this.legend = legend;
         this.mapProvince = categoryList;
         this.mapData = data;
+        this.mapDataEx = dataEx;
     }
 
     public String getLegend() {
@@ -44,5 +46,13 @@ public class EchartMapResponse extends BaseResponse {
 
     public void setData(String data) {
         this.mapData = data;
+    }
+
+    public String getMapDataEx() {
+        return mapDataEx;
+    }
+
+    public void setMapDataEx(String mapDataEx) {
+        this.mapDataEx = mapDataEx;
     }
 }

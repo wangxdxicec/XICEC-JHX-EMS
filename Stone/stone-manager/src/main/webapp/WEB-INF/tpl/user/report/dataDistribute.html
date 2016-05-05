@@ -26,7 +26,7 @@
 <body>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <div>
-    <div id="mapRegin" style="height: 530px;padding:20px;"></div>
+    <div id="mapRegin" style="height: 680px;padding:20px;"></div>
     <div align="center">
         <button type="button" class="btn btn-sm btn-success" onclick="refresh(true)">刷 新</button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -44,8 +44,8 @@
             <option value="helianthus">helianthus</option>
         </select>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span class="text-primary">切换数据对象</span>
-        <select id="data-select" onchange="selectDataSource();">
+        <span class="text-primary">区域</span>
+        <select id="data-select" onchange="selectDataArea();">
             <option selected="true" value='0'>国内</option>
             <option value='1'>全球</option>
         </select>
@@ -66,12 +66,12 @@
         var legend = '';
         var titleText = '';
         if(flag == 0){
-            titleText = '全国客商数据分布图';
-            legend = '国内客商';
+            titleText = '全国展商数据分布图';
+            legend = '国内展商';
             mapType = 'china';
         }else{
-            titleText = '全球客商数据分布图';
-            legend = '全球客商';
+            titleText = '全球展商数据分布图';
+            legend = '全球展商';
             mapType = 'world';
         }
         require.config({
@@ -195,7 +195,7 @@
                     x: 'right',
                     y: 'center',
                     feature: {
-                        mark: true,
+                        mark: {show: true},
                         dataView: {show: true, readOnly: false},
                         restore: {show: true},
                         saveAsImage: {show: true}
@@ -213,11 +213,16 @@
                         name: legend,
                         type: 'map',
                         mapType: mapType,
-                        roam: false,
+                        roam: true,
                         selectedMode: 'single',
                         itemStyle: {
-                            normal: {label: {show: true}, color: '#ffd700'},// for legend
-                            emphasis: {label: {show: true}}
+                            normal: {label: {show: true}, color: '#ffd700'},
+                            emphasis: {borderColor:'#B22222',borderWidth:2, label: {show: true}}
+                        },
+                        mapLocation : {
+                            x : 'center',
+                            y : 'center',
+                            width : '100%'
                         },
                         data:mapValue
                     }
@@ -277,10 +282,8 @@
                             maxValue = countValue;
                         }
                         var oneData = {name:nameValue,value:countValue};
-                        alert(oneData);
                         mapData.push(oneData);
                     }
-                    alert(mapData);
                     maxValue = parseInt(maxValue);
                     initMapChartInfo(mapData, parseInt(maxValue), 'default', 1);
                 } else {
@@ -317,17 +320,13 @@
         }
     }
 
-    function selectDataSource() {
+    function selectDataArea() {
         var value = document.getElementById("data-select").value;
         if(value != "" && value == 0){
             showInlandMapChartData();
         } else {
             showWordMapChartData();
         }
-    }
-    
-    function scancode() {
-        
     }
 </script>
 
