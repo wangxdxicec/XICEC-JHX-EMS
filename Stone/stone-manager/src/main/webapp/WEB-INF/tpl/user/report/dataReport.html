@@ -16,12 +16,7 @@
 			padding: 0px;
 			width: 100%;
 			height: 100%;
-		}/*
-
-		input {
-			width: 100px;
-			height: 30px;
-		}*/
+		}
 	</style>
 </head>
 <body>
@@ -33,14 +28,28 @@
 			<td style="text-align: right">数据对象：</td>
 			<td data-options ="width: $(this).width() * 0.07">
 				<select id="dataSource" onchange="setOwnerEnableOrUnabled();"/>
-					<option selected="true" value='0'>展商</option>
-					<option value='1'>客商</option>
+				<option selected="true" value='0'>展商</option>
+				<option value='1'>客商</option>
 				</select>
 			</td>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<td style="text-align: right">所属人：</td>
 			<td data-options="field: 'tag', formatter: formatTag, width: $(this).width() * 0.07">
 				<select id="exhibitorsTag">
+				</select>
+			</td>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td style="text-align: right">区域：</td>
+			<td data-options ="width: $(this).width() * 0.07">
+				<select id="dataRegion" onchange="changeArea();">
+					<option selected="true" value='0'>国内</option>
+					<option value='1'>国外</option>
+				</select>
+			</td>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td style="text-align: right">省份：</td>
+			<td data-options="field: 'province', formatter: formatProvince, width: $(this).width() * 0.07">
+				<select id="exhibitorsProvince">
 				</select>
 			</td>
 			<!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -107,12 +116,17 @@
 <script type="text/javascript">
 	var mapChart;
 	var owner;
+	var provinceValue;
 	var dataSource;
 	var xAxisValue;
 	var yAxisValue;
 	var yAxisValueEx;
 	var dataRegion;
 	var tags = {};
+	var province ={};
+	var ownerList = [];
+	var provinceList = [];
+	var data_Info = new Array();
 
 	$(document).ready(function () {
 		var myDate=new Date();
@@ -133,12 +147,41 @@
 			success : function(result) {
 				if(result){
 					$("#exhibitorsTag").html('');
-					$("#exhibitorsTag").append('<option value="">全部</option>');
+					$("#exhibitorsTag").append('<option value="-1">全部</option>');
 					for(var i=0,a;a=result.rows[i++];){
 						tags[a.id] = a.name;
+						ownerList.push(a.name);
 						$("#exhibitorsTag").append('<option value="'+a.id+'">'+a.name+'</option>');
 					}
 				}
+			},
+			error : function(result) {
+				$("#exhibitorsTag").html('');
+				document.getElementById('exhibitorsTag').disabled=true;
+			}
+		});
+
+		//加载省份列表
+		$.ajax({
+			type:"POST",
+			dataType:"json",
+			url:"${base}/user/queryProvinceByCountryId",
+			data:{ 'countryId': 44 },
+			success : function(result) {
+				if(result){
+					$("#exhibitorsProvince").html('');
+					document.getElementById('exhibitorsProvince').disabled=false;
+					$("#exhibitorsProvince").append('<option value="-1">全部</option>');
+					for(var i=0,a;a=result[i++];){
+						province[a.id] = a.chineseName;
+						provinceList.push(a.chineseName);
+						$("#exhibitorsProvince").append('<option value="'+a.id+'">'+a.chineseName+'</option>');
+					}
+				}
+			},
+			error : function(result) {
+				$("#exhibitorsProvince").html('');
+				document.getElementById('exhibitorsProvince').disabled=true;
 			}
 		});
 	});
@@ -151,18 +194,30 @@
 		}
 	}
 
+	function formatProvince(val, row) {
+		if (val != null) {
+			if(val > 0 && val <= province.length){
+				return province[val - 1].chineseName;
+			}
+			return null;
+		} else {
+			return null;
+		}
+	}
+
 	function setOwnerEnableOrUnabled() {
 		var source = document.getElementById("dataSource").value;
 		if(source == 0){
 			$("#exhibitorsTag").removeAttr("disabled");
+			$("#dataRegion").removeAttr("disabled");
 		} else {
+			$("#dataRegion").attr("disabled","disabled");
 			$("#exhibitorsTag").attr("disabled","disabled");
 		}
 	}
 
 	function filter(countryId) {
 		var filterParm = "?";
-		alert("countryId: " + countryId);
 		if(document.getElementById("exhibitorsTag").value != ""){
 			filterParm += '&tag=' + document.getElementById("exhibitorsTag").value;
 		}
@@ -172,7 +227,11 @@
 
 	function modifyTheme(){
 		var themeValue = document.getElementById("theme-select").value;
-		initChartInfo(dataSource, xAxisValue,yAxisValue, yAxisValueEx,themeValue, dataRegion);
+		if(dataSource == 1) {
+			initChartInfo(dataSource, xAxisValue,yAxisValue, yAxisValueEx,themeValue, dataRegion);
+		} else {
+			initTreeChartInfo(data_Info);
+		}
 	}
 
 	$('#exportDataDetail').click(function(){
@@ -180,6 +239,7 @@
 		var beginDate = document.getElementById("dataOfBeginDate").value;
 		var endDate = document.getElementById("dataOfEndDate").value;
 		var owner = document.getElementById("exhibitorsTag").value;
+		var proValue = document.getElementById("exhibitorsProvince").value;
 		if(beginDate != '' && endDate != ''){
 			var a1 = beginDate.split("-");
 			var b1 = endDate.split("-");
@@ -203,6 +263,8 @@
 					cidParm3.innerHTML += node3;
 					var node4 = "<input type='hidden' name='owner' value='" + owner + "'/>";
 					cidParm3.innerHTML += node4;
+					var node5 = "<input type='hidden' name='province' value='" + proValue + "'/>";
+					cidParm3.innerHTML += node5;
 					document.getElementById("exportInlandCustomersToExcel").submit();
 					$.messager.alert('提示', '导出所有客商成功');
 				}
@@ -216,6 +278,8 @@
 				cidParm3.innerHTML += node3;
 				var node4 = "<input type='hidden' name='owner' value='" + owner + "'/>";
 				cidParm3.innerHTML += node4;
+				var node5 = "<input type='hidden' name='province' value='" + proValue + "'/>";
+				cidParm3.innerHTML += node5;
 				document.getElementById("exportInlandCustomersToExcel").submit();
 				$.messager.alert('提示', '导出所有客商成功');
 			}
@@ -224,11 +288,13 @@
 
 	function showReport() {
 		dataSource = document.getElementById("dataSource").value;
-		dataRegion = 0;
+		dataRegion = document.getElementById("dataRegion").value;
 		var dimenType = 0;
 		var beginDate = document.getElementById("dataOfBeginDate").value;
 		var endDate = document.getElementById("dataOfEndDate").value;
 		owner = document.getElementById("exhibitorsTag").value;
+		provinceValue = document.getElementById("exhibitorsProvince").value;
+
 		if(beginDate != '' && endDate != ''){
 			var a1 = beginDate.split("-");
 			var b1 = endDate.split("-");
@@ -243,18 +309,27 @@
 					alert("开始时间不能等于结束时间");
 					return;
 				} else{
-					showDataReport(dataSource, owner, dataRegion, dimenType, beginDate, endDate);
+					showDataReport(dataSource, owner, provinceValue, dataRegion, dimenType, beginDate, endDate);
 				}
 			} else{
-				showDataReport(dataSource, owner, dataRegion, dimenType, beginDate, endDate);
+				showDataReport(dataSource, owner, provinceValue, dataRegion, dimenType, beginDate, endDate);
 			}
+		}
+	}
+
+	function changeArea() {
+		dataRegion = document.getElementById("dataRegion").value;
+		if(dataRegion == 0){
+			$("#exhibitorsProvince").removeAttr("disabled");
+		} else {
+			$("#exhibitorsProvince").attr("disabled","disabled");
 		}
 	}
 
 	function changeDimen() {
 		var dimenType = document.getElementById("dimenType").value;
 		if(dimenType != "" && dimenType == 0){
-			document.getElementById('dataOfBeginDate').onclick = function () {
+			document.getElementById('exhibitorsProvince').onclick = function () {
 				setmonth(this);
 			}
 			document.getElementById('dataOfEndDate').onclick = function () {
@@ -270,32 +345,106 @@
 		}
 	}
 
-	function showDataReport(dataSource, owner, dataRegion, dimenType, beginDate, endDate) {
+	function showDataReport(dataSource, owner, provinceValue, dataRegion, dimenType, beginDate, endDate) {
 		$.ajax({
 			url: "${base}/user/queryDataReportEx",
 			type: "post",
 			async : false, //同步执行
-			data: {"source":dataSource, "owner": owner, "region": dataRegion, 'dimen': dimenType, "startdate": beginDate, "enddate": endDate},
+			data: {"source":dataSource, "owner": owner, "province":provinceValue, "region": dataRegion, 'dimen': dimenType, "startdate": beginDate, "enddate": endDate},
 			dataType: "json",
 			success: function (mapValue) {
 				if (mapValue.resultCode == 0) {
-					xAxisValue = [];
-					yAxisValue = [];
-					yAxisValueEx = [];
-					var str = JSON.parse(mapValue.mapData);
-					var strEx = JSON.parse(mapValue.mapDataEx);
-					if(str != null && str.length > 0) {
-						for(var i = 0;i < str.length;i ++){
-							xAxisValue.push(str[i].yearMonth);
-							yAxisValue.push(parseInt(str[i].total));
+					if(dataSource == 1) {
+						xAxisValue = [];
+						yAxisValue = [];
+						yAxisValueEx = [];
+						var str = JSON.parse(mapValue.mapData);
+						var strEx = JSON.parse(mapValue.mapDataEx);
+						if(str != null && str.length > 0) {
+							for(var i = 0;i < str.length;i ++){
+								xAxisValue.push(str[i].yearMonth);
+								yAxisValue.push(parseInt(str[i].total));
+							}
+							for(var i = 0;i < strEx.length;i ++){
+								yAxisValueEx.push(parseInt(strEx[i].total));
+							}
+							initChartInfo(dataSource, xAxisValue, yAxisValue, yAxisValueEx, 'default', dataRegion);
+						} else {
+							$.messager.alert('错误', '没有找到合适的数据，请重新设定查询条件');
 						}
-						for(var i = 0;i < strEx.length;i ++){
-							yAxisValueEx.push(parseInt(strEx[i].total));
+					 } else {
+						data_Info = new Array();
+						if(dataRegion == 0) {
+							var inlandData = JSON.parse(mapValue.mapData);
+							var inland_4 = new Array();
+							var inland_3 = new Array();
+							var inland_2 = new Array();
+							var inland_Info = new Array();
+							if(inlandData != null && inlandData.length > 0) {
+								for(var i = 0;i < inlandData.length;i ++) {
+									var ownerName = inlandData[i].owner;
+									var provinceInfoList = inlandData[i].provinceInfo;
+									if(provinceInfoList != null && provinceInfoList.length > 0) {
+										for(var k = 0;k < provinceInfoList.length;k ++) {
+											var provinceName = provinceInfoList[k].province;
+											var provinceCount = provinceInfoList[k].count;
+											inland_4.push({name:provinceCount, value:provinceCount,level:5, itemStyle: {normal: {color: '#cc5555', label: {position: 'right'}}}});
+											inland_3.push({name:provinceName, children:inland_4,level:4, itemStyle: {normal: {color: '#cc9999'}}});
+											inland_4 = new Array();
+										}
+										inland_2.push({name:ownerName, children:inland_3,level:3, itemStyle: {normal: {color: '#cc9999'}}});
+										inland_3 = new Array();
+									} else {
+										inland_4.push({name:"", value:0,level:5, itemStyle: {normal: {color: '#cc5555', label: {position: 'right'}}}});
+										inland_3.push({name:"", children:inland_4,level:4, itemStyle: {normal: {color: '#cc9999'}}});
+										inland_4 = new Array();
+										inland_2.push({name:ownerName, children:inland_3,level:3, itemStyle: {normal: {color: '#cc9999'}}});
+										inland_3 = new Array();
+									}
+									inland_Info.push({name:"国内展商", children:inland_2,level:2, itemStyle: {normal: {color: '#cc9999'}}});
+									data_Info.push({name:"展商数据", children:inland_Info,level:1, itemStyle: {normal: {color: '#cc9999'}}});
+									inland_Info = new Array();
+								}
+							}
+						} else {
+							var outlnadData = JSON.parse(mapValue.mapDataEx);
+							var outland_4 = new Array();
+							var outland_3 = new Array();
+							var outland_2 = new Array();
+							var outland_Info = new Array();
+							if(outlnadData != null && outlnadData.length > 0) {
+								for(var i = 0;i < outlnadData.length;i ++) {
+									var ownerName = outlnadData[i].owner;
+									var provinceInfoList = outlnadData[i].provinceInfo;
+									if(provinceInfoList != null && provinceInfoList.length > 0) {
+										for(var k = 0;k < provinceInfoList.length;k ++) {
+											var provinceName = provinceInfoList[k].province;
+											var provinceCount = provinceInfoList[k].count;
+											outland_4.push({name:provinceCount, value:provinceCount,level:5, itemStyle: {normal: {color: '#cc5555', label: {position: 'right'}}}});
+											outland_3.push({name:provinceName, children:outland_4,level:4, itemStyle: {normal: {color: '#cc9999'}}});
+											outland_4 = new Array();
+										}
+										outland_2.push({name:ownerName, children:outland_3,level:3, itemStyle: {normal: {color: '#cc9999'}}});
+										outland_3 = new Array();
+									} else {
+										outland_4.push({name:"", value:0,level:5, itemStyle: {normal: {color: '#cc5555', label: {position: 'right'}}}});
+										outland_3.push({name:"", children:outland_4,level:4, itemStyle: {normal: {color: '#cc9999'}}});
+										outland_4 = new Array();
+										outland_2.push({name:ownerName, children:outland_3,level:3, itemStyle: {normal: {color: '#cc9999'}}});
+										outland_3 = new Array();
+									}
+									outland_Info.push({name:"国外展商", children:outland_2,level:2, itemStyle: {normal: {color: '#cc9999'}}});
+									data_Info.push({name:"展商数据", children:outland_Info,level:1, itemStyle: {normal: {color: '#cc9999'}}});
+									outland_Info = new Array();
+								}
+							}
 						}
-						initChartInfo(dataSource, xAxisValue,yAxisValue,yAxisValueEx, 'default', dataRegion);
-					} else {
-						$.messager.alert('错误', '没有找到合适的数据，请重新设定查询条件');
-					}
+						if(data_Info != null && data_Info.length>0) {
+							initTreeChartInfo(data_Info);
+						} else {
+							$.messager.alert('错误', '没有找到合适的数据，请重新设定查询条件');
+						}
+					 }
 				} else {
 					$.messager.alert('错误', '数据报表获取失败');
 				}
@@ -321,8 +470,8 @@
 		require.config({
 			paths: {
 				echarts: '${base}/resource/echarts/echarts',
-				'echarts/chart/bar': '${base}/resource/echarts/echarts',
-				'echarts/chart/line': '${base}/resource/echarts/echarts'
+				'echarts/chart/bar': '${base}/resource/echarts/bar',
+				'echarts/chart/line': '${base}/resource/echarts/line'
 			}
 		});
 
@@ -358,7 +507,7 @@
 			helianthus = theme;
 		});
 
-		require(['echarts','echarts/chart/bar','echarts/chart/line'],DrawEChart);
+		require(['echarts', 'echarts/chart/bar','echarts/chart/line'],DrawEChart);
 		function DrawEChart(ec) {
 			if(themeInfo.toLowerCase() == 'default'){
 				mapChart = ec.init(document.getElementById('dataReportRegin'), def);
@@ -433,6 +582,83 @@
 						name: label2,
 						type: mapType,
 						data: yValueEx
+					}
+				]
+			};
+			mapChart.setOption(option);
+			mapChart.hideLoading();
+		}
+	}
+
+	function initTreeChartInfo(data_Info) {
+		var mapType = 'tree';
+		var titleText = '展商数据报表';
+
+		//console.log("data_Info: " + data_Info);
+		require.config({
+			paths: {
+				echarts: '${base}/resource/echarts/echarts',
+				'echarts/chart/tree': '${base}/resource/echarts/tree'
+			}
+		});
+		var def;
+		require(['${base}/resource/echarts/theme/default'], function(theme) {
+			def = theme;
+		});
+		require(['echarts','echarts/chart/tree'],DrawEChart);
+		function DrawEChart(ec) {
+			mapChart = ec.init(document.getElementById('dataReportRegin'), def);
+			var option = {
+				title : {
+					text: titleText
+				},
+				toolbox: {
+					show : true,
+					feature : {
+						mark : {show: true},
+						dataView : {show: true, readOnly: false},
+						restore : {show: true},
+						saveAsImage : {show: true}
+					}
+				},
+				series : [
+					{
+						name:titleText,
+						type:mapType,
+						orient: 'horizontal',  // vertical horizontal
+						rootLocation: {x: 100,y: 230}, // 根节点位置  {x: 100, y: 'center'}
+						nodePadding: 8,
+						layerPadding: 200,
+						hoverable: false,
+						roam: true,
+						symbolSize: 8,
+						itemStyle: {
+							normal: {
+								color: '#4883b4',
+								label: {
+									show: true,
+									position: 'right',
+									formatter: "{b}",
+									textStyle: {
+										color: '#000',
+										fontSize: 8
+									}
+								},
+								lineStyle: {
+									color: '#ccc',
+									type: 'broken' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
+
+								}
+							},
+							emphasis: {
+								color: '#4883b4',
+								label: {
+									show: false
+								},
+								borderWidth: 0
+							}
+						},
+						data: data_Info
 					}
 				]
 			};

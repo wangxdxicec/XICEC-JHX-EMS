@@ -33,6 +33,20 @@ public class QueryExhibitor {
 		super();
 	}
 
+	public QueryExhibitor(Integer eid) {
+		super();
+		this.eid = eid;
+	}
+
+	public QueryExhibitor(Integer eid,
+						  String company,
+						  String companye) {
+		super();
+		this.eid = eid;
+		this.company = company;
+		this.companye = companye;
+	}
+
 	public QueryExhibitor(Integer eid, 
 						  String username, 
 						  String password, 

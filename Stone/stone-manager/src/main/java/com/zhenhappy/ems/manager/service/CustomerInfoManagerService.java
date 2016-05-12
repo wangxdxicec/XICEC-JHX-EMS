@@ -3,8 +3,12 @@ package com.zhenhappy.ems.manager.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+
+import com.zhenhappy.ems.dao.TagDao;
+import com.zhenhappy.ems.dto.DataReportForProvinceCountInfo;
 import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
 import com.zhenhappy.ems.dto.QueryExhibitorDataReport;
+import com.zhenhappy.ems.dto.QueryDataReportEx;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.CustomerSurveyDao;
 import com.zhenhappy.ems.manager.dto.ModifyCustomerInfo;
@@ -45,6 +49,10 @@ public class CustomerInfoManagerService {
 	private HibernateTemplate hibernateTemplate;
 	@Autowired
 	private CountryProvinceService countryProvinceService;
+	@Autowired
+	private TagDao tagDao;
+	@Autowired
+	private TagManagerService tagManagerService;
 
 	public HibernateTemplate getHibernateTemplate() {
 		return hibernateTemplate;
@@ -270,7 +278,7 @@ public class CustomerInfoManagerService {
 	 * @param enddate   截止日期
 	 * @param request
 	 */
-	public EchartMapResponse queryDataReportEx(QueryCustomerRequest request, String owner, Integer source, Integer region, Integer dimen,
+	public EchartMapResponse queryDataReportEx(QueryCustomerRequest request, Integer owner, Integer province,Integer source, Integer region, Integer dimen,
 													   String begindate, String enddate) {
 		Page page = new Page();
 		page.setPageSize(request.getRows());
@@ -298,22 +306,31 @@ public class CustomerInfoManagerService {
 		List<QueryExhibitorDataReport> outlandResultList = new ArrayList<QueryExhibitorDataReport>();
 		List xInlandList = new ArrayList();
 		List xOutLandList = new ArrayList();
-		String inlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
-				"from t_exhibitor where country = 44 and create_time between \'" + beginDay + "\' and \'" + endDay  +
-				"\' group by convert(char(7) ,create_time , 120)" +
-				" order by convert(char(7) ,create_time , 120)";
-		if(owner != null && !owner.equalsIgnoreCase("")){
-			inlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
-					"from t_exhibitor where country = 44 and tag = " + owner + " and create_time between \'" + beginDay + "\' and \'" + endDay  +
-					"\' group by convert(char(7) ,create_time , 120)" +
-					" order by convert(char(7) ,create_time , 120)";
+		String inlandSqlStr = "";
+		List<String> conditions = new ArrayList<String>();
+		conditions.add(" country = 44 ");
+		if(province != -1){
+			conditions.add(" province = " + province + " ");
 		}
-		if(source == 1){
+		if(source != 1) {
+			if(owner != -1) {
+				conditions.add(" tag = " + owner + " ");
+			}
+			conditions.add(" create_time between \'" +  beginDay + "\' and \'" + endDay + "\'");
+			String conditionsSql = StringUtils.join(conditions, " and ");
+			String conditionsSqlNoOrder = " where " + conditionsSql;
+			inlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
+					"from t_exhibitor " + conditionsSqlNoOrder + " group by convert(char(7) ,create_time , 120)" +
+					" order by convert(char(7) ,create_time , 120)";
+		} else {
+			conditions.add(" CreateTime between \'" +  beginDay + "\' and \'" + endDay + "\'");
+			String conditionsSql = StringUtils.join(conditions, " and ");
+			String conditionsSqlNoOrder = " where " + conditionsSql;
 			inlandSqlStr = "select convert(char(7) ,CreateTime , 120) as yearMonth, count(*) as total " +
-					"from visitor_Info where country = 44 and CreateTime between \'" + beginDay + "\' and \'" + endDay  +
-					"\' group by convert(char(7) ,CreateTime , 120)" +
+					"from visitor_Info " + conditionsSqlNoOrder + " group by convert(char(7) ,CreateTime , 120)" +
 					" order by convert(char(7) ,CreateTime , 120)";
 		}
+
 		List<Map<String, Object>> inlandQueryList = jdbcTemplate.queryForList(inlandSqlStr);
 		for (int i = 0; i < inlandQueryList.size(); i++) {
 			Map exhibitorMap = inlandQueryList.get(i);
@@ -334,22 +351,31 @@ public class CustomerInfoManagerService {
 			inlandResultList.add(temp);
 		}
 
-		String outlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
-				"from t_exhibitor where country <> 44 and create_time between \'" + beginDay + "\' and \'" + endDay  +
-				"\' group by convert(char(7) ,create_time , 120)" +
-				" order by convert(char(7) ,create_time , 120)";
-		if(owner != null && !owner.equalsIgnoreCase("")){
-			outlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
-					"from t_exhibitor where country <> 44 and tag = " + owner + " and create_time between \'" + beginDay + "\' and \'" + endDay  +
-					"\' group by convert(char(7) ,create_time , 120)" +
-					" order by convert(char(7) ,create_time , 120)";
+		String outlandSqlStr = "";
+		conditions = new ArrayList<String>();
+		conditions.add(" country <> 44 ");
+		if(province != -1){
+			conditions.add(" province = " + province + " ");
 		}
-		if(source == 1){
+		if(source != 1) {
+			if(owner != -1) {
+				conditions.add(" tag = " + owner + " ");
+			}
+			conditions.add(" create_time between \'" +  beginDay + "\' and \'" + endDay + "\'");
+			String conditionsSql = StringUtils.join(conditions, " and ");
+			String conditionsSqlNoOrder = " where " + conditionsSql;
+			outlandSqlStr = "select convert(char(7) ,create_time , 120) as yearMonth, count(*) as total " +
+					"from t_exhibitor " + conditionsSqlNoOrder + " group by convert(char(7) ,create_time , 120)" +
+					" order by convert(char(7) ,create_time , 120)";
+		} else {
+			conditions.add(" CreateTime between \'" +  beginDay + "\' and \'" + endDay + "\'");
+			String conditionsSql = StringUtils.join(conditions, " and ");
+			String conditionsSqlNoOrder = " where " + conditionsSql;
 			outlandSqlStr = "select convert(char(7) ,CreateTime , 120) as yearMonth, count(*) as total " +
-					"from visitor_Info where country <> 44 and CreateTime between \'" + beginDay + "\' and \'" + endDay  +
-					"\' group by convert(char(7) ,CreateTime , 120)" +
+					"from visitor_Info " + conditionsSqlNoOrder + " group by convert(char(7) ,CreateTime , 120)" +
 					" order by convert(char(7) ,CreateTime , 120)";
 		}
+
 		List<Map<String, Object>> outlandQueryList = jdbcTemplate.queryForList(outlandSqlStr);
 		for (int i = 0; i < outlandQueryList.size(); i++) {
 			Map exhibitorMap = outlandQueryList.get(i);
@@ -397,6 +423,171 @@ public class CustomerInfoManagerService {
 		JSONArray jsonArray = JSONArray.fromObject(resultList);
 		mapResponse.setData(jsonArray.toString());
 		JSONArray jsonArrayEx = JSONArray.fromObject(resultListEx);
+		mapResponse.setMapDataEx(jsonArrayEx.toString());
+		mapResponse.setResultCode(0);
+		return mapResponse;
+	}
+
+	/**
+	 * 分页查询展商/客商用于报表
+	 * @param sql
+	 * @param conditions 查询条件
+	 * @param beginDay  开始日期
+	 * @param endDay  结束日期
+	 * @param owner   所属者
+	 * @param inOrOut  0表示国内； 1表示国外
+	 * @return
+	 */
+	public List<DataReportForProvinceCountInfo> appendMapInfoData (String sql, List<String> conditions, String beginDay, String endDay, Integer owner, Integer inOrOut) {
+		conditions.add(" create_time between \'" +  beginDay + "\' and \'" + endDay + "\'");
+		String conditionsSql = StringUtils.join(conditions, " and ");
+		String conditionsSqlNoOrder = " where " + conditionsSql;
+
+		String inlandSqlStr = sql + "from t_exhibitor " + conditionsSqlNoOrder + (inOrOut == 0 ?" group by province" : " group by country");
+		//System.out.println("inlandSqlStr: " + inlandSqlStr);
+		TTag tag = tagManagerService.loadTagById(owner);
+		List<DataReportForProvinceCountInfo> provinceCountInfoList = new ArrayList<DataReportForProvinceCountInfo>();
+
+		List<Map<String, Object>> inlandQueryList = jdbcTemplate.queryForList(inlandSqlStr);
+		if(inlandQueryList != null && inlandQueryList.size() > 0) {
+			for (int i = 0; i < inlandQueryList.size(); i++) {
+				DataReportForProvinceCountInfo provinceCountInfo = new DataReportForProvinceCountInfo();
+				provinceCountInfo.setOwner(tag.getName());
+				Map exhibitorMap = inlandQueryList.get(i);
+				Iterator it = exhibitorMap.entrySet().iterator();
+
+				while (it.hasNext()) {
+					Map.Entry entry = (Map.Entry) it.next();
+					Object key = entry.getKey();
+					Object value = entry.getValue();
+					if(inOrOut == 0) {
+						if("provinceId".equalsIgnoreCase(key.toString())) {
+							List<WProvince> provinceList = hibernateTemplate.find("from WProvince where id=?", Integer.parseInt(value.toString()));
+							if(provinceList != null && provinceList.size()>0){
+								WProvince pro = provinceList.get(0);
+								provinceCountInfo.setProvince(pro.getChineseName());
+							}
+						}
+					} else{
+						if("countryId".equalsIgnoreCase(key.toString())) {
+							List<WCountry> countryList = hibernateTemplate.find("from WCountry where id=?", Integer.parseInt(value.toString()));
+							if(countryList != null && countryList.size()>0){
+								WCountry pro = countryList.get(0);
+								provinceCountInfo.setProvince(pro.getChineseName());
+							}
+						}
+					}
+					if("total".equalsIgnoreCase(key.toString())) {
+						provinceCountInfo.setCount(Integer.parseInt(value.toString()));
+					}
+				}
+				provinceCountInfoList.add(provinceCountInfo);
+			}
+		}else {
+			return null;
+		}
+		return  provinceCountInfoList;
+	}
+
+	public EchartMapResponse queryDataReportEx1(QueryCustomerRequest request, Integer owner, Integer province,Integer source, Integer region, Integer dimen,
+											   String begindate, String enddate) {
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+
+		EchartMapResponse mapResponse = new EchartMapResponse();
+		String beginDay = "";
+		String endDay = "";
+		if(dimen == 0){
+			beginDay = begindate;
+			endDay = enddate;
+		} else {
+			StringBuffer sb = new StringBuffer();
+			sb.append(begindate + "-01");
+			beginDay = sb.toString();
+			sb = new StringBuffer();
+			sb.append(enddate + "-01");
+			endDay = sb.toString();
+		}
+
+		List<String> conditions = new ArrayList<String>();
+
+		List<QueryDataReportEx> inlandResultList = new ArrayList<QueryDataReportEx>();
+		List<DataReportForProvinceCountInfo> inlandProvinceCountInfoList = new ArrayList<DataReportForProvinceCountInfo>();
+		String inladnsql = "select province as provinceId, count(*) as total ";
+		if(owner != -1) {
+			conditions.add(" country = 44 ");
+			if(province != -1){
+				conditions.add(" province = " + province + " ");
+			} else {
+				conditions.add(" province <>'' ");
+			}
+			conditions.add(" tag = " + owner + " ");
+			QueryDataReportEx  dataReportEx = new QueryDataReportEx();
+			TTag tag = tagManagerService.loadTagById(owner);
+			inlandProvinceCountInfoList = appendMapInfoData(inladnsql, conditions, beginDay, endDay, owner, 0);
+			conditions = new ArrayList<String>();
+			dataReportEx.setOwner(tag.getName());
+			dataReportEx.setProvinceInfo(inlandProvinceCountInfoList);
+			inlandResultList.add(dataReportEx);
+		} else {
+			List<TTag> tags = tagDao.queryPageByHQL("select count(*) from TTag", "from TTag", new Object[]{}, page);
+			if(tags != null && tags.size()>0){
+				for(int i=0;i<tags.size();i++){
+					QueryDataReportEx  dataReportEx = new QueryDataReportEx();
+					TTag tag = tags.get(i);
+					conditions.add(" country = 44 ");
+					if(province != -1){
+						conditions.add(" province = " + province + " ");
+					} else {
+						conditions.add(" province <>'' ");
+					}
+					conditions.add(" tag = " + tag.getId());
+					inlandProvinceCountInfoList = appendMapInfoData(inladnsql, conditions, beginDay, endDay, tag.getId(), 0);
+					conditions = new ArrayList<String>();
+					dataReportEx.setOwner(tag.getName());
+					dataReportEx.setProvinceInfo(inlandProvinceCountInfoList);
+					inlandResultList.add(dataReportEx);
+				}
+			}
+		}
+
+		conditions = new ArrayList<String>();
+		List<QueryDataReportEx> outlandResultList = new ArrayList<QueryDataReportEx>();
+		String outladnsql = "select country as countryId, count(*) as total ";
+		List<DataReportForProvinceCountInfo> outlandProvinceCountInfoList = new ArrayList<DataReportForProvinceCountInfo>();
+		if(owner != -1) {
+			conditions.add(" country <> 44 ");
+			conditions.add(" tag = " + owner + " ");
+			QueryDataReportEx  dataReportEx = new QueryDataReportEx();
+			TTag tag = tagManagerService.loadTagById(owner);
+			outlandProvinceCountInfoList = appendMapInfoData(outladnsql, conditions, beginDay, endDay, owner, 1);
+			conditions = new ArrayList<String>();
+			dataReportEx.setOwner(tag.getName());
+			dataReportEx.setProvinceInfo(outlandProvinceCountInfoList);
+			outlandResultList.add(dataReportEx);
+		} else {
+			List<TTag> tags = tagDao.queryPageByHQL("select count(*) from TTag", "from TTag", new Object[]{}, page);
+			if(tags != null && tags.size()>0){
+				for(int i=0;i<tags.size();i++){
+					QueryDataReportEx  dataReportEx = new QueryDataReportEx();
+					TTag tag = tags.get(i);
+					conditions.add(" country <> 44 ");
+					conditions.add(" tag = " + tag.getId());
+					outlandProvinceCountInfoList = appendMapInfoData(outladnsql, conditions, beginDay, endDay, tag.getId(), 1);
+					conditions = new ArrayList<String>();
+					dataReportEx.setOwner(tag.getName());
+					dataReportEx.setProvinceInfo(outlandProvinceCountInfoList);
+					outlandResultList.add(dataReportEx);
+				}
+			}
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
+		JSONArray jsonArray = JSONArray.fromObject(inlandResultList);
+		mapResponse.setData(jsonArray.toString());
+		JSONArray jsonArrayEx = JSONArray.fromObject(outlandResultList);
 		mapResponse.setMapDataEx(jsonArrayEx.toString());
 		mapResponse.setResultCode(0);
 		return mapResponse;
@@ -531,8 +722,8 @@ public class CustomerInfoManagerService {
 	 * @return
 	 */
 	@Transactional
-	public List<WCustomer> loadAllExhibitorsByDate(Date begDate, Date endDate) {
-		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where createdTime between ? and ?", new Object[]{begDate, endDate});
+	public List<WCustomer> loadAllExhibitorsByDate(Integer province, Date begDate, Date endDate) {
+		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where province = ? and createdTime between ? and ?", new Object[]{province, begDate, endDate});
 		return customers.size() > 0 ? customers : null;
 	}
 

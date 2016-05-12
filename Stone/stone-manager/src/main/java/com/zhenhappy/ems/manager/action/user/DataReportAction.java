@@ -89,7 +89,8 @@ public class DataReportAction extends BaseAction {
     @ResponseBody
     @RequestMapping(value = "queryDataReportEx")
     public EchartMapResponse queryDataReportEx(@RequestParam(value = "source", defaultValue = "0") Integer[] source,
-                                               @RequestParam(value = "owner") String owner,
+                                               @RequestParam(value = "owner", defaultValue = "-1") Integer owner,
+                                               @RequestParam(value = "province", defaultValue = "-1") Integer province,
                                                @RequestParam(value = "region", defaultValue = "") Integer[] region,
                                                @RequestParam("dimen") Integer[] dimen,
                                                @RequestParam("startdate") String begindate,
@@ -97,7 +98,11 @@ public class DataReportAction extends BaseAction {
                                                @ModelAttribute QueryCustomerRequest request) {
         EchartMapResponse response = new EchartMapResponse();
         try {
-            response = customerInfoManagerService.queryDataReportEx(request, owner, source[0], region[0], dimen[0], begindate, enddate);
+            if(source[0] == 1) {
+                response = customerInfoManagerService.queryDataReportEx(request, owner, province, source[0], region[0], dimen[0], begindate, enddate);
+            } else {
+                response = customerInfoManagerService.queryDataReportEx1(request, owner, province, source[0], region[0], dimen[0], begindate, enddate);
+            }
         } catch (Exception e) {
             response.setResultCode(1);
             log.error("query inland customers report error.", e);
@@ -114,12 +119,13 @@ public class DataReportAction extends BaseAction {
      */
     @RequestMapping(value = "exportDataReportInfo", method = RequestMethod.POST)
     public ModelAndView exportDataReportInfo(@RequestParam(value = "source", defaultValue = "0") Integer[] source,
-                                             @RequestParam(value = "owner", defaultValue = "") Integer owner,
+                                             @RequestParam(value = "owner", defaultValue = "-1") Integer owner,
+                                             @RequestParam(value = "province", defaultValue = "-1") Integer province,
                                              @RequestParam("startdate") String begindate,
                                              @RequestParam("enddate") String enddate) {
         Map model = new HashMap();
         if(source[0] == 0){
-            List<TExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitorsByDate(owner, strToDate(begindate), strToDate(enddate));
+            List<TExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitorsByDate(owner, province, begindate, enddate);
             List<QueryExhibitorInfo> queryExhibitorInfos = importExportService.exportExhibitor(exhibitors);
             model.put("list", queryExhibitorInfos);
             String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "电话", "传真", "邮箱", "网址", "中文地址", "英文地址", "邮编", "产品分类", "主营产品(中文)", "主营产品(英文)", "公司简介", "发票抬头", "地税税号" };
@@ -132,7 +138,7 @@ public class DataReportAction extends BaseAction {
             model.put("sheetName", "展商基本信息");
         }
         else {
-            List<WCustomer> visitorInfos = customerInfoManagerService.loadAllExhibitorsByDate(strToDate(begindate), strToDate(enddate));
+            List<WCustomer> visitorInfos = customerInfoManagerService.loadAllExhibitorsByDate(province, strToDate(begindate), strToDate(enddate));
             List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(visitorInfos);
             model.put("list", exportCustomer);
             String[] titles = new String[] { "公司中文名", "姓名", "性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
