@@ -11,19 +11,13 @@
 
     <context:component-scan base-package="com.zhenhappy.ems.manager.action"/>
     <mvc:resources mapping="/resource/**" location="/resource/"/>
-    <!-- <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix"> <value>/WEB-INF/pages/</value> </property> <property
-        name="suffix"> <value>.jsp</value> </property> </bean> -->
     <!-- 国际化操作 拦截器  -->
-    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-    </bean>
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
 
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"></bean>
 
-    <bean
-            class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
-    <bean
-            class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <list>
                 <ref bean="mappingFastJsonHttpMessageConverter"/>
@@ -31,13 +25,7 @@
         </property>
     </bean>
 
-    <!-- 解析json请求数据，将xml转换为java对象 -->
-    <!-- <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-        <property name="supportedMediaTypes"> <list> <value>application/json;charset=UTF-8</value>
-        <value>text/html;charset=UTF-8</value> </list> </property> </bean> -->
-
-    <bean id="mappingFastJsonHttpMessageConverter"
-          class="com.zhenhappy.fastJson.MappingFastJsonHttpMessageConverter">
+    <bean id="mappingFastJsonHttpMessageConverter" class="com.zhenhappy.fastJson.MappingFastJsonHttpMessageConverter">
         <property name="supportedMediaTypes">
             <list>
                 <value>application/json</value>
@@ -51,6 +39,7 @@
             </array>
         </property>
     </bean>
+
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basename" value="language/messages"></property>
     </bean>
@@ -69,7 +58,6 @@
             </props>
         </property>
     </bean>
-
 
     <!-- freemarker的配置 -->
     <bean id="freemarkerConfig"
@@ -91,7 +79,6 @@
                 <entry key="resource" value="/manager/resource"/>
             </map>
         </property>
-
     </bean>
     <!-- FreeMarker视图解析 如返回student。。在这里配置后缀名ftl和视图解析器。。 -->
     <bean id="viewResolver"
@@ -101,10 +88,27 @@
                   value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
 
         <property name="suffix" value=".html"/>
+        <property name="order" value="0" />
         <property name="contentType" value="text/html;charset=utf-8"/>
         <property name="exposeRequestAttributes" value="true"/>
         <property name="exposeSessionAttributes" value="true"/>
         <property name="exposeSpringMacroHelpers" value="true"/>
         <property name="requestContextAttribute" value="rc" />
+    </bean>
+
+    <!-- 设置JSP的配置文件路径 -->
+    <bean id="jspViewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/tpl/"/>
+        <property name="suffix" value=".jsp"/>
+        <property name="order" value="1" />
+    </bean>
+
+    <!-- 设置html的配置文件路径 -->
+    <bean id="htmlViewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/tpl/"/>
+        <property name="suffix" value=".html"/>
+        <property name="order" value="1" />
     </bean>
 </beans>

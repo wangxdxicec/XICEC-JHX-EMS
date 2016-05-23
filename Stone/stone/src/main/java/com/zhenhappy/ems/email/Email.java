@@ -10,7 +10,8 @@ public class Email {
 	private String receivers;
 	private String subject;
     private int gender;
-	private String fromAddress = "service@stonefair.org.cn";
+	//private String fromAddress = "service@stonefair.org.cn";
+	private String fromAddress = "do-not-reply@stonefair.org.cn";
 	private int flag;
 
 	public Email() {

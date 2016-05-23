@@ -69,7 +69,7 @@ public class ExhibitorAction extends BaseAction {
     private ImportExportAction importExportAction;
     @Autowired
     private SystemConfig systemConfig;
-    
+
     /**
      * 分页查询展商列表
      * @param request

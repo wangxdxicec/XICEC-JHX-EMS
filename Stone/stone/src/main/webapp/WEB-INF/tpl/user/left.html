@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<#import "/common/spring.ftl" as spring />
+<html lang="zh-cn">
 <style>
     .leftNav {
         height: 36px;
@@ -62,10 +65,26 @@
         background-image: url("${resource}/images/nav2.jpg");
     }
 </style>
+<#assign exhibitor_data_end_html = "${exhibitor_data_end_html}">
 <div style="float: left;width: 234px;min-height: 200px;background-color: #ffffff">
     <div id="leftExhibitor" class="leftNav">
-        <a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a>
-        <i></i>
+        <#if rc.locale=="zh_CN">
+            <#if .now?date gt exhibitor_data_end_html?date>
+                <a href="#" onclick="showInfoZh();"><@spring.message "module.exhibitor"/></a>
+                <i></i>
+            <#else>
+                <a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a>
+                <i></i>
+            </#if>
+        <#else>
+            <#if .now?date gt exhibitor_data_end_html?date>
+                <a href="#" onclick="showInfoEn();"><@spring.message "module.exhibitor"/></a>
+                <i></i>
+            <#else>
+                <a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a>
+                <i></i>
+            </#if>
+        </#if>
     </div>
     <!--<div id="leftProduct" class="leftNav">-->
         <!--<a href="${base}/user/products.html"><@spring.message "module.product"/></a>-->
@@ -132,4 +151,12 @@
     $(".leftNav").click(function(){
         window.location.href = $(this).find("a").attr("href");
     })
+
+    function showInfoZh() {
+        alert("已截止提交。");
+    }
+
+    function showInfoEn() {
+        alert("File Closed.");
+    }
 </script>

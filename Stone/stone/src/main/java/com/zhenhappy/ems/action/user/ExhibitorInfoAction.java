@@ -6,7 +6,6 @@ import com.zhenhappy.ems.dto.*;
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.entity.TExhibitorMeipai;
-import com.zhenhappy.ems.entity.TExhibitorMsg;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.MeipaiService;
 import com.zhenhappy.ems.service.MsgService;
@@ -18,14 +17,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.ejb.Local;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -40,8 +36,8 @@ import java.util.Locale;
  * Created by lianghaijian on 2014-04-08.
  */
 @Controller
-@SessionAttributes(value = Principle.PRINCIPLE_SESSION_ATTRIBUTE)
 @RequestMapping(value = "user")
+@SessionAttributes(value = Principle.PRINCIPLE_SESSION_ATTRIBUTE)
 public class ExhibitorInfoAction extends BaseAction {
 
     @Autowired
@@ -58,6 +54,9 @@ public class ExhibitorInfoAction extends BaseAction {
 
     @Autowired
     private MsgService msgService;
+
+    @Autowired
+    private ImportExportAction importExportAction;
 
     private static Logger log = Logger.getLogger(ExhibitorInfoAction.class);
 
@@ -169,20 +168,36 @@ public class ExhibitorInfoAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "updateinfo", method = RequestMethod.POST)
-    public ModelAndView updateInfo(@ModelAttribute TExhibitorInfo exhibitorInfo, @RequestParam("companyLogo") MultipartFile companyLogo, HttpServletRequest request, HttpServletResponse response, Locale locale) throws IOException {
+    public ModelAndView updateInfo(@ModelAttribute TExhibitorInfo exhibitorInfo,
+                                   @RequestParam("companyLogo") MultipartFile companyLogo,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   Locale locale) throws IOException {
         ModelAndView modelAndView = new ModelAndView();
         try {
             Principle principle = (Principle) request.getSession().getAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE);
             TExhibitor exhibitor = exhibitorService.getExhibitorByEid(principle.getExhibitor().getEid());
             exhibitorInfo.setEid(principle.getExhibitor().getEid());
             if (companyLogo != null && companyLogo.getSize() != 0) {
-                String fileName = systemConfig.getVal(Constants.appendix_directory) + "/" + new Date().getTime() + "." + FilenameUtils.getExtension(companyLogo.getOriginalFilename());
-                FileUtils.copyInputStreamToFile(companyLogo.getInputStream(), new File(fileName));
-                exhibitorInfo.setLogo(fileName);
+                if(companyLogo.getSize()/1024 > 1024) {
+                    if (locale.equals(Locale.US)) {
+                        modelAndView.setViewName("/user/info/update_en");
+                        modelAndView.addObject("alert", "The file size can not be more than 1M");
+                    } else {
+                        modelAndView.setViewName("/user/info/update");
+                        modelAndView.addObject("alert", "上传图片超过1M");
+                    }
+                    modelAndView.addObject("redirect", "/user/info");
+                    return modelAndView;
+                } else {
+                    String fileName = systemConfig.getVal(Constants.appendix_directory) + "/" + new Date().getTime() + "." + FilenameUtils.getExtension(companyLogo.getOriginalFilename());
+                    FileUtils.copyInputStreamToFile(companyLogo.getInputStream(), new File(fileName));
+                    exhibitorInfo.setLogo(fileName);
+                }
             }
             TExhibitorInfo info = exhibitorService.loadExhibitorInfoByEid(exhibitorInfo.getEid());
-            /*exhibitorInfo.setCompany(exhibitor.getCompany());
-            exhibitorInfo.setCompanyEn(exhibitor.getCompanye());*/
+            exhibitorInfo.setCompany(info.getCompany());
+            exhibitorInfo.setCompanyEn(info.getCompanyEn());
             exhibitorInfo.setCreateTime(info.getCreateTime());
             exhibitorInfo.setIsDelete(info.getIsDelete());
             exhibitorInfo.setAdminUpdateTime(info.getAdminUpdateTime());
@@ -214,6 +229,50 @@ public class ExhibitorInfoAction extends BaseAction {
             log.error("update exhibitor information error.", e);
         }
         return modelAndView;
+    }
+
+    @RequestMapping(value = "showLogo", method = RequestMethod.GET)
+    public void showLogo(HttpServletResponse response, @RequestParam("eid") Integer eid) {
+        try {
+            String logoFileName = exhibitorService.loadExhibitorInfoByEid(eid).getLogo();
+            if (StringUtils.isNotEmpty(logoFileName)) {
+                File logo = new File(logoFileName);
+                if (!logo.exists()) return;
+                OutputStream outputStream = response.getOutputStream();
+                FileUtils.copyFile(logo, outputStream);
+                outputStream.close();
+                outputStream.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "uploadCompanyLogo", method={RequestMethod.POST,RequestMethod.GET})
+    public BaseResponse uploadCompanyLogo(@RequestParam MultipartFile inputLogo,
+                                          @ModelAttribute HttpServletRequest request,
+                                          @RequestParam("eid") Integer eid) {
+        BaseResponse response = new BaseResponse();
+        try {
+            if(eid != null){
+                TExhibitorInfo info = exhibitorService.loadExhibitorInfoByEid(eid);
+                String oldLogoPath = info.getLogo();
+                System.out.println("--oldLogoPath: " + oldLogoPath + "--eid: " + eid);
+                File logo = importExportAction.upload(inputLogo, null, null);
+                if(StringUtils.isNotEmpty(oldLogoPath)){
+                    File oldLogo = new File(oldLogoPath);
+                    if(oldLogo.exists() == false) FileUtils.deleteQuietly(oldLogo);
+                }
+                info.setLogo(logo.getPath());
+                exhibitorService.update(info);
+            }else{
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            log.error("update company logo error.", e);
+            response.setResultCode(1);
+        }
+        return response;
     }
 
     /**

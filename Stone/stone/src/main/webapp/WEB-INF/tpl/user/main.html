@@ -9,7 +9,6 @@
 
     <title><@spring.message "site"/></title>
 
-
     <#include "/common/common-js.html" />
     <!-- Custom styles for this template -->
     <link href="${resource}/bootstrap/b2/css/bootstrap.css" rel="stylesheet">
@@ -90,29 +89,24 @@
 <body>
 <!-- /.navbar -->
 <#include "/user/header.html" />
+<#assign exhibitor_data_end_html = "${exhibitor_data_end_html}">
 <div style="width: 100%;padding-bottom: 20px;border-bottom: 1px #d3d3d3 solid;margin-bottom: 40px">
     <div style="width: 973px;margin: 0px auto;">
         <div>
-            <div style="margin-left: 7px;float: left">
-                <img src="${resource}/images/index_16.gif">
-            </div>
-            <div style="margin-left: 7px;float:left;margin-left: 30px">
-                <img src="${resource}/images/index_18.gif">
-            </div>
-            <div style="margin-left: 7px;float: left;margin-left: 30px">
-                <img src="${resource}/images/index_19.gif">
-            </div>
+            <div style="margin-left: 7px;float: left"><img src="${resource}/images/index_16.gif"></div>
+            <div style="margin-left: 7px;float:left;margin-left: 30px"><img src="${resource}/images/index_18.gif"></div>
+            <div style="margin-left: 7px;float: left;margin-left: 30px"><img src="${resource}/images/index_19.gif"></div>
             <div style="clear:both;"></div>
         </div>
         <div style="margin-top: 18px">
             <#if rc.locale=="zh_CN">
-                <#if .now?date gt "2015-12-20"?date>
-                    <div class="boxClose">
-                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                            <h4><a href="#"><@spring.message "module.exhibitor"/></a></h4>
-                            <h6><a href="#"><@spring.message "module.exhibitor.descNo"/></a></h6>
-                        </div>
+                <#if .now?date gt exhibitor_data_end_html?date>
+                <div class="boxClose">
+                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                        <h4><a href="#"><@spring.message "module.exhibitor"/></a></h4>
+                        <h6><a href="#"><@spring.message "module.exhibitor.descNo"/></a></h6>
                     </div>
+                </div>
                 <#else>
                     <div class="boxOff">
                         <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
@@ -122,13 +116,13 @@
                     </div>
                 </#if>
             <#else>
-                <#if .now?date gt "2015-12-28"?date>
-                    <div class="boxClose">
-                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                            <h4><a href="#"><@spring.message "module.exhibitor"/></a></h4>
-                            <h6><a href="#"><@spring.message "module.exhibitor.descNo"/></a></h6>
-                        </div>
+                <#if .now?date gt exhibitor_data_end_html?date>
+                <div class="boxClose">
+                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                        <h4><a href="#"><@spring.message "module.exhibitor"/></a></h4>
+                        <h6><a href="#"><@spring.message "module.exhibitor.descNo"/></a></h6>
                     </div>
+                </div>
                 <#else>
                     <div class="boxOff">
                         <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
@@ -138,6 +132,7 @@
                     </div>
                 </#if>
             </#if>
+
             <div class="boxClose" style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <!--<h4><a href="${base}/user/products.html"><@spring.message "module.product"/></a></h4>-->
@@ -174,10 +169,10 @@
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <#if rc.locale=="zh_CN">
                         <h4><a href="${base}/resource/2016厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a></h4>
-                        <h6><a href="${base}/resource/2016厦门石材展广告招租函.pdf">2016.2.1截止</a></h6>
+                        <h6><a href="${base}/resource/2016厦门石材展广告招租函.pdf">${exhibitor_data_end_html2017}.2.1截止</a></h6>
                         <#else>
                             <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf"><@spring.message "module.advise"/></a></h4>
-                            <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf">Submitting Deadline: Jan. 31, 2015</a></h6>
+                            <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf">Submitting Deadline: Jan. 31, ${exhibitor_data_end_html2017}</a></h6>
                     </#if>
                 </div>
             </div>
@@ -224,7 +219,6 @@
 
     </div>
 </div>
-
 
 <!--<#if rc.locale=="zh_CN">-->
     <!--&lt;!&ndash;微信1右侧漂浮&ndash;&gt;-->

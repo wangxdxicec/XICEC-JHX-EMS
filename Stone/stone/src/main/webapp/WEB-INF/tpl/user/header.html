@@ -132,6 +132,7 @@
             <div class="button_right"></div>
             <div style="clear: both"></div>
         </div>
+
         <#if rc.locale=="zh_CN">
             <div id="index" class="b button buttonOff">
                 <div class="button_left"></div>
@@ -228,7 +229,7 @@
             $(this).find("a").click();
         })
         var kaishi = new Date();
-        kaishi.setYear(2017);
+        kaishi.setYear(${exhibitor_data_end_html2017});
         kaishi.setMonth(2);
         kaishi.setDate(6);
         var now = new Date();

@@ -114,7 +114,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-					<warName>stone</warName>
+					<warName>ROOT</warName>
 				</configuration>
 			</plugin>
 			<plugin>

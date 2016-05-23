@@ -184,11 +184,10 @@ public class MailServiceImpl implements MailService {
         // 通过指定模板名获取FreeMarker模板实例
         Template template = null;
         if (email.getFlag() == 2) {
-            template = freeMarker.getConfiguration().getTemplate("mail/mailTemplate2.html");
+            template = freeMarker.getConfiguration().getTemplate("user/mail/mailTemplate2.html");
         }else{
-            template = freeMarker.getConfiguration().getTemplate("mail/mailTemplate1.html");
+            template = freeMarker.getConfiguration().getTemplate("user/mail/mailTemplate1.html");
         }
-
 
         // FreeMarker通过Map传递动态数据
         Map<Object, Object> model = new HashMap<Object, Object>();

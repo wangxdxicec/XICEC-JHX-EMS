@@ -41,6 +41,7 @@ var words = {
 
     //info
     isRequired:"不能为空",
-    unread:"未读"
-
+    unread:"未读",
+    
+    exhibitorisnull:"公司信息查找错误，请联系主委会，谢谢！"
 }

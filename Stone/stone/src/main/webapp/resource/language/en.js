@@ -42,5 +42,6 @@ var words = {
     //info
     isRequired:"is required",
 
-    unread:"Unread"
+    unread:"Unread",
+    exhibitorisnull:"Faile to find company info，Please contact our manager，Thank you！"
 }
