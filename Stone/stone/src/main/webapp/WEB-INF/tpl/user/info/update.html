@@ -287,6 +287,22 @@
                         </#list>
                     </div>
                 </div>
+
+                <hr/>
+                <div style="color: #f1b426;font-size: 16px;border-bottom: 1px #dbdbdb solid;line-height: 32px;font-weight: bolder"><@spring.message "info.update.exhibition.company_hignlight"/></div>
+                <div class="row-fluid" style="margin:20px auto auto auto;">
+                    <div class="control-group">
+                        <label for="company_hignlight" class="control-label"><@spring.message"info.update.exhibition.company_hignlight_info"/>
+                            <font color="#dc143c">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            (不能超过200字)</font></label>
+                        <div class="controls">
+                            <textarea style="height:180px;width:350px;resize: none;" catValidate="required:true"
+                                      name="company_hignlight" class="form-control" id="company_hignlight">${updateInfo.company_hignlight!''}</textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <#if exhibitor_data_end_html?date gt .now?date>
                     <button type="button" style="margin-top: 10px;" name="previewCatagory" class="btn btn-warning"><@spring.message "info.update.exhibition.preview"/></button>
                     <button type="button" style="margin-top: 10px;margin-left: 10px" id="saveButton" name="saveButton" class="btn btn-warning"><@spring.message "info.update.exhibition.save"/></button>
@@ -592,9 +608,9 @@
             });
 //			console.log(nowSelected);
 			if(nowSelected.length == 0) {
-				alert("产品所属分类不能为空,请至少选择一项")
-				return;
-			}
+                alert("产品所属分类不能为空,请至少选择一项")
+                return;
+            }
             $("#classjson").val($.toJSON(request));
             function needValidate(o){
                 var catValidate = $("#infoform [name='"+o.name+"']").attr("catValidate");
@@ -611,6 +627,12 @@
                         return;
                     }
                 }
+                if(formData[i].name=='company_hignlight'){
+					if(formData[i].value.length>200){
+						alert("公司亮点简介不能超过200个字");
+						return;
+					}
+				}
 //				if(formData[i].name=='mark'){
 //					if(formData[i].value==''){
 //						alert("公司简介不能为空");

@@ -13,11 +13,15 @@ public class EmailPattern {
     }
 
     public boolean isEmailPattern(String str) {
-        boolean flag = false;
+        /*boolean flag = false;
         Pattern p = Pattern.compile("^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\\.([a-zA-Z0-9_-])+)+$");
         Matcher m = p.matcher(str);
-        flag = m.matches();
-        return flag;
+        flag = m.matches();*/
+
+        String emailStr = "^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$";
+        Pattern p = Pattern.compile(emailStr);
+        Matcher m = p.matcher(str);
+        return m.matches();
     }
 
     public boolean isMobileNO(String mobiles) {

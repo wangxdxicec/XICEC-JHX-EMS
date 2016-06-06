@@ -21,7 +21,7 @@ public class CustomerInfoDaoImp extends BaseDaoHibernateImp<WCustomer> implement
 				" a.backupEmail, a.mobilePhoneCode, a.mobilePhone, a.telephoneCode, a.telephone, a.telephoneCode2," +
 				" a.faxCode, a.fax, a.faxCode2, a.website, a.remark, a.createdIp, a.createdTime, a.updatedIp," +
 				" a.updateTime, a.sendEmailNum, a.sendMsgNum, a.sendEmailDate, a.isDisabled, a.guid, a.isProfessional, " +
-				"a.isjudged, a.isMobile) from WCustomer a where a.id in (:ids)");
+				"a.isjudged, a.isMobile) from WCustomer a where a.id in (:ids) order by a.updateTime desc");
 		q.setParameterList("ids", ids);
 		return q.list();
 	}

@@ -60,7 +60,7 @@ public class TUserInfoService {
 		page.setPageIndex(1);
 		String conditionsSqlOrder = "where u.roleId = r.roleId";
 		List<QueryUserInfo> userInfoList = userInfoDao.queryPageByHQL("select count(*) from TUserInfo u, TUserRole r " + conditionsSqlOrder,
-				"select new com.zhenhappy.ems.dto.managerrole.QueryUserInfo(u.id, u.userName, u.password, u.userType, u.roleId, r.roleName,u.userDescription) "
+				"select new com.zhenhappy.ems.dto.managerrole.QueryUserInfo(u.id,u.name, u.userName, u.password, u.userType, u.roleId, r.roleName,u.userDescription) "
 						+ "from TUserInfo u, TUserRole r " + conditionsSqlOrder, new Object[]{}, page);
 		if(userInfoList != null && userInfoList.size()>0){
 			List<TUserInfo> userInfoResultList = new ArrayList<TUserInfo>();
@@ -68,6 +68,7 @@ public class TUserInfoService {
 				QueryUserInfo queryUserInfo = userInfoList.get(i);
 				TUserInfo tUserInfo = new TUserInfo();
 				tUserInfo.setId(queryUserInfo.getId());
+				tUserInfo.setName(queryUserInfo.getName());
 				tUserInfo.setUserName(queryUserInfo.getUsername());
 				tUserInfo.setPassword(queryUserInfo.getPassword());
 				tUserInfo.setUserType(queryUserInfo.getUserType());
@@ -80,10 +81,6 @@ public class TUserInfoService {
 		} else {
 			return null;
 		}
-		/*List<TUserInfo> userInfoList = userInfoDao.queryByHql("select u.id, u.userName, u.password, u.userType, u.roleId, r.roleName,u.userDescription" +
-				" from TUserInfo u, TUserRole r where u.roleId = r.roleId", new Object[]{});*/
-		/*List<TUserInfo> userInfoList = userInfoDao.queryByHql("select u.id, u.userName, u.password, u.userType, u.roleId,u.userDescription" +
-				" from TUserInfo u", new Object[]{});*/
 	}
 
 	@Transactional()
@@ -143,5 +140,19 @@ public class TUserInfoService {
 		if (id != null) {
 			deleteUserInfo(id);
 		}
+	}
+
+	//根据ownerId查找，用于资料分享操作
+	@Transactional()
+	public TUserInfo findOneUserInfoByOwnerId(Integer ownerId){
+		List<TUserInfo> userInfoist = userInfoDao.queryByHql("from TUserInfo where ownerId = ?", new Object[]{ownerId});
+		return userInfoist.size() > 0 ? userInfoist.get(0) : null;
+	}
+
+	//根据ownerId查找，用于资料分享操作
+	@Transactional()
+	public List<TUserInfo> findUserInfoByRoleId(Integer roleId){
+		List<TUserInfo> userInfoist = userInfoDao.queryByHql("from TUserInfo where roleId = ?", new Object[]{roleId});
+		return userInfoist.size() > 0 ? userInfoist : null;
 	}
 }

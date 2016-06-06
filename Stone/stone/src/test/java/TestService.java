@@ -32,45 +32,45 @@ public class TestService {
 
     @Test
     public void testGetAllTypes() {
-        System.out.println(JSONObject.toJSONString(exhibitorService.loadAllProductTypes()));
+        //System.out.println(JSONObject.toJSONString(exhibitorService.loadAllProductTypes()));
     }
 
     @Test
     public void testGetExhibitorChecked() {
-        System.out.println(JSONObject.toJSONString(exhibitorService.loadAllProductTypesWithCheck(4)));
+        //System.out.println(JSONObject.toJSONString(exhibitorService.loadAllProductTypesWithCheck(4)));
     }
 
     @Test
     public void testGetProduts() {
-        System.out.printf(JSONObject.toJSONString(productService.loadAllProducts(4)));
+        //System.out.printf(JSONObject.toJSONString(productService.loadAllProducts(4)));
     }
 
     @Test
     public void testQueryProducts() {
-        ProductQueryDto p = new ProductQueryDto();
+        /*ProductQueryDto p = new ProductQueryDto();
         p.setProductModel("小号");
-        System.out.println(JSONObject.toJSONString(productService.queryProducts(p, 4)));
+        System.out.println(JSONObject.toJSONString(productService.queryProducts(p, 4)));*/
     }
 
     @Test
     public void testVisas() {
-        System.out.printf("size:" + visaService.queryVisasByEid(2).size());
+        //System.out.printf("size:" + visaService.queryVisasByEid(2).size());
     }
 
     @Test
     public void testTypeProducts(){
-        System.out.printf(JSONObject.toJSONString(productService.previewProducts(4)));
+        //System.out.printf(JSONObject.toJSONString(productService.previewProducts(4)));
     }
 
     @Test
     public void testQueryContactVisas(){
-        List<ContactVisaDto> contactVisaDtos = visaService.queryContactsWithVisaByEid(2);
-        System.out.printf(contactVisaDtos.size()+"-- size");
+       /* List<ContactVisaDto> contactVisaDtos = visaService.queryContactsWithVisaByEid(2);
+        System.out.printf(contactVisaDtos.size()+"-- size");*/
     }
 
 	@Test
 	public void testLoadExhibitorInfoByEid(){
-		TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(1544);
-		System.out.printf(exhibitorInfo.toString());
+		/*TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(1544);
+		System.out.printf(exhibitorInfo.toString());*/
 	}
 }

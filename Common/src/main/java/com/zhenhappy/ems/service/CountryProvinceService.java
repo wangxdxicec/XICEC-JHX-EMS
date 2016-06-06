@@ -47,6 +47,36 @@ public class CountryProvinceService {
             return (WCountry) country.get(0);
         }
     }
+
+    /**
+     * 根据name查询国家
+     * @param name
+     * @return
+     */
+    @Transactional
+    public WCountry loadCountryByName(String name){
+        List country = hibernateTemplate.find("from WCountry where chineseName=?", name);
+        if(country.size()==0){
+            return null;
+        }else{
+            return (WCountry) country.get(0);
+        }
+    }
+
+    /**
+     * 根据CountryValue查询国家
+     * @param CountryValue
+     * @return
+     */
+    @Transactional
+    public WCountry loadCountryByCountryValue(String CountryValue){
+        List country = hibernateTemplate.find("from WCountry where CountryValue=?", CountryValue);
+        if(country.size()==0){
+            return null;
+        }else{
+            return (WCountry) country.get(0);
+        }
+    }
     
     /**
      * 查询所有省份
@@ -79,7 +109,7 @@ public class CountryProvinceService {
     
     /**
      * 根据countryId查询省份
-     * @param id
+     * @param countryId
      * @return
      */
     @Transactional

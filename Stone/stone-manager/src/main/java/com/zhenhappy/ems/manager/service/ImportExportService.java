@@ -83,6 +83,7 @@ public class ImportExportService extends ExhibitorService {
 					queryExhibitorInfo.setMainProduct(exhibitorInfo.getMainProduct());
 					queryExhibitorInfo.setMainProductEn(exhibitorInfo.getMainProductEn());
 					queryExhibitorInfo.setMark(exhibitorInfo.getMark());
+					queryExhibitorInfo.setCompany_lighnts(exhibitorInfo.getCompany_hignlight());
 					TInvoiceApply invoice = invoiceService.getByEid(exhibitorInfo.getEid());
 					if(invoice != null){
 						if(StringUtils.isNotEmpty(invoice.getInvoiceNo())) {

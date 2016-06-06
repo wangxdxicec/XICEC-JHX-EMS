@@ -1,8 +1,10 @@
 package com.zhenhappy.ems.manager.action.user.managerrole;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zhenhappy.ems.entity.TTag;
 import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
+import com.zhenhappy.ems.manager.service.TagManagerService;
 import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.manager.tag.WriterUtil;
 import com.zhenhappy.ems.service.managerrole.TUserInfoService;
@@ -24,10 +26,13 @@ import java.util.List;
 @RequestMapping("user")
 @SessionAttributes(value = ManagerPrinciple.MANAGERPRINCIPLE)
 public class UserAction {
+    static Logger logger = Logger.getLogger(UserAction.class);
+
     private TUserInfo user;
     @Autowired
     private TUserInfoService userService;
-    static Logger logger = Logger.getLogger(UserAction.class);
+    @Autowired
+    private TagManagerService tagManagerService;
 
     @RequestMapping("userList")
     public void userList(HttpServletRequest request, HttpServletResponse response) {
@@ -64,8 +69,19 @@ public class UserAction {
                 userService.updateUserInfo(user);
                 result.put("success", true);
             } else {   // 添加
+                // 没有重复可以添加
                 TUserInfo tUserInfo = userService.existUserInfoWithUserName(user.getUserName());
-                if (tUserInfo == null) {  // 没有重复可以添加
+                if (tUserInfo == null) {
+                    //若在Tag列表里有对应的姓名，则将ownerId和shareId设置成对应的tag id，表示拥有资料库
+                    TTag tag = tagManagerService.loadTagByName(user.getName());
+                    if(tag != null){
+                        user.setOwnerId(tag.getId());
+                        user.setShareId(String.valueOf(tag.getId()));
+                    }else{
+                        //针对国内管理员：历史数据，进行特殊处理
+                        user.setOwnerId(-1);
+                        user.setShareId("-1");
+                    }
                     userService.addUserInfo(user);
                     result.put("success", true);
                 } else {

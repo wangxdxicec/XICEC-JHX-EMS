@@ -6,10 +6,30 @@
 <html>
 <head>
     <title>金泓信展商管理后台</title>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        input {
+            width: 200px;
+            height: 20px;
+        }
+
+        .exhibitors:hover{
+            background-color:#6caef5;
+        }
+        .exhibitors{
+            padding:8px;
+        }
+    </style>
 </head>
-<body style="margin: 1px;">
+<body>
 <table id="datareportshow" class="easyui-treegrid" fitColumns="true" >
-    <table style="height: 2%;" fit="true">
+    <table>
         <tr>
             <td width="100" align="center">数据对象：</td>
             <td width="30" align="center">
@@ -31,8 +51,8 @@
                        onclick="setday(this)" readonly="readonly"/>
             </td>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <td width="50" align="center">
-                <button type="button" class="btn btn-primary" id="showReport" onclick="showReport();">生成报表</button>
+            <td width="120" align="center">
+                <button type="button" class="btn btn-primary" id="showReport" onclick="showReport();">生&nbsp;&nbsp;成&nbsp;&nbsp;报&nbsp;&nbsp;表</button>
             </td>
         </tr>
         <tr>
@@ -56,7 +76,7 @@
                        onclick="setday(this)" readonly="readonly"/>
             </td>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <td width="80" align="center">
+            <td width="120" align="center">
                 <button type="button" class="btn btn-primary" id="exportDataDetail">导出详细数据</button>
             </td>
         </tr>

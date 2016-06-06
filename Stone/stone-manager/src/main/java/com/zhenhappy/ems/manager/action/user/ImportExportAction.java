@@ -112,11 +112,11 @@ public class ImportExportAction extends BaseAction {
         else exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
         List<QueryExhibitorInfo> queryExhibitorInfos = importExportService.exportExhibitor(exhibitors);
         model.put("list", queryExhibitorInfos);
-        String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "电话", "传真", "邮箱", "网址", "中文地址", "英文地址", "邮编", "产品分类", "主营产品(中文)", "主营产品(英文)", "公司简介", "发票抬头", "地税税号" };
+        String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "电话", "传真", "邮箱", "网址", "中文地址", "英文地址", "邮编", "产品分类", "主营产品(中文)", "主营产品(英文)", "公司简介", "公司亮点", "发票抬头", "地税税号" };
         model.put("titles", titles);
-        String[] columns = new String[] { "boothNumber", "company", "companyEn", "phone", "fax", "email", "website", "address", "addressEn", "zipcode", "productType", "mainProduct", "mainProductEn", "mark", "invoiceTitle", "invoiceNo" };
+        String[] columns = new String[] { "boothNumber", "company", "companyEn", "phone", "fax", "email", "website", "address", "addressEn", "zipcode", "productType", "mainProduct", "mainProductEn", "mark", "company_lighnts", "invoiceTitle", "invoiceNo" };
         model.put("columns", columns);
-        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20,40,20,20};
         model.put("columnWidths", columnWidths);
         model.put("fileName", "展商基本信息.xls");
         model.put("sheetName", "展商基本信息");
@@ -681,6 +681,46 @@ public class ImportExportAction extends BaseAction {
 		model.put("columnWidths", columnWidths);
 		model.put("fileName", "客商问卷调查数据.xls");
 		model.put("sheetName", "客商问卷调查数据");
+		return new ModelAndView(new JXLExcelView(), model);
+	}
+
+	/**
+	 * 根据年份和时间导出客商列表到Excel
+	 * @param fieldYear
+	 * @param fieldTime
+	 * @param inlandOrForeign
+	 * @return
+	 */
+	@RequestMapping(value = "exportCustomersByYearOrTimeToExcel", method = RequestMethod.POST)
+	public ModelAndView exportCustomersByYearOrTimeToExcel(@ModelAttribute QueryCustomerRequest request,
+														   @RequestParam(value = "fieldYear") String fieldYear,
+														   @RequestParam(value = "fieldTime") String fieldTime,
+														   @RequestParam(value = "inlandOrForeign") Integer inlandOrForeign) {
+		Map model = new HashMap();
+		List<WCustomer> customers = new ArrayList<WCustomer>();
+		customers = customerInfoManagerService.loadCustomerByYearOrTime(request,fieldYear, fieldTime, inlandOrForeign);
+		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
+		if(inlandOrForeign == 1){
+			model.put("list", exportCustomer);
+			String[] titles = new String[] { "公司中文名", "姓名","预约登记号" ,"性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址","登记时间","修改时间", "备注" };
+			model.put("titles", titles);
+			String[] columns = new String[] { "company", "name", "checkingNo","sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address","createdTime","updateTime", "remark" };
+			model.put("columns", columns);
+			Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+			model.put("columnWidths", columnWidths);
+			model.put("fileName", "国内客商基本信息.xls");
+			model.put("sheetName", "国内客商基本信息");
+		}else {
+			model.put("list", exportCustomer);
+			String[] titles = new String[] { "公司中文名", "姓名","预约登记号", "性别", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址","登记时间","修改时间", "备注" };
+			model.put("titles", titles);
+			String[] columns = new String[] { "company", "name", "checkingNo","sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address","createdTime","updateTime", "remark" };
+			model.put("columns", columns);
+			Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+			model.put("columnWidths", columnWidths);
+			model.put("fileName", "国外客商基本信息.xls");
+			model.put("sheetName", "国外客商基本信息");
+		}
 		return new ModelAndView(new JXLExcelView(), model);
 	}
 }

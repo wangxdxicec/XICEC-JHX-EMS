@@ -26,7 +26,7 @@ public class TestVisaService {
 
     @Test
     public void testQueryContactVisas(){
-        List<JoinerVisaDto> joinerVisaDtos = visaService.queryJoinersWithVisaByEid(2200);
-        System.out.printf(joinerVisaDtos.size() + "-- size");
+       /* List<JoinerVisaDto> joinerVisaDtos = visaService.queryJoinersWithVisaByEid(2200);
+        System.out.printf(joinerVisaDtos.size() + "-- size");*/
     }
 }

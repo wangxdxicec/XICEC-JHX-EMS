@@ -177,7 +177,8 @@
         <th data-options="field:'ck',checkbox:true"></th>
         <th data-options="fidel:'roleId',hidden:'true'">
         <th data-options="field:'id',width:80" align="center">用户编号</th>
-        <th field="userName" width="60" align="center">用户名</th>
+        <th field="name" width="60" align="center">姓名</th>
+        <th field="userName" width="60" align="center">帐号</th>
         <th field="password" width="60" align="center">密码</th>
         <th field="roleName" width="60" align="center">用户角色</th>
         <th field="userDescription" width="60" align="center">备注</th>
@@ -207,12 +208,15 @@
 </div>
 
 <!-- 新增和修改对话框 -->
-<div id="dlg" class="easyui-dialog" style="text-align:right;width: 620px;height: 320px;padding: 10px 20px"
+<div id="dlg" class="easyui-dialog" style="text-align:right;width: 820px;height: 320px;padding: 10px 20px"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post">
         <table cellspacing="5px;">
             <tr>
-                <td>用户名：</td>
+                <td>姓名：</td>
+                <td><input type="text" id="name" name="name" class="easyui-validatebox" required="true"/></td>
+                <td>&nbsp;&nbsp;</td>
+                <td>账号：</td>
                 <td><input type="text" id="userName" name="userName" class="easyui-validatebox" required="true"/></td>
                 <td>&nbsp;&nbsp;</td>
                 <td>密码：</td>

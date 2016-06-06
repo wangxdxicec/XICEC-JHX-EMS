@@ -3,12 +3,12 @@ package com.zhenhappy.ems.manager.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhenhappy.ems.manager.dto.companyinfo.ExportHistoryCustomerInfo;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.format.Alignment;
@@ -62,14 +62,14 @@ public class JXLExcelView extends AbstractJExcelView {
 		if(columnWidth.length > 0){
 			columnWidths = columnWidth;
 		}
-		
+		//按什么分组
+		String sortBy = (String)map.get("sortby");
 		OutputStream os = null;
 		try {
 			// 设置response方式,使执行此controller时候自动出现下载页面,而非直接使用excel打开
 			response.setContentType("APPLICATION/OCTET-STREAM");
 			response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(excelName, "UTF-8"));
 			os = response.getOutputStream();
-			
 			// 全局设置
 			WorkbookSettings setting = new WorkbookSettings();
 			java.util.Locale locale = new java.util.Locale("zh", "CN");
@@ -77,18 +77,45 @@ public class JXLExcelView extends AbstractJExcelView {
 			setting.setEncoding("ISO-8859-1");
 			// 创建工作薄
 			work = Workbook.createWorkbook(os); // 建立excel文件
-			// 创建第一个工作表
-			jxl.write.WritableSheet ws = work.createSheet(sheetName, 1); // sheet名称
-			// 添加标题
-			addColumNameToWsheet(ws);
-
 			List list = (List) map.get("list");
-			writeContext(ws, list);
 
+			if(null != sortBy && sortBy.equals("country")){
+				Map<String, List> resultMap = new HashMap<String, List>(); // 最终要的结果
+				for(int i=0;i<list.size();i++){
+					ExportHistoryCustomerInfo exportHistoryCustomerInfo = (ExportHistoryCustomerInfo)list.get(i);
+					if(resultMap.containsKey(exportHistoryCustomerInfo.getCountryEx())){
+						resultMap.get(exportHistoryCustomerInfo.getCountryEx()).add(exportHistoryCustomerInfo);
+					}else{
+						List listTemp = new ArrayList();
+						listTemp.add(exportHistoryCustomerInfo);
+						resultMap.put(exportHistoryCustomerInfo.getCountryEx(),listTemp);
+					}
+				}
+
+				Iterator iter = resultMap.entrySet().iterator();
+				int i=1;
+				while (iter.hasNext()) {
+					Map.Entry entry = (Map.Entry) iter.next();
+					String key = (String) entry.getKey();
+					List val = (List)entry.getValue();
+
+					// 创建第一个工作表
+					jxl.write.WritableSheet ws = work.createSheet(key, i); // sheet名称
+					// 添加标题
+					addColumNameToWsheet(ws);
+					writeContext(ws, val);
+					i++;
+				}
+			}else {
+				// 创建第一个工作表
+				jxl.write.WritableSheet ws = work.createSheet(sheetName, 1); // sheet名称
+				// 添加标题
+				addColumNameToWsheet(ws);
+				writeContext(ws, list);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-
 			// 写入文件
 			try {
 				work.write();
@@ -100,9 +127,7 @@ public class JXLExcelView extends AbstractJExcelView {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		}
-
 	}
 
 	private <T> void writeContext(WritableSheet wsheet, List<T> list) {
@@ -112,18 +137,22 @@ public class JXLExcelView extends AbstractJExcelView {
 		int cols = dbColumnNames.length;
 		String columnName = null;
 		Object value = null;
+
+		jxl.write.WritableFont wfont = getFont();
+		WritableCellFormat writableCellFormat = new WritableCellFormat(wfont);
 		try {
+			writableCellFormat.setWrap(true);
 			for (int i = 0; i < rows; i++) {
 				T t = (T) list.get(i);
 				for (int j = 0; j < cols; j++) {
 					columnName = dbColumnNames[j];
 					value = PropertyUtils.getProperty(t, columnName);
 					if(value == null) {
-						//wlabel = new jxl.write.Label(j, (i + 1), "" + "", wcf);
-						wlabel = new jxl.write.Label(j, (i + 1), "" + "");
+						wlabel = new jxl.write.Label(j, (i + 1), "" + "", writableCellFormat);
+						//wlabel = new jxl.write.Label(j, (i + 1), "" + "");
 					}else{
-						//wlabel = new jxl.write.Label(j, (i + 1), value + "", wcf);
-						wlabel = new jxl.write.Label(j, (i + 1), value + "");
+						wlabel = new jxl.write.Label(j, (i + 1), value + "", writableCellFormat);
+						//wlabel = new jxl.write.Label(j, (i + 1), value + "\n");
 					}
 					wsheet.addCell(wlabel);
 				}
@@ -142,7 +171,7 @@ public class JXLExcelView extends AbstractJExcelView {
 		jxl.write.WritableFont wfont = getFont();
 		if (null == wfont) {
 			wfont = new WritableFont(WritableFont.ARIAL,
-					WritableFont.DEFAULT_POINT_SIZE, WritableFont.BOLD);
+					WritableFont.DEFAULT_POINT_SIZE, WritableFont.BOLD, true);
 
 		}
 		jxl.write.WritableCellFormat wcfFC = getFormat();

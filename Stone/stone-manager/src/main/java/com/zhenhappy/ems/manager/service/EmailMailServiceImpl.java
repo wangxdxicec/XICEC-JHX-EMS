@@ -7,6 +7,7 @@ import com.zhenhappy.ems.dao.SendMailDetailDao;
 import com.zhenhappy.ems.entity.Email;
 import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.ems.entity.TVisitorMailLog;
+import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.service.EmailMailService;
 import com.zhenhappy.ems.service.VisitorLogMailService;
 import com.zhenhappy.util.Page;
@@ -75,9 +76,14 @@ public class EmailMailServiceImpl implements EmailMailService {
         MimeMessage mailMessage = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, "utf-8");
         TVisitorMailLog visitorMailLog = new TVisitorMailLog();
-
+        StringBuffer emailBuffer = new StringBuffer();
+        emailBuffer.append(email.getReceivers());
+        if(StringUtil.isNotEmpty(email.getBackupReceivers())){
+            emailBuffer.append(";" + email.getBackupReceivers());
+        }
         try {
-            String receivers = email.getReceivers().replaceAll("\\;", ",");
+            //String receivers = email.getReceivers().replaceAll("\\;", ",");
+            String receivers = emailBuffer.toString().replaceAll("\\;", ",");
             // 设置收件人，寄件人
             InternetAddress[] toAddress = InternetAddress.parse(receivers);
             mailMessage.setRecipients(Message.RecipientType.TO, toAddress); // 发送给多个账号

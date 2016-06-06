@@ -32,6 +32,7 @@ public class QueryExhibitorInfo {
 	private String invoiceTitle;
 	private String invoiceNo;
 	private String boothNumber;
+	private String company_lighnts;
 
 	public Integer getEinfoid() {
 		return einfoid;
@@ -241,4 +242,11 @@ public class QueryExhibitorInfo {
 		this.boothNumber = boothNumber;
 	}
 
+	public String getCompany_lighnts() {
+		return company_lighnts;
+	}
+
+	public void setCompany_lighnts(String company_lighnts) {
+		this.company_lighnts = company_lighnts;
+	}
 }

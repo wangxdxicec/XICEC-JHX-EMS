@@ -9,6 +9,7 @@ public class Email {
 	private String boothNumber;
 	private String company;
 	private String receivers;
+	private String backupReceivers;
     private int gender;
 	private String fromAddress = "service@stonefair.org.cn";
 	private int flag; //0:表示展会观众；1：表示专业采购商
@@ -34,6 +35,14 @@ public class Email {
 	private String mail_register_subject_en_unpro;
 	private String mail_register_content_en_unpro;
 	private Integer emailType; //邮件种类 0：表示普通客商  1：表示专业客商
+
+	public String getBackupReceivers() {
+		return backupReceivers;
+	}
+
+	public void setBackupReceivers(String backupReceivers) {
+		this.backupReceivers = backupReceivers;
+	}
 
 	public Integer getCustomerId() {
 		return customerId;
@@ -87,7 +96,7 @@ public class Email {
 		super();
 	}
 
-	public Email(String name, String boothNumber, String company, String receivers, String subject,
+	public Email(String name, String boothNumber, String company, String receivers, String backupReceivers, String subject,
 				 int flag, int country, String followName, String RegID, String checkingNo, String mail_register_subject_cn_unpro,
 				 String mail_register_content_cn_unpro, String mail_register_subject_en_unpro, String mail_register_content_en_unpro,
 				 Integer emailType) {
@@ -97,6 +106,7 @@ public class Email {
 		this.company = company;
 		this.subject = subject;
 		this.receivers = receivers;
+		this.backupReceivers = backupReceivers;
 		this.fromAddress = "service@stonefair.org.cn";
 		this.flag = flag;
 		this.country = country;

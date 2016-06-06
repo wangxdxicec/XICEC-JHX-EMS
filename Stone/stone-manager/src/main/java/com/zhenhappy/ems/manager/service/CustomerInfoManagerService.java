@@ -11,7 +11,7 @@ import com.zhenhappy.ems.dto.QueryExhibitorDataReport;
 import com.zhenhappy.ems.dto.QueryDataReportEx;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.CustomerSurveyDao;
-import com.zhenhappy.ems.manager.dto.ModifyCustomerInfo;
+import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
 import com.zhenhappy.ems.manager.util.DiffListOperate;
 import com.zhenhappy.ems.service.CountryProvinceService;
@@ -22,6 +22,7 @@ import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -29,10 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zhenhappy.ems.dao.CustomerInfoDao;
-import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerResponse;
 import com.zhenhappy.ems.manager.exception.DuplicateCustomerException;
 import com.zhenhappy.util.Page;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 /**
  * Created by wujianbin on 2014-08-11.
@@ -92,7 +92,7 @@ public class CustomerInfoManagerService {
 				conditions.add(" e.telephone like '%" + new String(request.getTelephone().getBytes("ISO-8859-1"),"utf-8") + "%'");
 			}
 			if (request.getCreateTime() != null) {
-				conditions.add(" e.createTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
+				conditions.add(" e.createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
 			}
 			if (request.getEmail() != null) {
 				conditions.add(" e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%'");
@@ -713,7 +713,7 @@ public class CustomerInfoManagerService {
 	 */
 	@Transactional
 	public List<WCustomer> loadAllInlandCustomer() {
-		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country = 44 order by createdTime desc", new Object[]{});
+		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country = 44 order by updateTime desc", new Object[]{});
 		return customers.size() > 0 ? customers : null;
 	}
 
@@ -814,6 +814,28 @@ public class CustomerInfoManagerService {
 	}
 
 	/**
+	 * 根据公司查询客商
+	 * @param company
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadCustomerByCompany(String company) {
+		List<WCustomer> wCustomers = customerInfoDao.queryByHql("from WCustomer where company=?", new Object[]{company});
+		return wCustomers.size() > 0 ? wCustomers : null;
+	}
+
+	/**
+	 * 根据联系人查询客商
+	 * @param firstName
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadCustomerByFirstName(String firstName) {
+		List<WCustomer> wCustomers = customerInfoDao.queryByHql("from WCustomer where firstName=?", new Object[]{firstName});
+		return wCustomers.size() > 0 ? wCustomers : null;
+	}
+
+	/**
 	 * 修改客商是否专业
 	 * @param request
 	 * @throws Exception
@@ -890,5 +912,69 @@ public class CustomerInfoManagerService {
 	public List<TVisitor_Info_Survey> loadAllCustomerSurvey() {
 		List<TVisitor_Info_Survey> customerSurvey = customerSurveyDao.queryByHql("from TVisitor_Info_Survey order by createdTime desc", new Object[]{});
 		return customerSurvey.size() > 0 ? customerSurvey : null;
+	}
+
+	/**
+	 * 查询所有客商问卷调查
+	 * @return
+	 */
+	@Transactional
+	public QueryCustomerYearResponse loadYearListForCustomer(@ModelAttribute QueryCustomerYearRequest request) {
+		QueryCustomerYearResponse customerYearResponse = new QueryCustomerYearResponse();
+		String hql = "select convert(varchar(4),CreateTime,120) as yearValue from visitor_Info group by convert(varchar(4),CreateTime,120) order by yearValue desc";
+		List<Map<String, Object>> yearList = jdbcTemplate.queryForList(hql);
+		List<QueryCustomerYear> yearResultList = new ArrayList<QueryCustomerYear>();
+		for (int i = 0; i < yearList.size(); i++) {
+			Map exhibitorMap = yearList.get(i);
+			QueryCustomerYear temp = new QueryCustomerYear();
+			Iterator it = exhibitorMap.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry entry = (Map.Entry) it.next();
+				Object key = entry.getKey();
+				Object value = entry.getValue();
+				if("yearValue".equalsIgnoreCase(key.toString())) {
+					if(value != null){
+						temp.setYear(value.toString());
+						yearResultList.add(temp);
+					}
+				}
+			}
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
+		JSONArray jsonArray = JSONArray.fromObject(yearResultList);
+		customerYearResponse.setYearData(jsonArray.toString());
+		customerYearResponse.setResultCode(0);
+		return customerYearResponse;
+	}
+
+	/**
+	 * 根据年度和时间查询客商基本信息
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadCustomerByYearOrTime(QueryCustomerRequest request, String fieldYear, String fieldTime, Integer inlandOrForeign) {
+		List<String> conditions = new ArrayList<String>();
+		if(StringUtils.isNotEmpty(fieldYear)){
+			int thisYearValue = Integer.parseInt(fieldYear);
+			int lastYearValue = thisYearValue - 1;
+			String yearHql = " w.createdTime between '" + lastYearValue + "-03-10' " + " and '" + thisYearValue + "-03-09'";
+			conditions.add(yearHql);
+		}
+		if(inlandOrForeign == 1){
+			conditions.add(" country = 44 ");
+		}else {
+			conditions.add(" country <> 44 ");
+		}
+		String conditionsSql = StringUtils.join(conditions, " and ");
+		String conditionsSqlNoOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlNoOrder = " where " + conditionsSql;
+		}
+
+		String sql = "from WCustomer w " + conditionsSqlNoOrder + "order by " + (Integer.parseInt(fieldTime) == 0 ?"w.createdTime": "w.updateTime") + " desc";
+		List<WCustomer> customers = customerInfoDao.queryByHql(sql, new Object[]{});
+		return customers.size() > 0 ? customers : null;
 	}
 }

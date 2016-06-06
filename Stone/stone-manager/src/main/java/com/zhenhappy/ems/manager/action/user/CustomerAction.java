@@ -345,4 +345,17 @@ public class CustomerAction extends BaseAction {
         }
         return response;
     }
+
+    @ResponseBody
+    @RequestMapping(value = "loadYearListForCustomer", method = RequestMethod.POST)
+    public QueryCustomerYearResponse loadYearListForCustomer(@ModelAttribute QueryCustomerYearRequest request) {
+        QueryCustomerYearResponse response = new QueryCustomerYearResponse();
+        try {
+            response = customerInfoManagerService.loadYearListForCustomer(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query tags error.", e);
+        }
+        return response;
+    }
 }

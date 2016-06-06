@@ -33,7 +33,7 @@
         <tr style="height: 30px;">
             <td style="width: 300px" colspan="2">
                 <a id="modifyBaseInfo" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">修改账号信息</a>
-                <a id="sendEmail" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" style="margin-left: 10px">发送邮件</a>
+                <a id="sendEmail" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" style="margin-left: 10px" >发送邮件</a>
                 <a id="sendMsg" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">发送短信</a>
                 <a id="setProfessional" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-redo'"><#if customer.isProfessional?exists && customer.isProfessional==1>设为普通客商<#else>设为专业客商</#if></a>
             </td>
@@ -212,7 +212,7 @@
     </form>
 </div>
 
-<!-- 短信选择表单 -->
+<!-- 邮件选择表单 -->
 <div id="customerSelectEmailTypeDlg" data-options="iconCls:'icon-edit',modal:true">
     <form id="customerSelectEmailTypeForm"  name="customerSelectEmailTypeForm">
         <table style="width: 250px;margin: 20px auto">
@@ -224,6 +224,7 @@
                 <td style="text-align: center"><a id="sendProfessionalMsg" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">给专业客商发<font color="#006400">邀请参加</font>邮件</a></td>
             </tr>
             <input type="hidden" value="${id}" name="id">
+            <input type="hidden" value="${customer.isProfessional}" name="isNormalOrProfessional">
         </table>
     </form>
 </div>
@@ -234,6 +235,7 @@ var province = [];
 var checkedProducts = [];
 var checkedJoiners = [];
 var checkedContacts = [];
+var isNormalOrProfessional;
 
 /********************************************************自定义函数开始****************************************************************/
 function country_change(countryId){
@@ -416,6 +418,15 @@ $(document).ready(function () {
     });
 
     $("#sendNormalMsg").click(function () {
+        if(${customer.isProfessional} == 1) {
+            $.messager.show({
+                title: '提示信息',
+                msg: '请选择专业客商邮件发送',
+                timeout: 3000,
+                showType: 'slide'
+            });
+            return;
+        }
         $("#customerSelectEmailTypeDlg").dialog("close");
         $.messager.confirm('确认发送','你确定要给普通客商发邮件吗?',function(r){
             if (r){
@@ -454,6 +465,15 @@ $(document).ready(function () {
     });
 
     $("#sendProfessionalMsg").click(function () {
+        if(${customer.isProfessional} != 1) {
+            $.messager.show({
+                title: '提示信息',
+                msg: '请选择普通客商邮件发送',
+                timeout: 3000,
+                showType: 'slide'
+            });
+            return;
+        }
         $("#customerSelectEmailTypeDlg").dialog("close");
         $.messager.confirm('确认发送','你确定要给专业客商发邮件吗?',function(r){
             if (r){

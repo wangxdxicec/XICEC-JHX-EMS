@@ -23,7 +23,7 @@
 <body>
 <!-- 客商列表 -->
 <div id="tabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
-	<div title="展商列表" style="padding:5px">
+	<div title="客商列表" style="padding:5px">
 		<table id="customers" data-options="url:'${base}/user/queryForeignCustomersByPage',
          						   loadMsg: '数据加载中......',
 						           singleSelect:false,	//只能当行选择：关闭
@@ -86,6 +86,10 @@
 <form id="exportForeignCustomersToExcel" action="${base}/user/exportForeignCustomersToExcel" method="post">
 	<div id="cidParm2"></div>
 </form>
+<!-- 导出客商到Excel -->
+<form id="exportCustomersByYearOrTimeToExcel" action="${base}/user/exportCustomersByYearOrTimeToExcel" method="post">
+	<div id="cidParm1"></div>
+</form>
 <!-- 工具栏 -->
 <div id="customerbar">
 	<div style="display:inline-block;">
@@ -102,6 +106,22 @@
 		<div id="exportAllCustomers" iconCls="icon-redo">所有客商信息到Excel</div>
 		<div id="exportSelectedCustomers" iconCls="icon-redo">所选客商信息到Excel</div>
 	</div>
+	<div class="menu-sep"></div>
+	<td width="30" align="center">年份：</td>
+	<td width="30" align="center">
+		<select id="customerTime">
+		</select>
+	</td>
+	<td width="30" align="center">字段：</td>
+	<td width="30" align="center">
+		<select id="customerField">
+			<option selected="true" value='0'>初次预约登记时间</option>
+			<option value='1'>激活预约登记时间</option>
+		</select>
+	</td>
+	<td width="80" align="center">
+		<button type="button" class="btn btn-primary" id="exportDataDetail">导出数据</button>
+	</td>
 </div>
 
 <script>
@@ -319,8 +339,43 @@
 		$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;
 		$('#customers').datagrid('reload');
 	}
+
+	//根据年份和时间导出客商到Excel
+	$('#exportDataDetail').click(function () {
+		var cidParm1 = document.getElementById("cidParm1");
+		var fieldYear = document.getElementById("customerTime").value;
+		var fieldTime = document.getElementById("customerField").value;
+		cidParm1.innerHTML = "";
+		var node1 = "<input type='hidden' name='fieldYear' value='"+fieldYear+"' />";
+		cidParm1.innerHTML += node1;
+		var node2 = "<input type='hidden' name='fieldTime' value='"+fieldTime+"' />";
+		cidParm1.innerHTML += node2;
+		var node3 = "<input type='hidden' name='inlandOrForeign' value='2'/>";
+		cidParm1.innerHTML += node3;
+		document.getElementById("exportCustomersByYearOrTimeToExcel").submit();
+		$.messager.alert('提示', '导出客商资料成功');
+	});
 //----------------------------------------------------自定义函数结束--------------------------------------------------------//
     $(document).ready(function () {
+		//加载导出的年份
+		$.ajax({
+			type:"POST",
+			dataType:"json",
+			url:"${base}/user/loadYearListForCustomer",
+			success : function(result) {
+				if(result.resultCode == 0){
+					var yeardata = JSON.parse(result.yearData);
+					if (yeardata != null && yeardata.length > 0) {
+						$("#customerTime").html('');
+						$("#customerTime").append('<option value="">全部</option>');
+						for (var i = 0, a; a = yeardata[i++];) {
+							$("#customerTime").append('<option value="'+a.year+'">'+a.year+'</option>');
+						}
+					}
+				}
+			}
+		});
+
 		//加载国家列表
 		$.ajax({
 			type:"POST",

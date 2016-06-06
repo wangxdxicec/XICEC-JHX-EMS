@@ -20,12 +20,14 @@ public class TUserInfo implements java.io.Serializable {
     private Integer roleId;    // 所属角色ID
     private String userDescription;  // 用户描述
     private String roleName;
+    private Integer ownerId;       //资料库对应的tag id，若为null表示没有资料库
+    private String shareId;         //资料库分享给对应的tag id
 
     public TUserInfo() {
     }
 
     public TUserInfo(Integer id, String  name, String userName, String password, Integer userType,
-                     Integer roleId, String userDescription, String roleName) {
+                     Integer roleId, String userDescription, String roleName, Integer ownerId, String shareId) {
         this.id = id;
         this.name = name;
         this.userName = userName;
@@ -34,6 +36,8 @@ public class TUserInfo implements java.io.Serializable {
         this.roleId = roleId;
         this.userDescription = userDescription;
         this.roleName = roleName;
+        this.ownerId = ownerId;
+        this.shareId = shareId;
     }
 
     @Id
@@ -110,11 +114,29 @@ public class TUserInfo implements java.io.Serializable {
         this.roleName = roleName;
     }
 
+    @Column(name = "ownerId")
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    @Column(name = "shareId")
+    public String getShareId() {
+        return shareId;
+    }
+
+    public void setShareId(String shareId) {
+        this.shareId = shareId;
+    }
+
     @Override
     public String toString() {
         return "User [id=" + id + ", userName=" + userName
                 + ", password=" + password + ", userType=" + userType
                 + ", roleId=" + roleId + ", userDescription=" + userDescription
-                + ", roleName=" + roleName + "]";
+                + ", roleName=" + roleName + ", ownerId=" + ownerId + ", shareId=" + shareId + "]";
     }
 }

@@ -39,6 +39,7 @@ public class TExhibitorInfo implements java.io.Serializable {
 	private Date updateTime;
 	private Integer adminUser;
 	private Date adminUpdateTime;
+    private String company_hignlight;
 	@Transient
 	private String classjson;
     @Transient
@@ -60,7 +61,11 @@ public class TExhibitorInfo implements java.io.Serializable {
     /**
      * full constructor
      */
-    public TExhibitorInfo(Integer einfoid, Integer eid, String organizationCode, String company, String companyEn, String companyT,String phone, String fax, String email, String website, String address, String addressEn, String zipcode, String mainProduct, String mainProductEn, String logo, String mark, String emark, String meipai, String meipaiEn, Integer isDelete, Date createTime, Date updateTime, Integer adminUser, Date adminUpdateTime, String classjson, String brandsData) {
+    public TExhibitorInfo(Integer einfoid, Integer eid, String organizationCode, String company, String companyEn, String companyT,
+                          String phone, String fax, String email, String website, String address, String addressEn, String zipcode,
+                          String mainProduct, String mainProductEn, String logo, String mark, String emark, String meipai, String meipaiEn,
+                          Integer isDelete, Date createTime, Date updateTime, Integer adminUser, Date adminUpdateTime, String classjson,
+                          String brandsData, String company_hignlight) {
         this.einfoid = einfoid;
         this.eid = eid;
         this.organizationCode = organizationCode;
@@ -88,6 +93,7 @@ public class TExhibitorInfo implements java.io.Serializable {
         this.adminUpdateTime = adminUpdateTime;
         this.classjson = classjson;
         this.brandsData = brandsData;
+        this.company_hignlight = company_hignlight;
     }
 
     // Property accessors
@@ -337,6 +343,15 @@ public class TExhibitorInfo implements java.io.Serializable {
         this.zipcode = zipcode;
     }
 
+    @Column(name = "company_hignlight")
+    public String getCompany_hignlight() {
+        return company_hignlight;
+    }
+
+    public void setCompany_hignlight(String company_hignlight) {
+        this.company_hignlight = company_hignlight;
+    }
+
     @Override
     public String toString() {
         return "TExhibitorInfo{" +
@@ -366,6 +381,7 @@ public class TExhibitorInfo implements java.io.Serializable {
                 ", adminUpdateTime=" + adminUpdateTime +
                 ", classjson='" + classjson + '\'' +
                 ", brandsData='" + brandsData + '\'' +
+                ", company_hignlight='" + company_hignlight + '\'' +
                 '}';
     }
 }

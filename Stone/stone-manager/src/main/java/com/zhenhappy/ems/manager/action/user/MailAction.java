@@ -11,6 +11,7 @@ import com.zhenhappy.ems.manager.dto.GetMailSendDetailsResponse;
 import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 import com.zhenhappy.ems.manager.service.CustomerTemplateService;
+import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.service.EmailMailService;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.VisitorLogMsgService;
@@ -188,6 +189,10 @@ public class MailAction extends BaseAction {
                         ReadWriteEmailAndMsgFile.setFileContentIsNull();
                         ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.stoneEmailFileName);
                         ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给邮箱为：" + customer.getEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.stoneEmailFileName);
+                        if(StringUtil.isNotEmpty(customer.getBackupEmail())){
+                            email.setBackupReceivers(customer.getBackupEmail());
+                            ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给邮箱为：" + customer.getBackupEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.stoneEmailFileName);
+                        }
                         //log.info("======给境内邮箱为：" + customer.getEmail() + "账号发邮件======");
                         if(customer.getIsProfessional() == 1) {
                             email.setFlag(1);//专业采购商
@@ -212,6 +217,9 @@ public class MailAction extends BaseAction {
                         //email.setReceivers("datea120@163.com");
 
                         customerInfoManagerService.updateCustomerEmailNum(customer.getId());
+                        if(StringUtil.isNotEmpty(customer.getBackupEmail())){
+                            customerInfoManagerService.updateCustomerEmailNum(customer.getId());
+                        }
                         mailService.sendMailByAsyncAnnotationMode(email);
 
                         List<VApplyEmail> customerApplyEmailList = customerApplyEmailInfoDao.queryByHql("from VApplyEmail where CustomerID=?", new Object[]{customer.getId()});

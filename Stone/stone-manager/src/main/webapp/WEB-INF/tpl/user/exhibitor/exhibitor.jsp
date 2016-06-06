@@ -82,8 +82,8 @@
                     </th>
                     <th data-options="field: 'country', formatter: formatCountry, width: $(this).width() * 0.03">
                         <span id="scountry" class="sortable">国家</span><br/>
-                        <select id="exhibitorsCountry" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
-                        </select>
+						<select id="exhibitorsCountry" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
+						</select>
                     </th>
                     <th data-options="field: 'province', formatter: formatProvince, width: $(this).width() * 0.07">
                         <span id="sprovince" class="sortable">省份</span><br/>
