@@ -1,7 +1,6 @@
 package com.zhenhappy.ems.manager.action.user;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ public class TagAction extends BaseAction {
 
     @RequestMapping(value = "tag")
     public ModelAndView directToArticle() {
-        ModelAndView modelAndView = new ModelAndView("/user/tag");
+        ModelAndView modelAndView = new ModelAndView("/WEB-INF/tpl/user/tag/tag.jsp");
         return modelAndView;
     }
     

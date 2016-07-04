@@ -89,7 +89,7 @@
 <body>
 <!-- /.navbar -->
 <#include "/user/header.html" />
-<#assign exhibitor_data_end_html = "${exhibitor_data_end_html}">
+<#assign exhibitor_data_end_html = "${tExhibitorTime.company_Info_Data_End_Html}">
 <div style="width: 100%;padding-bottom: 20px;border-bottom: 1px #d3d3d3 solid;margin-bottom: 40px">
     <div style="width: 973px;margin: 0px auto;">
         <div>
@@ -111,7 +111,7 @@
                     <div class="boxOff">
                         <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                             <h4><a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a></h4>
-                            <h6><a href="${base}/user/info.html"><@spring.message "module.exhibitor.desc"/></a></h6>
+                            <h6><a href="${base}/user/info.html">${tExhibitorTime.company_Info_Submit_Deadline_Zh}<@spring.message "module.exhibitor.desc"/></a></h6>
                         </div>
                     </div>
                 </#if>
@@ -127,7 +127,7 @@
                     <div class="boxOff">
                         <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                             <h4><a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a></h4>
-                            <h6><a href="${base}/user/info.html"><@spring.message "module.exhibitor.desc"/></a></h6>
+                            <h6><a href="${base}/user/info.html">${tExhibitorTime.company_Info_Submit_Deadline_En}<@spring.message "module.exhibitor.desc"/></a></h6>
                         </div>
                     </div>
                 </#if>
@@ -144,7 +144,11 @@
             <div class="boxOff" style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <h4><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner"/></a></h4>
-                    <h6><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner.desc"/></a></h6>
+                    <#if rc.locale=="zh_CN">
+                        <h6><a href="${base}/user/queryJoiners.html">${tExhibitorTime.participant_List_Submit_Deadline_Zh}<@spring.message "module.joiner.desc"/></a></h6>
+                    <#else>
+                        <h6><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner.desc"/>${tExhibitorTime.participant_List_Submit_Deadline_En}</a></h6>
+                    </#if>
                 </div>
             </div>
             <div style="clear:both;"></div>
@@ -154,25 +158,33 @@
                 <div class="boxOff">
                     <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                         <h4><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice"/></a></h4>
-                        <h6><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice.desc"/></a></h6>
+                        <#if rc.locale=="zh_CN">
+                            <h6><a href="${base}/user/invoice/index.html">${tExhibitorTime.invoice_Information_Submit_Deadline_Zh}<@spring.message "module.invoice.desc"/></a></h6>
+                        <#else>
+                            <h6><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice.desc"/>${tExhibitorTime.invoice_Information_Submit_Deadline_En}</a></h6>
+                        </#if>
                     </div>
                 </div>
                 <#else>
                     <div class="boxOff">
                         <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                             <h4><a href="${base}/user/visa/index.html"><@spring.message "module.visa"/></a></h4>
-                            <h6><a href="${base}/user/visa/index.html"><@spring.message "module.visa.desc"/></a></h6>
+                            <#if rc.locale=="zh_CN">
+                                <h6><a href="${base}/user/visa/index.html">${tExhibitorTime.visa_Info_Submit_Deadline_Zh}<@spring.message "module.visa.desc"/></a></h6>
+                            <#else>
+                                <h6><a href="${base}/user/visa/index.html"><@spring.message "module.visa.desc"/>${tExhibitorTime.visa_Info_Submit_Deadline_En}</a></h6>
+                            </#if>
                         </div>
                     </div>
             </#if>
             <div class="boxOff" style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <#if rc.locale=="zh_CN">
-                        <h4><a href="${base}/resource/2016厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a></h4>
-                        <h6><a href="${base}/resource/2016厦门石材展广告招租函.pdf">${exhibitor_data_end_html2017}.2.1截止</a></h6>
+                        <h4><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a></h4>
+                        <h6><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf">${tExhibitorTime.advertisement_Submit_Deadline_Zh}截止</a></h6>
                         <#else>
-                            <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf"><@spring.message "module.advise"/></a></h4>
-                            <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf">Submitting Deadline: Jan. 31, ${exhibitor_data_end_html2017}</a></h6>
+                            <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank"><@spring.message "module.advise"/></a></h4>
+                            <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank">Submitting Deadline: ${tExhibitorTime.advertisement_Submit_Deadline_En}</a></h6>
                     </#if>
                 </div>
             </div>
@@ -271,7 +283,7 @@
             $(this).addClass("boxOn").removeClass("boxOff");
         })
         $(".boxOn,.boxOff").click(function(){
-            window.location.href = $(this).find("a").attr("href");
+            //window.location.href = $(this).find("a").attr("href");
         })
     });
 </script>

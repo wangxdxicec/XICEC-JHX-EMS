@@ -1,6 +1,3 @@
-/*
- *    Copyright 2014-2015 The Happy Network Corporation
- */
 package com.zhenhappy.ems.manager.service;
 
 import com.zhenhappy.ems.dao.SendMailDetailDao;

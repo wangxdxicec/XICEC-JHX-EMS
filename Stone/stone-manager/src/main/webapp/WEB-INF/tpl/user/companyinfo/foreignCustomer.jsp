@@ -140,7 +140,7 @@
 </div>
 
 <!-- 资料重复提示对话框 -->
-<div id="repeatDiv" class="easyui-dialog" iconCls="icon-search" style="width:850px;height:700px; padding: 5px" closed="true">
+<div id="repeatDiv" class="easyui-dialog" iconCls="icon-search" data-options="width: $(this).width() * 0.75, height: $(this).height() * 0.86" closed="true">
 	<div style="height: 360px;">
 		<table id="willImportTable" title="要导入的资料" class="easyui-datagrid" fitColumns="true" rownumbers="true" fit="true">
 		</table>
@@ -154,11 +154,11 @@
 <!-- 修改资料对话框 -->
 <div id="modifyCustomerInfoDlg" data-options="iconCls:'icon-edit',modal:true">
 	<form id="modifyCustomerInfoForm"  name="modifyCustomerInfoForm">
-		<table style="width: 600px;margin: 20px auto">
+		<table style="width: 380px;margin: 20px auto">
 			<tr>
 				<td style="width: 90px;text-align: right">国家：</td>
 				<td style="width: 90px;text-align: left" data-options="field: 'country', formatter: formatCountry">
-					<select id="historyCustomerCountry" style="width:66%" value="" name="country">
+					<select id="historyCustomerCountry" style="width:70%" value="" name="country">
 					</select>
 				</td>
 			</tr>

@@ -27,4 +27,11 @@ public class ContactDaoImp extends BaseDaoHibernateImp<TContact> implements Cont
 		q.setParameterList("eids", eids);
 		return q.list();
 	}
+
+	@Override
+	public List<TContact> loadContactByEid(Integer eid) {
+		Query q = this.getSession().createQuery("select new TContact(c.id, c.name, c.position, c.phone, c.email, c.eid, c.isDelete) from TContact c where c.eid in (:eid)");
+		q.setParameter("eid", eid);
+		return q.list();
+	}
 }

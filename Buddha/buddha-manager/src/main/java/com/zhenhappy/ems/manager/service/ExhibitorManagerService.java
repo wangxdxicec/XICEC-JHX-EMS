@@ -3,26 +3,24 @@ package com.zhenhappy.ems.manager.service;
 import com.zhenhappy.ems.dao.ExhibitorClassDao;
 import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
+import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorClass;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.entity.TExhibitorMeipai;
 import com.zhenhappy.ems.entity.TInvoiceApply;
 import com.zhenhappy.ems.entity.TProductType;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dao.ExhibitorBoothDao;
-import com.zhenhappy.ems.manager.dto.AddExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorInfoRequest;
-import com.zhenhappy.ems.manager.dto.QueryBoothNumAndMeipai;
-import com.zhenhappy.ems.manager.dto.QueryExhibitor;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
+import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.InvoiceService;
 import com.zhenhappy.ems.service.MeipaiService;
+import com.zhenhappy.ems.service.managerrole.TUserInfoService;
 import com.zhenhappy.util.Page;
 
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +62,8 @@ public class ExhibitorManagerService extends ExhibitorService {
     private ProductManagerService productManagerService;
     @Autowired
     private ExhibitorBoothDao exhibitorBoothDao;
+    @Autowired
+    private TUserInfoService userInfoService;
 
     /**
      * 分页获取展商列表
@@ -72,11 +72,20 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @throws UnsupportedEncodingException 
      */
 	@Transactional
-    public QueryExhibitorResponse queryExhibitorsByPage(QueryExhibitorRequest request) throws UnsupportedEncodingException {
+    public QueryExhibitorResponse queryExhibitorsByPage(QueryExhibitorRequest request, TUserInfo userInfo) throws UnsupportedEncodingException {
 		List<String> conditions = new ArrayList<String>();
-		if (request.getTag() != null) {
-			conditions.add(" e.tag = " + request.getTag().intValue() + " ");
+        if(userInfo.getRoleId() > 2){
+            if (request.getTag() != null) {
+                conditions.add(" e.tag = " + request.getTag().intValue() + " ");
+            }else {
+                conditions.add(" e.tag = " + userInfo.getOwnerId() + " ");
+            }
+        }else {
+            if (request.getTag() != null) {
+                conditions.add(" e.tag = " + request.getTag().intValue() + " ");
+            }
         }
+
 		if (request.getGroup() != null) {
 			conditions.add(" e.group = " + request.getGroup().intValue() + " ");
         }
@@ -101,12 +110,32 @@ public class ExhibitorManagerService extends ExhibitorService {
         if (request.getIsLogout() != null) {
             conditions.add(" e.isLogout = " + request.getIsLogout().intValue() + " ");
         }
+
+        if(request.getPre() != null && 1==request.getPre()){
+            conditions.add(" convert(varchar, e.createTime,120) >= '2016-04-25 00:00:00' and convert(varchar, e.createTime,120) <= '2016-10-18 23:59:59' ");
+        }
+
+        if(request.getType() == 1){
+            conditions.add(" e.exhibitor_type = " + request.getType() + " ");
+            conditions.add(" e.eid = i.eid ");
+        }else if(request.getType() == 2) {
+            conditions.add(" e.exhibitor_type = " + request.getType() + " ");
+            conditions.add(" e.eid = i.eid ");
+        }else if(request.getType() == 0){
+            conditions.add(" (e.exhibitor_type = \'\' or e.exhibitor_type is null) ");
+            conditions.add(" e.eid=i.eid");
+        }
+
         String conditionsSql = StringUtils.join(conditions, " and ");
         String conditionsSqlNoOrder = "";
         if(StringUtils.isNotEmpty(conditionsSql)){
         	conditionsSqlNoOrder = " where " + conditionsSql;
         }
-        conditions.add(" e.eid=b.eid and e.eid=i.eid ");
+
+        conditions.add(" (i.isDelete != 1 or i.isDelete is null) ");
+        if(request.getType() == 0){
+            conditions.add(" e.eid=b.eid and e.eid=i.eid");
+        }
         conditionsSql = StringUtils.join(conditions, " and ");
         String conditionsSqlOrder = "";
         if(StringUtils.isNotEmpty(request.getSort()) && StringUtils.isNotEmpty(request.getOrder())){
@@ -119,25 +148,43 @@ public class ExhibitorManagerService extends ExhibitorService {
                     conditionsSqlOrder = " where " + conditionsSql + " order by case when (e." + request.getSort() + "='' or e." + request.getSort() + " is null) then 1 else 0 end , e." + request.getSort() + " " + request.getOrder() + " ";
                 }
             }else{
-                conditionsSqlOrder = " where " + conditionsSql + " order by e.createTime ASC ";
+                conditionsSqlOrder = " where " + conditionsSql + " order by e.updateTime desc ";
             }
         }else{
-        	conditionsSqlOrder = " where " + conditionsSql + " order by e.createTime ASC ";
+        	conditionsSqlOrder = " where " + conditionsSql + " order by e.updateTime desc ";
         }
         Page page = new Page();
         page.setPageSize(request.getRows());
         page.setPageIndex(request.getPage());
-        List<QueryExhibitor> exhibitors = exhibitorDao.queryPageByHQL("select count(*) from TExhibitor e, TExhibitorInfo i " + conditionsSqlNoOrder,
-        		"select new com.zhenhappy.ems.manager.dto.QueryExhibitor(e.eid, e.username, e.password, e.area, i.company, i.companyEn, e.country, e.province, e.isLogout, e.tag, e.group, b.boothNumber, e.exhibitionArea) "
-        		+ "from TExhibitor e, TExhibitorBooth b, TExhibitorInfo i " + conditionsSqlOrder, new Object[]{}, page);
+
+        if(request.getType() == 0){
+            if(StringUtils.isNotEmpty(conditionsSqlNoOrder)) {
+                conditionsSqlNoOrder = conditionsSqlNoOrder + " and e.eid=i.eid";
+            } else {
+                conditionsSqlNoOrder = " where e.eid=i.eid ";
+            }
+        }
+
+        List<QueryExhibitor> exhibitors = new ArrayList<QueryExhibitor>();
+        exhibitors = exhibitorDao.queryPageByHQL("select count(*) from TExhibitor e, TExhibitorInfo i " + conditionsSqlNoOrder,
+                "select new com.zhenhappy.ems.manager.dto.QueryExhibitor(e.eid, e.username, e.password, e.area, i.company, i.companyEn, e.country, " +
+                        "e.province, e.isLogout, e.tag, e.group," + (request.getType() == 0 ? " b.boothNumber," : "") + " e.exhibitionArea, e.exhibitor_type) "
+                        + "from TExhibitor e," + (request.getType() == 0 ? " TExhibitorBooth b," : "") + " TExhibitorInfo i " + conditionsSqlOrder, new Object[]{}, page);
+
         for(QueryExhibitor exhibitor:exhibitors){
         	TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
-    		if(exhibitorInfo != null){
-    			if(StringUtils.isNotEmpty(exhibitorInfo.getEmail()) || StringUtils.isNotEmpty(exhibitorInfo.getPhone())) exhibitor.setInfoFlag(1);
-    			else exhibitor.setInfoFlag(0);
-    		}else{
-    			exhibitor.setInfoFlag(0);
-    		}
+            if(exhibitorInfo == null){
+                System.out.println("eid=" + exhibitor.getEid() + "公司中文名=" +  exhibitor.getCompany() + "公司英文名=" +  exhibitor.getCompanye() + "\n" +  "没有展商详细信息");
+            }else{
+                if(1 == exhibitor.getIsLogout()){
+                    exhibitor.setInfoFlag(2);
+                }else {
+                    if(StringUtils.isNotEmpty(exhibitorInfo.getEmail()) || StringUtils.isNotEmpty(exhibitorInfo.getPhone()))
+                        exhibitor.setInfoFlag(1);
+                    else
+                        exhibitor.setInfoFlag(0);
+                }
+            }
         }
         QueryExhibitorResponse response = new QueryExhibitorResponse();
         response.setResultCode(0);
@@ -181,6 +228,24 @@ public class ExhibitorManagerService extends ExhibitorService {
     @Transactional
     public TExhibitor loadExhibitorByEid(Integer eid) {
         return exhibitorDao.query(eid);
+    }
+
+    /**
+     * 根据eid查询展商
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public QueryTagResponse queryExhibitorByEidForMoveForeign(QueryTagRequest request, Integer eid) {
+        Page page = new Page();
+        page.setPageSize(request.getRows());
+        page.setPageIndex(request.getPage());
+        List<TExhibitor> tExhibitorList = exhibitorDao.queryPageByHQL("select count(*) from TExhibitor where eid=?", "from TExhibitor where eid=?", new Object[]{eid}, page);
+        QueryTagResponse response = new QueryTagResponse();
+        response.setResultCode(0);
+        response.setRows(tExhibitorList);
+        response.setTotal(page.getTotalCount());
+        return response;
     }
     
     /**
@@ -343,10 +408,15 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @return
      */
     @Transactional
-    public List<QueryBoothNumAndMeipai> loadBoothNumAndMeipai(Integer[] eids){
+    public List<QueryBoothNumAndMeipai> loadBoothNumAndMeipai(Integer[] eids, Integer tag, Integer type, ManagerPrinciple principle){
     	List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
-    	if(eids == null) exhibitors = loadAllExhibitors();
-    	else exhibitors = loadSelectedExhibitors(eids);
+    	if(eids == null) {
+            TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+            TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+            exhibitors = loadAllExhibitorsByTagAndRole(tag, type, userInfo1);
+        } else {
+            exhibitors = loadSelectedExhibitors(eids);
+        }
     	List<QueryBoothNumAndMeipai> boothNumAndMeipais = new ArrayList<QueryBoothNumAndMeipai>();
 		for(TExhibitor exhibitor:exhibitors){
 			TExhibitorBooth booth = queryBoothByEid(exhibitor.getEid());
@@ -523,10 +593,10 @@ public class ExhibitorManagerService extends ExhibitorService {
         exhibitor.setCreateUser(adminId);
         exhibitor.setCreateTime(new Date());
         Integer eid = (Integer) getHibernateTemplate().save(exhibitor);
-        //---add by wangxd, begin---
+        /*//---add by wangxd, begin---
         exhibitorInfo.setEid(eid);
         getHibernateTemplate().save(exhibitorInfo);
-        //---add by wangxd, end---
+        //---add by wangxd, end---*/
         ModifyExhibitorInfoRequest modifyExhibitorInfoRequest = new ModifyExhibitorInfoRequest();
         modifyExhibitorInfoRequest.setEid(eid);
         /*modifyExhibitorInfoRequest.setCompany(exhibitor.getCompany());
@@ -559,10 +629,12 @@ public class ExhibitorManagerService extends ExhibitorService {
     	if(StringUtils.isEmpty(request.getCompanyName().trim()) && StringUtils.isEmpty(request.getCompanyNameE().trim())){
     		 throw new DuplicateUsernameException("公司中英文名至少要有一项");
     	}
-    	if(loadAllExhibitorByCompany(request.getCompanyName().trim(), request.getEid()) != null) throw new DuplicateUsernameException("公司中文名重复");
-    	if(loadAllExhibitorByCompanye(request.getCompanyNameE().trim(), request.getEid()) != null) throw new DuplicateUsernameException("公司英文名重复");
+    	if(loadAllExhibitorByCompany(request.getCompanyName().trim(), request.getEid()) != null)
+            throw new DuplicateUsernameException("公司中文名重复");
+    	if(loadAllExhibitorByCompanye(request.getCompanyNameE().trim(), request.getEid()) != null)
+            throw new DuplicateUsernameException("公司英文名重复");
     	TExhibitor exhibitor = exhibitorDao.query(request.getEid());
-        TExhibitorInfo exhibitorInfo = exhibitorInfoDao.query(request.getEid());
+        TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
     	if(exhibitor != null){
     		if(StringUtils.isNotEmpty(request.getUsername())){
     			if(loadAllExhibitorByUsername(request.getUsername(), request.getEid()) != null) throw new DuplicateUsernameException("用户名重复");
@@ -587,6 +659,7 @@ public class ExhibitorManagerService extends ExhibitorService {
             exhibitor.setContractId("");
             if(StringUtils.isNotEmpty(request.getExhibitionArea())) exhibitor.setExhibitionArea(request.getExhibitionArea());
             else exhibitor.setExhibitionArea("0");
+            exhibitorInfoDao.update(exhibitorInfo);
 	        exhibitorDao.update(exhibitor);
     	}
     }
@@ -707,6 +780,13 @@ public class ExhibitorManagerService extends ExhibitorService {
             		exhibitor.setUpdateUser(adminId);
             		exhibitor.setUpdateTime(new Date());
             		getHibernateTemplate().update(exhibitor);
+
+                    //wangxd 2016-07-01  佛事展新需求，注销展商后，对应的展位号一并清空
+                    TExhibitorBooth booth = queryBoothByEid(exhibitor.getEid());
+                    if(booth != null){
+                        booth.setBoothNumber("");
+                        exhibitorBoothDao.update(booth);
+                    }
             	}
     		}
     	}
@@ -769,6 +849,7 @@ public class ExhibitorManagerService extends ExhibitorService {
 				exhibitorInfo.setMainProduct(request.getMainProduct());
 				exhibitorInfo.setMainProductEn(request.getMainProductEn());
 				exhibitorInfo.setMark(request.getMark());
+                exhibitorInfo.setCompany(request.getCompany());
 				if(StringUtils.isNotEmpty(request.getLogo())) exhibitorInfo.setLogo(request.getLogo());
 				if(request.getEinfoid() != null) exhibitorInfoDao.update(exhibitorInfo);
 				else exhibitorInfoDao.create(exhibitorInfo);
@@ -935,4 +1016,67 @@ public class ExhibitorManagerService extends ExhibitorService {
 		}
 	}
 
+    /**
+     * 根据tag和权限查询对应展商列表
+     * @return
+     */
+    @Transactional
+    public List<TExhibitor> loadAllExhibitorsByTagAndRole(Integer owner, Integer type, TUserInfo userInfo) {
+        List<TExhibitor> exhibitors;
+        if(userInfo != null){
+            if(userInfo.getRoleId() > 2){
+                owner = userInfo.getOwnerId();
+            }
+        }
+        if(owner == -1){
+            exhibitors = exhibitorDao.loadAllExhibitorsByType(type);
+        }else {
+            exhibitors = exhibitorDao.loadAllExhibitorsByTagAndRole(owner, type);
+        }
+        return exhibitors.size() > 0 ? exhibitors : null;
+    }
+
+    /**
+     * 修改展商是否参展
+     * @param id
+     * @throws Exception
+     */
+    @Transactional
+    public void modifyExhibitorToParticateOrNot(Integer id) throws Exception {
+        TExhibitor tExhibitor = loadExhibitorByEid(id);
+        if(tExhibitor != null){
+            if(tExhibitor.getIsLogout() == 0 || (tExhibitor.getIsLogout() == null)){
+                tExhibitor.setIsLogout(1);
+
+                //wangxd 2016-07-01 若展商不参展，则清空其对应的展位号
+                TExhibitorBooth booth = queryBoothByEid(tExhibitor.getEid());
+                if(booth != null){
+                    booth.setBoothNumber("");
+                    exhibitorBoothDao.update(booth);
+                }
+            }else {
+                tExhibitor.setIsLogout(0);
+            }
+            exhibitorDao.update(tExhibitor);
+        }
+    }
+
+    /**
+     * 移展商至国内或国外
+     * @param id
+     * @throws Exception
+     */
+    @Transactional
+    public void moveInlandOrForeign(Integer id, Integer index) throws Exception {
+        TExhibitor tExhibitor = loadExhibitorByEid(id);
+        if(tExhibitor != null){
+            if(index == 44){
+                tExhibitor.setArea(1);
+            }else{
+                tExhibitor.setArea(2);
+            }
+            tExhibitor.setCountry(index);
+            exhibitorDao.update(tExhibitor);
+        }
+    }
 }

@@ -9,11 +9,14 @@ public class QueryCustomerRequest extends EasyuiRequest {
     private Integer country;
     private String address;
     private String city;
-    private String mobilePhone;
-    private String telephone;
+    private String mobile;
+    private String tel;
     private String email;
     private String createTime;
     private Integer inlandOrForeign;  //1:表示国内客商  2：表示国外客商
+    private Integer isRabbicFlag;  //0：表示非法师；1：表示法师
+    private Integer sourceValue;  //0：表示网站；1：表示手机
+    private Integer pre;  //1：表示本次的数据；
 
     public Integer getInlandOrForeign() {
         return inlandOrForeign;
@@ -23,12 +26,12 @@ public class QueryCustomerRequest extends EasyuiRequest {
         this.inlandOrForeign = inlandOrForeign;
     }
 
-    public String getMobilePhone() {
-        return mobilePhone;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setMobilePhone(String mobilePhone) {
-        this.mobilePhone = mobilePhone;
+    public void setMobile(String mobilePhone) {
+        this.mobile = mobilePhone;
     }
 
     public Integer getCountry() {
@@ -63,12 +66,12 @@ public class QueryCustomerRequest extends EasyuiRequest {
         this.address = address;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public String getTel() {
+        return tel;
     }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setTel(String telephone) {
+        this.tel = telephone;
     }
 
     public String getEmail() {
@@ -93,5 +96,29 @@ public class QueryCustomerRequest extends EasyuiRequest {
 
     public void setCreateTime(String createdTime) {
         this.createTime = createdTime;
+    }
+
+    public Integer getIsRabbicFlag() {
+        return isRabbicFlag;
+    }
+
+    public void setIsRabbicFlag(Integer isRabbicFlag) {
+        this.isRabbicFlag = isRabbicFlag;
+    }
+
+    public Integer getSourceValue() {
+        return sourceValue;
+    }
+
+    public void setSourceValue(Integer sourceValue) {
+        this.sourceValue = sourceValue;
+    }
+
+    public Integer getPre() {
+        return pre;
+    }
+
+    public void setPre(Integer pre) {
+        this.pre = pre;
     }
 }

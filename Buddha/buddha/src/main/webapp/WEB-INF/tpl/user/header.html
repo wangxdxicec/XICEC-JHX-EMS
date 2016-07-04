@@ -54,7 +54,7 @@
 </div>
 <script>
     $(document).ready(function(){
-        var kaishi = new Date("2015-10-15");
+        var kaishi = new Date(${tExhibitorTime.buddha_Fair_Show_Date_Begin});
         var now = new Date();
         var day = ((kaishi.getTime()-now.getTime())/1000/60/60/24);
         var dayString = Math.ceil(day)+"";

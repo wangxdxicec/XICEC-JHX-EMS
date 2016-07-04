@@ -91,7 +91,13 @@
             <@spring.message "banner.one"/>
         </div>
         <div style="color: #c9c9c9;font-size: 18px;left: 315px;top: 95px;position: absolute">
-            <@spring.message "banner.two"/>
+            <#if tExhibitorTime?exists>
+                <#if rc.locale=="zh_CN">
+                    ${tExhibitorTime.stone_Fair_Show_Date_Zh}&nbsp;<@spring.message "banner.two"/>
+                <#else>
+                    <@spring.message "banner.two"/>&nbsp;${tExhibitorTime.stone_Fair_Show_Date_En}
+                </#if>
+            </#if>
         </div>
         <div style="color: #ffffff;font-size: 32px;left: 315px;bottom: 30px;position: absolute">
             <@spring.message "banner.three"/>
@@ -99,8 +105,8 @@
         <div style="position: absolute;right: 38px;bottom: 6px;background-image:url('${resource}/images/time.jpg') ;width: 65px;height: 31px"></div>
         <#if rc.locale=="zh_CN">
             <font style="color:#ffffff;position: absolute;right: 23px;bottom: 10px;"><@spring.message "banner.time"/></font>
-            <#else>
-                <font style="color:#ffffff;position: absolute;right: -1px;bottom: 10px;"><@spring.message "banner.time"/></font>
+        <#else>
+            <font style="color:#ffffff;position: absolute;right: -1px;bottom: 10px;"><@spring.message "banner.time"/></font>
         </#if>
         <font id="baiwei" style="color:#666666;position: absolute;right: 90px;bottom: 10px;">0</font>
         <font id="shiwei" style="color:#666666;position: absolute;right: 67px;bottom: 10px;">0</font>
@@ -229,7 +235,7 @@
             $(this).find("a").click();
         })
         var kaishi = new Date();
-        kaishi.setYear(${exhibitor_data_end_html2017});
+        kaishi.setYear(${tExhibitorTime.stone_fair_begin_year});
         kaishi.setMonth(2);
         kaishi.setDate(6);
         var now = new Date();

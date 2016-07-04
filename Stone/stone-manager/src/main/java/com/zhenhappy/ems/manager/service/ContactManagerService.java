@@ -52,6 +52,16 @@ public class ContactManagerService extends ContactService {
 
 	/**
 	 * 通过id获取联系人
+	 * @return
+	 */
+	@Transactional
+	public List<TContact> loadAllContact() {
+		List<TContact> contacts = getContactDao().queryByHql("from TContact", new Object[]{});
+		return contacts;
+	}
+
+	/**
+	 * 通过id获取联系人
 	 * @param id
 	 * @return
 	 */

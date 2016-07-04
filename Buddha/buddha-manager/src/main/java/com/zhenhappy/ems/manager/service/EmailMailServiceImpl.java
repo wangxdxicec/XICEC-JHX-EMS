@@ -1,6 +1,3 @@
-/*
- *    Copyright 2014-2015 The Happy Network Corporation
- */
 package com.zhenhappy.ems.manager.service;
 
 import com.zhenhappy.ems.dao.SendMailDetailDao;
@@ -59,7 +56,7 @@ public class EmailMailServiceImpl implements EmailMailService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
+    //@Autowired
     private SendMailDetailDao sendMailDetailDao;
     @Autowired
     VisitorLogMailService visitorLogMailService;
@@ -82,6 +79,7 @@ public class EmailMailServiceImpl implements EmailMailService {
             InternetAddress[] toAddress = InternetAddress.parse(receivers);
             mailMessage.setRecipients(Message.RecipientType.TO, toAddress); // 发送给多个账号
             //messageHelper.setFrom("hxscsd@163.com"); // 发件人
+            email.setFromAddress("info@buddhafair.com");
             if(email.getUseTemplate()) {
                 messageHelper.setFrom("info@buddhafair.com");
                 visitorMailLog.setMailFrom("info@buddhafair.com");
@@ -96,8 +94,8 @@ public class EmailMailServiceImpl implements EmailMailService {
                 visitorMailLog.setMailContent(getMailText(email));
                 messageHelper.setText(getMailText(email), true); // 邮件内容，注意加参数true，表示启用html格式
             } else {
-                visitorMailLog.setMailContent(email.getRegister_content());
-                messageHelper.setText(email.getRegister_content(), true); // 邮件内容，注意加参数true，表示启用html格式
+                visitorMailLog.setMailContent(email.getRegister_content_cn());
+                messageHelper.setText(email.getRegister_content_cn(), true); // 邮件内容，注意加参数true，表示启用html格式
             }
 
             visitorMailLog.setCustomerID(email.getCustomerId());
@@ -220,11 +218,13 @@ public class EmailMailServiceImpl implements EmailMailService {
         if (email.getFlag() == 1 && email.getCountry() == 0) {
             template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay.html");
         }else if (email.getFlag() == 1 && email.getCountry() == 1){
-            template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_eng.html");
+            //template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_eng.html");
+            template = freeMarker.getConfiguration().getTemplate("mail/ForeignVisitorReplay.html");
         }else if (email.getFlag() == 0 && email.getCountry() == 0){
             template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro.html");
         }else if (email.getFlag() == 0 && email.getCountry() == 1){
-            template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro_eng.html");
+            //template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay_unPro_eng.html");
+            template = freeMarker.getConfiguration().getTemplate("mail/ForeignVisitorReplay.html");
         }
 
         // FreeMarker通过Map传递动态数据

@@ -150,6 +150,16 @@ public class ExhibitorService {
         return exhibitorInfos.size() > 0 ? exhibitorInfos.get(0) : null;
     }
 
+    public TExhibitor loadExhibitorByEid(Integer exhibitorId) {
+        List<TExhibitor> exhibitors = exhibitorDao.queryByHql("from TExhibitor where eid = ?", new Object[]{exhibitorId});
+        return exhibitors.size() > 0 ? exhibitors.get(0) : null;
+    }
+
+    public List<TExhibitor> loadExhibitorByType(Integer type) {
+        List<TExhibitor> exhibitors = exhibitorDao.queryByHql("from TExhibitor where exhibitor_type = ?", new Object[]{String.valueOf(type)});
+        return exhibitors.size() > 0 ? exhibitors : null;
+    }
+
     @Transactional
     public void saveExhibitorProductClass(List<ProductTypeCheck> selecteds, Integer einfo_id) {
         jdbcTemplate.execute("delete from t_exhibitor_class_other where exhibitor_class_id in (select id from t_exhibitor_class where einfo_id =" + einfo_id + " )");

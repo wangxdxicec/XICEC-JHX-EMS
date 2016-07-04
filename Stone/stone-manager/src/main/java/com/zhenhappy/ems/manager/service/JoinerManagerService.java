@@ -35,6 +35,7 @@ public class JoinerManagerService extends JoinerService {
         if (StringUtils.isNotEmpty(request.getName())) {
             conditions.add(" name like '%" + request.getName() + "%' ");
         }
+        conditions.add(" isDelete = 0 ");
         String conditionsSql = StringUtils.join(conditions, " and ");
         Page page = new Page();
         page.setPageSize(request.getRows());
@@ -72,6 +73,16 @@ public class JoinerManagerService extends JoinerService {
     public List<TExhibitorJoiner> loadExhibitorJoinerByEid(Integer eid) {
 		List<TExhibitorJoiner> joiners = getJoinerDao().queryByHql("from TExhibitorJoiner where isDelete!=1 and eid=?", new Object[]{eid});
 		return joiners;
+    }
+
+    /**
+     * 通过id获取参展人员
+     * @return
+     */
+    @Transactional
+    public List<TExhibitorJoiner> loadAllExhibitorJoiner() {
+        List<TExhibitorJoiner> joiners = getJoinerDao().queryByHql("from TExhibitorJoiner", new Object[]{});
+        return joiners;
     }
 
 	/**

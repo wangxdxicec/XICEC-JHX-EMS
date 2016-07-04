@@ -62,7 +62,7 @@ public class TVisitorInfo implements java.io.Serializable {
     private Boolean isRecieveDoc;
     private Boolean isMobile;
     private Boolean isjudged;
-    private Boolean isProfessional;
+    private Integer isProfessional;  //0：表示非专业客商；1：表示政府部门；2：表示专业客商
     private Boolean isAccommodation;
     private Boolean isDisabled;
     private Boolean isReaded;
@@ -85,6 +85,8 @@ public class TVisitorInfo implements java.io.Serializable {
     private String tmp_V_position3;
     private String tmp_V_contact3;
     private String guid;
+    private Integer govementFlag;
+    private String rabbi;
 
     // Constructors
 
@@ -98,7 +100,7 @@ public class TVisitorInfo implements java.io.Serializable {
     }
 
     /** full constructor */
-    public TVisitorInfo(Integer id, String email, String checkingNo,
+    /*public TVisitorInfo(Integer id, String email, String checkingNo,
                         String password, String firstName, String lastName, String sex,
                         String company, String position, Integer country, String province,
                         String city, String address, String backupEmail,
@@ -107,7 +109,7 @@ public class TVisitorInfo implements java.io.Serializable {
                         String fax, String faxCode2, String website, String remark,
                         String createIp, Date createTime, String updateIp,
                         Date updateTime, Integer sendEmailNum,Date sendEmailDate,
-                        Boolean isDisabled, String guid) {
+                        Boolean isDisabled, String guid, String govement, String rabbi) {
         this.id = id;
         this.email = email;
         this.checkingNo = checkingNo;
@@ -140,7 +142,9 @@ public class TVisitorInfo implements java.io.Serializable {
         this.sendEmailTime = sendEmailDate;
         this.isDisabled = isDisabled;
         this.guid = guid;
-    }
+        this.govement = govement;
+        this.rabbi = rabbi;
+    }*/
 
     public TVisitorInfo(Integer id, String email, String checkingNo,
                      String password, String firstName, String lastName, String sex,
@@ -152,13 +156,13 @@ public class TVisitorInfo implements java.io.Serializable {
                      String createIp, Date createTime, String updateIp,
                      Date updateTime, Integer sendEmailNum,Date sendEmailTime, Integer sendMsgNum,Date sendMsgTime,
                      String langFlag,String visitDate,String beenToFair,String beenToRole,Boolean isRecieveEmail,
-                     Boolean isRecieveDoc,Boolean isMobile,Boolean isjudged,Boolean isProfessional,Boolean isAccommodation,
+                     Boolean isRecieveDoc,Boolean isMobile,Boolean isjudged,Integer isProfessional,Boolean isAccommodation,
                      Boolean isDisabled, Boolean isReaded,
                      String tmp_Country,String tmp_Postcode,String tmp_Interest,String tmp_InterestOthers,
                      String tmp_Knowfrom,String tmp_KnowfromOthers,String tmp_V_name1,String tmp_V_title1,
                      String tmp_V_position1,String tmp_V_contact1,String tmp_V_name2,String tmp_V_title2,
                      String tmp_V_position2,String tmp_V_contact2,String tmp_V_name3,String tmp_V_title3,
-                     String tmp_V_position3,String tmp_V_contact3,String guid) {
+                     String tmp_V_position3,String tmp_V_contact3,String guid, Integer govement, String rabbi) {
         this.id = id;
         this.email = email;
         this.checkingNo = checkingNo;
@@ -224,6 +228,8 @@ public class TVisitorInfo implements java.io.Serializable {
         this.tmp_V_position3 = tmp_V_position3;
         this.tmp_V_contact3 = tmp_V_contact3;
         this.guid = guid;
+        this.govementFlag = govement;
+        this.rabbi = rabbi;
     }
 
     // Property accessors
@@ -364,11 +370,11 @@ public class TVisitorInfo implements java.io.Serializable {
     }
 
     @Column(name = "Mobile", length = 250)
-    public String getMobile() {
+    public String getMobilePhone() {
         return this.mobilePhone;
     }
 
-    public void setMobile(String mobilePhone) {
+    public void setMobilePhone(String mobilePhone) {
         this.mobilePhone = mobilePhone;
     }
 
@@ -568,9 +574,9 @@ public class TVisitorInfo implements java.io.Serializable {
     public void setIsjudged(Boolean isjudged) { this.isjudged = isjudged; }
 
     @Column(name = "IsProfessional")
-    public Boolean getIsProfessional() { return isProfessional; }
+    public Integer getIsProfessional() { return isProfessional; }
 
-    public void setIsProfessional(Boolean professional) { isProfessional = professional; }
+    public void setIsProfessional(Integer professional) { isProfessional = professional; }
 
     @Column(name = "IsAccommodation")
     public Boolean getIsAccommodation() { return isAccommodation; }
@@ -677,4 +683,21 @@ public class TVisitorInfo implements java.io.Serializable {
 
     public void setGuid(String guid) { this.guid = guid; }
 
+    @Column(name = "govement")
+    public Integer getGovement() {
+        return govementFlag;
+    }
+
+    public void setGovement(Integer govement) {
+        this.govementFlag = govement;
+    }
+
+    @Column(name = "rabbi")
+    public String getRabbi() {
+        return rabbi;
+    }
+
+    public void setRabbi(String rabbi) {
+        this.rabbi = rabbi;
+    }
 }

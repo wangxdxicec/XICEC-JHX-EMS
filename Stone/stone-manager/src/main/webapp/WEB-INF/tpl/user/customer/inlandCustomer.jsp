@@ -23,7 +23,7 @@
 <body>
 <!-- 客商列表 -->
 <div id="tabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
-	<div title="展商列表" style="padding:5px">
+	<div title="客商列表" style="padding:5px">
 		<table id="customers" data-options="url:'${base}/user/queryInlandCustomersByPage',
          						   loadMsg: '数据加载中......',
 						           singleSelect:false,	//只能当行选择：关闭
@@ -58,10 +58,10 @@
 					手机<br/>
 					<input id="customerMobilePhone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'telephone', width: $(this).width() / 7">
+				<%--<th data-options="field: 'telephone', width: $(this).width() / 7">
 					电话<br/>
 					<input id="customerTelephone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-				</th>
+				</th>--%>
 				<th data-options="field: 'email', width: $(this).width() / 7">
 					邮箱<br/>
 					<input id="customerEmail" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
@@ -70,12 +70,24 @@
 					登记时间<br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
+				<th data-options="field: 'updateTime', formatter:formatDatebox, width: $(this).width() / 8">
+					<span id="supdateTime" class="sortable">修改时间</span><br/>
+					<input id="updateTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
 				<th data-options="field: 'isProfessional', formatter: formatStatus, width: $(this).width() / 7">
 					<span id="sisProfessional" class="sortable">状态</span><br/>
 					<select id="customerIsProfessional" style="width:104%;height:21px;" onchange="filter();">
 						<option selected value="">全部</option>
 						<option value="0">普通</option>
 						<option value="1">专业</option>
+					</select>
+				</th>
+				<th data-options="field: 'isActivated', formatter: formatActiviteStatus, width: $(this).width() / 7">
+					<span id="sisActivated" class="sortable">状态</span><br/>
+					<select id="customerIsActivated" style="width:104%;height:21px;" onchange="filter();">
+						<option selected value="">全部</option>
+						<option value="0">注销</option>
+						<option value="1">激活</option>
 					</select>
 				</th>
 			</tr>
@@ -348,6 +360,14 @@
 		}
 	}
 
+	function formatActiviteStatus(val, row) {
+		if (val == 0) {
+			return '注销';
+		} else {
+			return '激活';
+		}
+	}
+
 	Date.prototype.format = function (format)
 	{
 		var o = {
@@ -385,9 +405,9 @@
 		if(document.getElementById("customerMobilePhone").value != ""){
 			filterParm += '&mobilePhone=' + encodeURI(document.getElementById("customerMobilePhone").value);
 		}
-		if(document.getElementById("customerTelephone").value != ""){
+		/*if(document.getElementById("customerTelephone").value != ""){
 			filterParm += '&telephone=' + encodeURI(document.getElementById("customerTelephone").value);
-		}
+		}*/
 		if(document.getElementById("customerEmail").value != ""){
 			filterParm += '&email=' + encodeURI(document.getElementById("customerEmail").value);
 		}
@@ -396,6 +416,9 @@
 		}
 		if(document.getElementById("customerIsProfessional").value != ""){
 			filterParm += '&isProfessional=' + document.getElementById("customerIsProfessional").value;
+		}
+		if(document.getElementById("customerIsActivated").value != ""){
+			filterParm += '&isActivated=' + document.getElementById("customerIsActivated").value;
 		}
 		filterParm += '&inlandOrForeign=1';
 		$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;

@@ -206,7 +206,24 @@
 <div region="center">
     <div class="easyui-tabs" fit="true" border="false" id="tabs">
         <div title="首页" data-options="iconCls:'icon-home'">
-            <div align="center" style="padding-top: 100px;"><font color="red" size="10">欢迎使用</font></div>
+            <div align="center" style="padding-top: 70px;"><font color="red" size="10">欢迎使用</font></div>
+            <table id="showinfo" style="padding-top: 30px;">
+                <thead>
+                <tr>
+                    <th align="left" data-options="padding-top: 40px, width:$(this).width() / 2">
+                        <div align="left"><font color="black" size="6">展会期间：</font></div>
+                        <div align="left" style="padding-top: 10px;padding-left: 50px;"><font color="red" size="3">展商基本信息缺失，文字用红色表示</font></div>
+                        <div align="left" style="padding-top: 10px;padding-left: 50px;"><font color="green" size="3">展商基本信息完整，文字用绿色表示</font></div>
+                        <div align="left" style="padding-top: 10px;padding-left: 50px;"><font color="black" size="3">展商注销后未登录，文字加粗黑色表示</font></div>
+                        <div align="left" style="padding-top: 10px;padding-left: 50px;"><font color="orange" size="3">展商参展人员缺失，文字用橙色表示</font></div>
+                        <div align="left" style="padding-top: 10px;padding-left: 50px;"><font color="#161616" size="3">展商注销后未登录，文字用浅黑色表示</font></div>
+                    </th>
+                    <th align="right" data-options="padding-top: 40px, width:$(this).width() / 2">
+                        <div align="right" style="padding-top: 10px;"><img src="${base}/resource/color_stone.png"></div>
+                    </th>
+                </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>

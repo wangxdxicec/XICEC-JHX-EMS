@@ -40,6 +40,7 @@ public class QueryCustomerInfo {
 	private String guid;
 	private Integer isProfessional;
 	private Boolean isjudged;
+	private Integer isActivated;
 
 	// Constructors
 
@@ -98,7 +99,7 @@ public class QueryCustomerInfo {
 	}
 
 	public QueryCustomerInfo(Integer id, String firstName, String company, String city, String address,
-							String mobile, String tel, String email, Date createTime, Integer isProfessional) {
+							String mobile, String tel, String email, Date createTime, Date updateTime, Integer isProfessional, Integer isActivated) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -108,11 +109,13 @@ public class QueryCustomerInfo {
 		this.telephone = tel;
 		this.email = email;
 		this.createdTime = createTime;
+		this.updateTime = updateTime;
 		this.isProfessional = isProfessional;
+		this.isActivated = isActivated;
 	}
 
 	public QueryCustomerInfo(Integer id, String firstName, String company, Integer country, String address,
-							String mobile, String tel, String email, Date createTime, Integer isProfessional) {
+							String mobile, String tel, String email, Date createTime, Date updateTime, Integer isProfessional, Integer isActivated) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -122,7 +125,9 @@ public class QueryCustomerInfo {
 		this.telephone = tel;
 		this.email = email;
 		this.createdTime = createTime;
+		this.updateTime = updateTime;
 		this.isProfessional = isProfessional;
+		this.isActivated = isActivated;
 	}
 
 	public QueryCustomerInfo(Integer id, String email, String checkingNo,
@@ -441,5 +446,13 @@ public class QueryCustomerInfo {
 
 	public void setIsProfessional(Integer professional) {
 		isProfessional = professional;
+	}
+
+	public Integer getIsActivated() {
+		return isActivated;
+	}
+
+	public void setIsActivated(Integer isActivated) {
+		this.isActivated = isActivated;
 	}
 }

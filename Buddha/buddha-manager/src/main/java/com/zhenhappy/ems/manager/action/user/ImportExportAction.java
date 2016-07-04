@@ -20,11 +20,13 @@ import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.dao.VisitorInfoDao;
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.JoinerService;
+import com.zhenhappy.ems.service.managerrole.TUserInfoService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -77,9 +79,9 @@ public class ImportExportAction extends BaseAction {
     @Autowired
     private JoinerService joinerService;
     @Autowired
-    private ExhibitorService exhibitorService;
-    @Autowired
     private ExhibitorInfoDao exhibitorInfoDao;
+    @Autowired
+    private TUserInfoService userInfoService;
 
     /**
      * 导出展商列表到Excel
@@ -87,11 +89,18 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportExhibitorsToExcel", method = RequestMethod.POST)
-    public ModelAndView exportExhibitorsToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+    public ModelAndView exportExhibitorsToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                                @RequestParam(value = "tag", defaultValue = "-1") Integer tag,
+                                                @RequestParam(value = "type") Integer type,
+                                                @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         Map model = new HashMap();
         List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
-        if(eids[0] == -1) exhibitors = exhibitorManagerService.loadAllExhibitors();
-        else exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        if(eids[0] == -1)
+            exhibitors = exhibitorManagerService.loadAllExhibitorsByTagAndRole(tag, type, userInfo1);
+        else
+            exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
         List<QueryExhibitorInfo> queryExhibitorInfos = importExportService.exportExhibitor(exhibitors);
         model.put("list", queryExhibitorInfos);
         String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "电话", "传真", "邮箱", "网址", "中文地址", "英文地址", "邮编", "产品分类", "主营产品(中文)", "主营产品(英文)", "公司简介", "发票抬头", "地税税号" };
@@ -240,11 +249,16 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportBoothNumAndMeipaiToExcel", method = RequestMethod.POST)
-	public ModelAndView exportBoothNumAndMeipaiToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+	public ModelAndView exportBoothNumAndMeipaiToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                                       @RequestParam(value = "tag", defaultValue = "-1") Integer tag,
+                                                       @RequestParam(value = "type") Integer type,
+                                                       @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
     	Map model = new HashMap();
         List<QueryBoothNumAndMeipai> boothNumAndMeipais = new ArrayList<QueryBoothNumAndMeipai>();
-        if(eids[0] == -1) boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(null);
-        else boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(eids);
+        if(eids[0] == -1)
+            boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(null, tag, type, principle);
+        else
+            boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(eids, tag, type, principle);
         model.put("list", boothNumAndMeipais);
         String[] titles = new String[] { "展位号", "企业楣牌(中文)", "企业楣牌(英文)" };
 		model.put("titles", titles);
@@ -263,12 +277,18 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportExhibitorJoinersToExcel", method = RequestMethod.POST)
-    public ModelAndView exportExhibitorJoinersToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+    public ModelAndView exportExhibitorJoinersToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                                      @RequestParam(value = "tag", defaultValue = "-1") Integer tag,
+                                                      @RequestParam(value = "type") Integer type,
+                                                      @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         Map model = new HashMap();
         log.info("====eid.length: " + eids.length);
         List<TExhibitorJoinerEx> exhibitorJoiners = new ArrayList<TExhibitorJoinerEx>();
-        if(eids[0] == -1)
-            exhibitorJoiners = joinerService.queryAllJoiners();
+        if(eids[0] == -1){
+            TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+            TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+            exhibitorJoiners = joinerService.queryAllJoinersByTagAndRole(tag, type, userInfo1);
+        }
         else {
             List<TExhibitorJoiner> exhibitorJoinerInfo = joinerService.queryAllJoinersByEids(eids);
             for(TExhibitorJoiner joinerInfo:exhibitorJoinerInfo){
@@ -329,34 +349,40 @@ public class ImportExportAction extends BaseAction {
      * 导出会刊
      * @param eids
      * @param request
+     * @param tag：表示当前的所属者
      * @param response
      * @return
      * @throws Exception
      */
     @RequestMapping("/exportTransactionsToZip")
     public ModelAndView exportTransactionsToZip(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
-                                                        HttpServletRequest request,
-                                                        HttpServletResponse response) throws Exception {
+                                                @RequestParam(value = "tag", defaultValue = "-1") Integer tag,
+                                                @RequestParam(value = "type") Integer type,
+                                                HttpServletRequest request,
+                                                HttpServletResponse response,
+                                                @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) throws Exception {
 //    	String dirPath = "D:\\Users\\Foshi\\tmp\\" + UUID.randomUUID();
     	String appendix_directory = systemConfig.getVal(Constants.appendix_directory).replaceAll("\\\\\\\\", "\\\\");
         String randomFile = UUID.randomUUID().toString();
     	String destDir = appendix_directory + "\\tmp\\" + randomFile;
     	FileUtils.forceMkdir(new File(destDir)); // 创建临时文件夹
         if(eids[0] == -1){
-            exportTransactions(null, destDir);
+            exportTransactions(null, destDir, tag, type, principle);
             importExportService.copyLogo(null, destDir);
         }else{
-            exportTransactions(eids, destDir);
+            exportTransactions(eids, destDir, tag, type, principle);
             importExportService.copyLogo(eids, destDir);
         }
 	    CreateZip.zipToFile(destDir, randomFile);
     	return download(destDir, randomFile, request, response);
     }
 
-    private void exportTransactions(Integer[] eids, String dirPath) throws Exception {
+    private void exportTransactions(Integer[] eids, String dirPath, Integer owner, Integer type, ManagerPrinciple principle) throws Exception {
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
     	List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
     	if(eids == null){
-    		exhibitors = exhibitorManagerService.loadAllExhibitors();
+    		exhibitors = exhibitorManagerService.loadAllExhibitorsByTagAndRole(owner,type, userInfo1);
     	}else{
     		exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
     	}
@@ -414,9 +440,13 @@ public class ImportExportAction extends BaseAction {
     				continue;
     			}
         		String filePath = "";
-        		if(StringUtils.isNotEmpty(exhibitorInfo.getCompany())) filePath = dirPath + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + ".txt";
-        		else filePath = dirPath + "\\" + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + ".txt";
-        		importExportService.WriteStringToFile(getTransactionText(transaction), filePath);
+                if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()) || StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())){
+                    if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()))
+                        filePath = dirPath + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + ".txt";
+                    else
+                        filePath = dirPath + "\\" + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + ".txt";
+                    importExportService.WriteStringToFile(getTransactionText(transaction), filePath);
+                }
 //	        		System.out.println("导出" + exhibitor.getCompany() + "成功");
         	}
     	}
@@ -495,18 +525,19 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportInlandCustomersToExcel", method = RequestMethod.POST)
-    public ModelAndView exportInlandCustomersToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids) {
+    public ModelAndView exportInlandCustomersToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                     @RequestParam(value = "rabbi") Integer rabbi) {
         Map model = new HashMap();
         List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
         if(cids[0] == -1)
-            customers = customerInfoManagerService.loadAllInlandCustomer();
+            customers = customerInfoManagerService.loadAllRabbiCustomer(1, rabbi);
         else
-            customers = customerInfoManagerService.loadSelectedCustomers(cids);
+            customers = customerInfoManagerService.loadSelectedCustomers(cids, rabbi);
         List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
         model.put("list", exportCustomer);
         String[] titles = new String[] { "ID","注册编号", "公司", "姓名", "性别", "职位","国家","城市","邮箱","手机", "传真","电话", "网址", "地址","登记时间","随行人员","随行人员联系方式", "感兴趣产品" };
         model.put("titles", titles);
-        String[] columns = new String[] { "id","checkingNo", "company", "name", "sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "createdTime","accompanyName", "accompanyContact", "tmp_Interest" };
+        String[] columns = new String[] { "id","checkingNo", "company", "name", "sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "createTime","accompanyName", "accompanyContact", "tmp_Interest" };
         model.put("columns", columns);
         Integer[] columnWidths = new Integer[]{10,20,50,20,20,20,20,20,20,20,20,20,20,50,20,60,60,20};
         model.put("columnWidths", columnWidths);
@@ -521,23 +552,170 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportForeignCustomersToExcel", method = RequestMethod.POST)
-    public ModelAndView exportForeignCustomersToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids) {
+    public ModelAndView exportForeignCustomersToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                      @RequestParam(value = "rabbi") Integer rabbi) {
         Map model = new HashMap();
         List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
         if(cids[0] == -1)
-            customers = customerInfoManagerService.loadAllForeignCustomer();
+            customers = customerInfoManagerService.loadAllRabbiCustomer(2, rabbi);
         else
-            customers = customerInfoManagerService.loadSelectedCustomers(cids);
+            customers = customerInfoManagerService.loadSelectedCustomers(cids, rabbi);
         List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
         model.put("list", exportCustomer);
         String[] titles = new String[] { "ID","注册编号", "公司", "姓名", "性别","电话", "国家", "城市", "邮箱", "手机", "传真", "网址", "地址", "登记时间","随行人员","随行人员联系方式","感兴趣产品" };
         model.put("titles", titles);
-        String[] columns = new String[] { "id","checkingNo", "company", "name",  "sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "createdTime","accompanyName", "accompanyContact","tmp_Interest" };
+        String[] columns = new String[] { "id","checkingNo", "company", "name",  "sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "createTime","accompanyName", "accompanyContact","tmp_Interest" };
         model.put("columns", columns);
         Integer[] columnWidths = new Integer[]{10,20,50,20,20,20,20,20,20,20,20,20,20,50,60,60,20};
         model.put("columnWidths", columnWidths);
         model.put("fileName", "客商基本信息.xls");
         model.put("sheetName", "客商基本信息");
         return new ModelAndView(new JXLExcelView(), model);
+    }
+
+    /**
+     * 导入素食展资料
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value="upload/vegetarianExhibitor", method={RequestMethod.POST,RequestMethod.GET})
+    public ImportVegetarianOrThanilandExhibitorResponse importExhibitors(@RequestParam MultipartFile file,
+                                                                         @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) throws IOException {
+        File importFile = upload(file, "\\import", FilenameUtils.getBaseName(file.getOriginalFilename()) + new Date().getTime() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        if(userInfo != null){
+            ImportVegetarianOrThanilandExhibitorResponse report = importExportService.importVegetarianExhibitor(importFile, userInfo1, 1);
+            return report;
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 导入泰国展资料
+     * @param file
+     * @param principle
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value="upload/thailandExhibitor", method={RequestMethod.POST,RequestMethod.GET})
+    public ImportVegetarianOrThanilandExhibitorResponse importThailandExhibitor(@RequestParam MultipartFile file,
+                                                @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) throws IOException {
+        File importFile = upload(file, "\\import", FilenameUtils.getBaseName(file.getOriginalFilename()) + new Date().getTime() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        if(userInfo != null){
+            ImportVegetarianOrThanilandExhibitorResponse report = importExportService.importThailandExhibitor(importFile, userInfo1, 2);
+            return report;
+        }else {
+            return null;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "showWillImportCustomerInfo")
+    public QueryDuplicatExhibitorResponse showWillImportCustomerInfo(@ModelAttribute QueryDuplicateExhibitorRequest request) {
+        QueryDuplicatExhibitorResponse response = new QueryDuplicatExhibitorResponse();
+        try {
+            response = importExportService.getWillImportCustomerList(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("show will import Customer Info error.", e);
+        }
+        return response;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "showIsExistCustomerInfo")
+    public QueryDuplicatExhibitorResponse showIsExistCustomerInfo(@RequestParam(value = "willImportCheckedItems", defaultValue = "") Integer[] willImportCheckedItems,
+                                                                                @ModelAttribute QueryDuplicateExhibitorRequest request) {
+        QueryDuplicatExhibitorResponse response = new QueryDuplicatExhibitorResponse();
+        try {
+            response = importExportService.getIsExistCustomerList(request, willImportCheckedItems);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("show is exist Customer Info error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 插入客商资料
+     * @param tids
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "insertHistoryCustomerInfo", method = RequestMethod.POST)
+    public BaseResponse insertHistoryCustomerInfo(@RequestParam(value = "tids", defaultValue = "") Integer[] tids,
+                                                  @RequestParam(value = "type") Integer type,
+                                                  @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        try {
+            if(tids == null) throw new Exception();
+            importExportService.insertCustomerInfoByTids(tids, type, userInfo1);
+        } catch (Exception e) {
+            log.error("remove customer info error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 忽略选中要插入的客商资料
+     * @param tids
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "ignoreHistoryCustomerInfo", method = RequestMethod.POST)
+    public BaseResponse ignoreHistoryCustomerInfo(@RequestParam(value = "tids", defaultValue = "") Integer[] tids,
+                                                  @RequestParam(value = "type") Integer type,
+                                                  @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            if(tids == null) throw new Exception();
+            importExportService.ignoreCustomerInfoByTids(tids);
+        } catch (Exception e) {
+            log.error("remove customer info error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 删除已经存在的展商资料
+     * @param tids
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "deleteExistExhibitorInfo", method = RequestMethod.POST)
+    public BaseResponse deleteExistExhibitorInfo(@RequestParam(value = "tids", defaultValue = "") Integer[] tids,
+                                                 @RequestParam(value = "type") Integer type,
+                                                 @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        try {
+            if(tids == null) throw new Exception();
+            boolean flag1 = importExportService.refreshIsExistCustomerList(tids, userInfo1);
+            boolean flag2 = importExportService.removeCustomerInfoByTids(tids, type, userInfo1);
+            if(flag1 || flag2){
+                response.setResultCode(0);
+            }else{
+                response.setResultCode(1);
+            }
+        } catch (Exception e) {
+            log.error("remove customer info error.", e);
+            response.setResultCode(1);
+        }
+        return response;
     }
 }

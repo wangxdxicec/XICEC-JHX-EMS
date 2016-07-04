@@ -4,8 +4,12 @@ import com.zhenhappy.ems.dto.ExhibitorBooth;
 import com.zhenhappy.ems.dto.LoginRequest;
 import com.zhenhappy.ems.dto.LoginResponse;
 import com.zhenhappy.ems.dto.Principle;
+import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.service.ExhibitorService;
+import com.zhenhappy.ems.service.ExhibitorTimeService;
+import com.zhenhappy.ems.service.MailService;
+import com.zhenhappy.ems.stonetime.TExhibitorTime;
 import com.zhenhappy.ems.sys.Constants;
 import com.zhenhappy.ems.util.ImageMarkLogoByText;
 import com.zhenhappy.system.SystemConfig;
@@ -15,18 +19,15 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.ejb.Local;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.*;
-import java.util.Locale;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by lianghaijian on 2014-03-31.
@@ -43,6 +44,9 @@ public class PublicAction {
 
     @Autowired
     private ExhibitorService exhibitorService;
+
+    @Autowired
+    private ExhibitorTimeService exhibitorTimeService;
 
     private static Logger log = Logger.getLogger(PublicAction.class);
 
@@ -80,8 +84,13 @@ public class PublicAction {
                     //默认国内展区
                     httpServletRequest.getSession().setAttribute("zone", new Integer(1));
                 }
-                response.setResultCode(0);
             }
+
+            //加载前台界面相关时间对象
+            TExhibitorTime tExhibitorTime = exhibitorTimeService.loadExhibitorTime();
+            httpServletRequest.getSession().setAttribute("tExhibitorTime", tExhibitorTime);
+
+            response.setResultCode(0);
         } catch (Exception e) {
             log.error("login error.username:" + request.getUsername(), e);
             response.setResultCode(3);

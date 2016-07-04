@@ -8,6 +8,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhenhappy.ems.entity.TTag;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.service.managerrole.TUserInfoService;
+import com.zhenhappy.util.Page;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,14 +32,6 @@ import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.WCountry;
 import com.zhenhappy.ems.entity.WProvince;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.ActiveExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.AddExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.BindBoothRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorInfoRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
@@ -68,7 +65,7 @@ public class ExhibitorAction extends BaseAction {
     @Autowired
     private ImportExportAction importExportAction;
     @Autowired
-    private SystemConfig systemConfig;
+    private TUserInfoService userInfoService;
     
     /**
      * 分页查询展商列表
@@ -77,17 +74,69 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "queryExhibitorsByPage")
-    public QueryExhibitorResponse queryExhibitorsByPage(@ModelAttribute QueryExhibitorRequest request) {
+    public QueryExhibitorResponse queryExhibitorsByPage(@ModelAttribute QueryExhibitorRequest request,
+                                                        @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         QueryExhibitorResponse response = null;
         try {
-        	response = exhibitorManagerService.queryExhibitorsByPage(request);
+            TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+            TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+            if(userInfo != null){
+                response = exhibitorManagerService.queryExhibitorsByPage(request, userInfo1);
+            }
         } catch (Exception e) {
             response.setResultCode(1);
             log.error("query exhibitors error.", e);
         }
         return response;
     }
-    
+
+    /**
+     * 判断资料库所属人
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "loadOwnerListByRole")
+    public QueryTagResponse loadOwnerListByRole(@ModelAttribute EasyuiRequest request,
+                                              @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        QueryTagResponse response = new QueryTagResponse();
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        if(userInfo1 != null){
+            Page page = new Page();
+            page.setPageSize(request.getRows());
+            page.setPageIndex(request.getPage());
+
+            List<TTag> tags = new ArrayList<TTag>();
+            if(userInfo1.getRoleId() < 3){
+                tags = tagManagerService.loadAllTags();
+            }else {
+                String shareId = userInfo.getShareId();
+                if(StringUtils.isNotEmpty(shareId)){
+                    tags = new ArrayList<TTag>();
+                    String[] tagArray = shareId.split(",");
+                    for(int i=0;i<tagArray.length;i++){
+                        TTag tag = tagManagerService.loadTagById(Integer.parseInt(tagArray[i]));
+                        if(tag != null){
+                            tags.add(tag);
+                        }
+                    }
+                } else {
+                    response.setDescription("该用户没有对应展商资料");
+                    response.setResultCode(1);
+                }
+            }
+            response.setResultCode(0);
+            response.setRows(tags);
+            response.setTotal(page.getTotalCount());
+        }else {
+            response.setDescription("该用户没有对应展商资料");
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
     /**
      * 查询展商列表
      * @return
@@ -123,7 +172,7 @@ public class ExhibitorAction extends BaseAction {
 
     @RequestMapping(value = "exhibitor")
     public ModelAndView directToCompany(@RequestParam("eid") Integer eid) {
-        ModelAndView modelAndView = new ModelAndView("/user/company");
+        ModelAndView modelAndView = new ModelAndView("user/exhibitor/company");
         modelAndView.addObject("eid", eid);
         modelAndView.addObject("exhibitor", exhibitorManagerService.loadExhibitorByEid(eid));
         modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(eid));
@@ -143,7 +192,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "addExhibitor", method = RequestMethod.POST)
-    public BaseResponse addExhibitorAccount(@ModelAttribute AddExhibitorRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse addExhibitorAccount(@ModelAttribute AddExhibitorRequest request,
+                                            @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	exhibitorManagerService.addExhibitor(request, principle.getAdmin().getId());
@@ -165,7 +215,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "modifyExhibitor", method = RequestMethod.POST)
-    public BaseResponse modifyExhibitorAccount(@ModelAttribute ModifyExhibitorRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse modifyExhibitorAccount(@ModelAttribute ModifyExhibitorRequest request,
+                                               @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
             exhibitorManagerService.modifyExhibitorAccount(request, principle.getAdmin().getId());
@@ -181,7 +232,8 @@ public class ExhibitorAction extends BaseAction {
     
     @ResponseBody
     @RequestMapping(value = "activeExhibitor", method = RequestMethod.POST)
-    public BaseResponse activeExhibitor(@ModelAttribute ActiveExhibitorRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse activeExhibitor(@ModelAttribute ActiveExhibitorRequest request,
+                                        @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
             TExhibitorTerm term = new TExhibitorTerm();
@@ -208,7 +260,8 @@ public class ExhibitorAction extends BaseAction {
 
     @ResponseBody
     @RequestMapping(value = "bindBooth", method = RequestMethod.POST)
-    public BaseResponse bindBooth(@ModelAttribute BindBoothRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse bindBooth(@ModelAttribute BindBoothRequest request,
+                                  @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
             TExhibitorBooth booth = new TExhibitorBooth();
@@ -246,7 +299,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "modifyExhibitorsTag", method = RequestMethod.POST)
-    public BaseResponse modifyExhibitorsTag(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @RequestParam("tag") Integer tag, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse modifyExhibitorsTag(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @RequestParam("tag") Integer tag,
+                                            @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	if(eids != null && tag != null){
@@ -292,7 +346,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "modifyExhibitorsArea", method = RequestMethod.POST)
-    public BaseResponse modifyExhibitorsArea(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @RequestParam("area") Integer area, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse modifyExhibitorsArea(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @RequestParam("area") Integer area,
+                                             @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	if(eids != null && area != null){
@@ -313,7 +368,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "disableExhibitors", method = RequestMethod.POST)
-    public BaseResponse disableExhibitors(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse disableExhibitors(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                          @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	if(eids != null){
@@ -334,7 +390,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "enableExhibitors", method = RequestMethod.POST)
-    public BaseResponse enableExhibitors(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse enableExhibitors(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                         @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	if(eids != null){
@@ -408,7 +465,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "queryProvinceByCountryId", method = RequestMethod.POST)
-    public List<WProvince> queryProvinceByCountryId(@RequestParam("countryId") Integer countryId, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public List<WProvince> queryProvinceByCountryId(@RequestParam("countryId") Integer countryId,
+                                                    @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
     	List<WProvince> province = new ArrayList<WProvince>();
         try {
         	province = countryProvinceService.loadProvinceByCountryId(countryId);
@@ -499,5 +557,65 @@ public class ExhibitorAction extends BaseAction {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * 修改展商是否参展
+     * @param id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyExhibitorToParticateOrNot", method = RequestMethod.POST)
+    public BaseResponse modifyExhibitorToParticateOrNot(@RequestParam(value = "id", defaultValue = "")Integer id) {
+        BaseResponse response = new BaseResponse();
+        try {
+            exhibitorManagerService.modifyExhibitorToParticateOrNot(id);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer professional error: ", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 根据eid查询展商
+     * @param eid
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryExhibitorByEidForMoveForeign", method = RequestMethod.POST)
+    public QueryTagResponse queryExhibitorByEidForMoveForeign(@ModelAttribute QueryTagRequest request,
+                                                              @RequestParam(value = "id", defaultValue = "") Integer eid) {
+        QueryTagResponse response = new QueryTagResponse();
+        try {
+            response = exhibitorManagerService.queryExhibitorByEidForMoveForeign(request, eid);
+        } catch (Exception e) {
+            log.error("query exhibitors error for move foreign.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 移展商至国内或国外
+     * @param id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "moveInlandOrForeign", method = RequestMethod.POST)
+    public BaseResponse moveInlandOrForeign(@RequestParam(value = "eid", defaultValue = "")Integer id,
+                                            @RequestParam(value = "countryIndex", defaultValue = "")Integer countryIndex) {
+        BaseResponse response = new BaseResponse();
+        try {
+            exhibitorManagerService.moveInlandOrForeign(id, countryIndex);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("move exhibitor error: ", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
 }

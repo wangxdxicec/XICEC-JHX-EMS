@@ -10,4 +10,5 @@ import com.zhenhappy.ems.entity.TContact;
 public interface ContactDao extends BaseDao<TContact> {
 	public List<TContact> loadContactByCids(Integer[] cids);
 	public List<TContact> loadContactByEids(Integer[] eids);
+	public List<TContact> loadContactByEid(Integer eid);
 }

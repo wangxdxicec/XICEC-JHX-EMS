@@ -36,6 +36,8 @@ public class TExhibitor implements java.io.Serializable {
 	private Integer group;
 	private String contractId;
 	private String exhibitionArea;
+	private String exhibitor_type;  //0或null：表示普通展商；1：表示素食展；2：表示泰国展
+	private Integer isLogin; //是否登录过。0：表示未登录；1或null表示登录过；
 
     // Constructors
 
@@ -51,14 +53,14 @@ public class TExhibitor implements java.io.Serializable {
 	/**
 	 * full constructor
 	 */
-	public TExhibitor(Integer eid, String username, String password, Integer level, /*String company, String companye, String companyt,*/ Integer area, Date lastLoginTime, String lastLoginIp, Integer isLogout, Integer createUser, Date createTime, Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country, Integer group, String contractId, String exhibitionArea) {
+	public TExhibitor(Integer eid, String username, String password, Integer level,Integer area, Date lastLoginTime,
+					  String lastLoginIp, Integer isLogout, Integer createUser, Date createTime,
+					  Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country,
+					  Integer group, String contractId, String exhibitionArea, String exhibitor_type, Integer isLogin) {
 		this.eid = eid;
 		this.username = username;
 		this.password = password;
 		this.level = level;
-		/*this.company = company;
-		this.companye = companye;
-		this.companyt = companyt;*/
 		this.area = area;
 		this.lastLoginTime = lastLoginTime;
 		this.lastLoginIp = lastLoginIp;
@@ -73,9 +75,15 @@ public class TExhibitor implements java.io.Serializable {
 		this.group = group;
 		this.contractId = contractId;
 		this.exhibitionArea = exhibitionArea;
+		this.exhibitor_type = exhibitor_type;
+		this.isLogin = isLogin;
 	}
 
-	public TExhibitor(Integer eid, String username, String password, Integer level, /*String company, String companye,*/ Integer area, Date lastLoginTime, String lastLoginIp, Integer isLogout, Integer createUser, Date createTime, Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country, Integer group, String contractId) {
+	public TExhibitor(Integer eid, String username, String password, Integer level,
+					  /*String company, String companye,*/ Integer area, Date lastLoginTime, String lastLoginIp,
+					  Integer isLogout, Integer createUser, Date createTime, Integer updateUser,
+					  Date updateTime, Integer tag, Integer province, Integer country, Integer group,
+					  String contractId) {
 		this.eid = eid;
 		this.username = username;
 		this.password = password;
@@ -290,6 +298,24 @@ public class TExhibitor implements java.io.Serializable {
 		this.exhibitionArea = exhibitionArea;
 	}
 
+	@Column(name = "exhibitor_type")
+	public String getExhibitor_type() {
+		return exhibitor_type;
+	}
+
+	public void setExhibitor_type(String exhibitor_type) {
+		this.exhibitor_type = exhibitor_type;
+	}
+
+	@Column(name = "is_login")
+	public Integer getIsLogin() {
+		return isLogin;
+	}
+
+	public void setIsLogin(Integer isLogin) {
+		this.isLogin = isLogin;
+	}
+
 	@Override
 	public String toString() {
 		return "TExhibitor{" +
@@ -314,6 +340,8 @@ public class TExhibitor implements java.io.Serializable {
 				", group=" + group +
 				", contractId='" + contractId + '\'' +
 				", exhibitionArea='" + exhibitionArea + '\'' +
+				", exhibitor_type='" + exhibitor_type + '\'' +
+				", isLogin='" + isLogin + '\'' +
 				'}';
 	}
 }

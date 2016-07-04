@@ -28,9 +28,6 @@ public class ExhibitorImp extends BaseDaoHibernateImp<TExhibitor> implements Exh
 				+ "e.username, "
 				+ "e.password, "
 				+ "e.level, "
-				+ "e.company, "
-				+ "e.companye, "
-				+ "e.companyt, "
 				+ "e.area, "
 				+ "e.lastLoginTime, "
 				+ "e.lastLoginIp, "
@@ -44,7 +41,9 @@ public class ExhibitorImp extends BaseDaoHibernateImp<TExhibitor> implements Exh
 				+ "e.country, "
 				+ "e.group, "
 				+ "e.contractId, "
-				+ "e.exhibitionArea)"
+				+ "e.exhibitionArea,"
+				+ "e.exhibitor_type,"
+				+ "e.isLogin)"
 				+ "from TExhibitor e where e.eid in (:eids)");
 		q.setParameterList("eids", eids);
 		return q.list();
@@ -56,9 +55,6 @@ public class ExhibitorImp extends BaseDaoHibernateImp<TExhibitor> implements Exh
 				+ "e.username, "
 				+ "e.password, "
 				+ "e.level, "
-				+ "e.company, "
-				+ "e.companye, "
-				+ "e.companyt, "
 				+ "e.area, "
 				+ "e.lastLoginTime, "
 				+ "e.lastLoginIp, "
@@ -72,9 +68,79 @@ public class ExhibitorImp extends BaseDaoHibernateImp<TExhibitor> implements Exh
 				+ "e.country, "
 				+ "e.group, "
 				+ "e.contractId, "
-				+ "e.exhibitionArea)"
+				+ "e.exhibitionArea,"
+				+ "e.exhibitor_type,"
+				+ "e.isLogin)"
 				+ "from TExhibitor e where e.isLogout = " + flag + "and  e.eid in (:eids)");
 		q.setParameterList("eids", eids);
+		return q.list();
+	}
+
+	@Override
+	public List<TExhibitor> loadAllExhibitorsByTagAndRole(int tag, Integer type) {
+		String typeCondition = "";
+		if(type == 1){
+			typeCondition = " and exhibitor_type = 1";
+		}else if(type == 2){
+			typeCondition = " and exhibitor_type = 2";
+		} else if(type == 0){
+			typeCondition = " (and exhibitor_type = '' or exhibitor_type is null)";
+		}
+		Query q = this.getSession().createQuery("select new TExhibitor(e.eid, "
+				+ "e.username, "
+				+ "e.password, "
+				+ "e.level, "
+				+ "e.area, "
+				+ "e.lastLoginTime, "
+				+ "e.lastLoginIp, "
+				+ "e.isLogout, "
+				+ "e.createUser, "
+				+ "e.createTime, "
+				+ "e.updateUser, "
+				+ "e.updateTime, "
+				+ "e.tag, "
+				+ "e.province, "
+				+ "e.country, "
+				+ "e.group, "
+				+ "e.contractId, "
+				+ "e.exhibitionArea, "
+				+ "e.exhibitor_type,"
+				+ "e.isLogin)"
+				+ "from TExhibitor e where e.tag = " + tag + typeCondition);
+		return q.list();
+	}
+
+	@Override
+	public List<TExhibitor> loadAllExhibitorsByType(Integer type) {
+		String typeCondition = "";
+		if(type == 1){
+			typeCondition = " exhibitor_type = 1";
+		}else if(type == 2){
+			typeCondition = " exhibitor_type = 2";
+		} else if(type == 0){
+			typeCondition = " (exhibitor_type = '' or exhibitor_type is null)";
+		}
+		Query q = this.getSession().createQuery("select new TExhibitor(e.eid, "
+				+ "e.username, "
+				+ "e.password, "
+				+ "e.level, "
+				+ "e.area, "
+				+ "e.lastLoginTime, "
+				+ "e.lastLoginIp, "
+				+ "e.isLogout, "
+				+ "e.createUser, "
+				+ "e.createTime, "
+				+ "e.updateUser, "
+				+ "e.updateTime, "
+				+ "e.tag, "
+				+ "e.province, "
+				+ "e.country, "
+				+ "e.group, "
+				+ "e.contractId, "
+				+ "e.exhibitionArea, "
+				+ "e.exhibitor_type,"
+				+ "e.isLogin)"
+				+ "from TExhibitor e where " + typeCondition);
 		return q.list();
 	}
 }

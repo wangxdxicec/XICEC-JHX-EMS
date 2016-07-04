@@ -84,7 +84,7 @@
 <body>
 <#include "/user/header.html" />
 <!-- /.navbar -->
-<#assign exhibitor_data_end_html = "${exhibitor_data_end_html}">
+<#assign exhibitor_data_end_html = "${tExhibitorTime.company_Info_Data_End_Html}">
 <div style="width: 100%">
     <div class="row-fluid" style="width: 962px;margin: 0px auto;">
         <#include "/user/left.html" />
@@ -96,7 +96,7 @@
                 <#if .now?date gt exhibitor_data_end_html?date>
                     <div class="alert alert-block">已截止</div>
                     <#else>
-                        <div class="alert alert-block"> ${exhibitor_data_end_html2016}.12.20截止，所提交的信息将同步到官网、会刊、App和微信公众号等平台供采购商查阅。</div>
+                        <div class="alert alert-block"> ${tExhibitorTime.company_Info_Data_End_Html}截止，所提交的信息将同步到官网、会刊、App和微信公众号等平台供采购商查阅。</div>
                 </#if>
                 <div style="color: red"><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>为必填项</div>
                 <div class="control-group">
@@ -238,10 +238,10 @@
                         <#if updateInfo.logo?exists && updateInfo.logo!=''>
                             <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="${base}/user/logoImg?eid=${updateInfo.eid}" id="previewLogo" name="preview" />
                         <#else>
-                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="preview" class="img-rounded" />
+                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="previewLogo" class="img-rounded" />
                         </#if>
                         <#else>
-                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="preview" class="img-rounded" />
+                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="previewLogo" class="img-rounded" />
                     </#if>
                     <!--<div class="controls">
                         <a href="#" class="img-thumbnail">
@@ -273,7 +273,9 @@
                                 <#list type.childrenTypes as ctype>
                                     <li><a id="subTypeId_${ctype.id}" role="child" parentId="${type.id}"
                                            subTypeId="${ctype.id}" typeName="${ctype.typeName}"
+                                           typeNameEn="${ctype.typeNameEN}"
                                            parentName="${type.typeName}"
+                                           parentNameEn="${type.typeNameEN}"
                                            other="${ctype.isOther!"0"}" href="javascript:void(0)"
                                         class="list-group-item">
                                         <i class="icon-ok pull-right hide"></i>
@@ -289,7 +291,7 @@
                 </div>
 
                 <hr/>
-                <div style="color: #f1b426;font-size: 16px;border-bottom: 1px #dbdbdb solid;line-height: 32px;font-weight: bolder"><@spring.message "info.update.exhibition.company_hignlight"/></div>
+                <div style="color: #f1b426;font-size: 16px;border-bottom: 1px #dbdbdb solid;line-height: 32px;font-weight: bolder">${tExhibitorTime.stone_fair_end_year}&nbsp;-&nbsp;${tExhibitorTime.stone_fair_begin_year}<@spring.message "info.update.exhibition.company_hignlight"/></div>
                 <div class="row-fluid" style="margin:20px auto auto auto;">
                     <div class="control-group">
                         <label for="company_hignlight" class="control-label"><@spring.message"info.update.exhibition.company_hignlight_info"/>
@@ -331,9 +333,29 @@
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-body">
-
+            <div class="modal-head">
+                <img src="${base}/resource/exhibitor_info_head.png">
             </div>
+            <div class="modal-body-center-booth" style="margin-left: 30px; margin-right: 70px; margin-top: 10px;"></div>
+            <div class="modal-body-center-logo" style="margin-left: 70px; margin-right: 70px;">
+                <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="${base}/user/logoImg?eid=${updateInfo.eid}" id="previewLogoShow" name="preview" />
+            </div>
+
+            <div class="modal-body-center-companyZh" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-companyEn" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-addressZh" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-addressEn" style="margin-left: 135px; margin-right: 70px;"></div>
+            <div class="modal-body-center-tel" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-fax" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-website" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-email" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-mainproduct" style="margin-left: 70px;margin-top: 15px; margin-right: 70px;">主营产品/Special Products: </div>
+            <div class="modal-body-center-mainproductvalueZh" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-mainproductvalueEn" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-producttype" style="margin-left: 70px;margin-top: 15px; margin-right: 70px;">产品类别/Product Range: </div>
+            <div class="modal-body-center-producttypevalueZh" style="margin-left: 70px; margin-right: 70px;"></div>
+            <div class="modal-body-center-producttypevalueEn" style="margin-left: 70px; margin-right: 70px;"></div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "close"/></button>
             </div>
@@ -664,6 +686,7 @@
         });
 
         $("[name='previewCatagory']").click(function(){
+            var boothNum = '${booth.boothNumber}';
             var selectMap = {};
             $("[role='child']").each(function () {
                 if (!$($(this).children()[0]).hasClass("hide")) {
@@ -675,7 +698,9 @@
                     selectItem.parentTypeId = $(this).attr("parentid");
                     selectItem.subTypeId = $(this).attr("subTypeId");
                     selectItem.parentName = $(this).attr("parentName");
+                    selectItem.parentNameEn = $(this).attr("parentNameEn");
                     selectItem.subName = $(this).attr("typeName");
+                    selectItem.subNameEn = $(this).attr("typeNameEN");
                     selectItem.isOther = $(this).attr("other");
                     if (selectItem.isOther == 1) {
                         selectItem.otherDescription = $("#child_other_" + $(this).attr("parentid")).val();
@@ -683,14 +708,73 @@
                     selectMap['parentId'+$(this).attr("parentid")].items.push(selectItem);
                 }
             });
-            $("#preview .modal-body").html("");
+
+            $("#preview .modal-body-center-booth").html("");
+            $("#preview .modal-body-center-companyZh").html("");
+            $("#preview .modal-body-center-companyEn").html("");
+            $("#preview .modal-body-center-addressZh").html("");
+            $("#preview .modal-body-center-addressEn").html("");
+            $("#preview .modal-body-center-tel").html("");
+            $("#preview .modal-body-center-fax").html("");
+            $("#preview .modal-body-center-website").html("");
+            $("#preview .modal-body-center-email").html("");
+            $("#preview .modal-body-center-mainproductvalueZh").html("");
+            $("#preview .modal-body-center-mainproductvalueEn").html("");
+            $("#preview .modal-body-center-producttypevalueZh").html("");
+            $("#preview .modal-body-center-producttypevalueEn").html("");
+
+
+            $("#preview .modal-body-center-booth").append(boothNum);
+            var companyNameZh = $("[name='company']").val();
+            var companyNameEn = $("[name='companyEn']").val();
+            var addressZh = $("[name='address']").val();
+            var addressEn = $("[name='addressEn']").val();
+            var tel = $("[name='phoneCountryNumber']").val()+"-"+$("[name='areaNumber']").val()+"-"+$("[name='phoneNumber']").val();
+            var fax = $("[name='faxCountryNumber']").val()+"-"+$("[name='faxAreaNumber']").val()+"-"+$("[name='faxNumber']").val();
+            var website = $("[name='website']").val();
+            var email = $("[name='email']").val();
+            var mainProductZh = $("[name='mainProduct']").val();
+            var mainProductEn = $("[name='mainProductEn']").val();
+            $("#preview .modal-body-center-companyZh").append("<b>" + companyNameZh + "</b>");
+            $("#preview .modal-body-center-companyEn").append("<b>" + companyNameEn + "</b>");
+            $("#preview .modal-body-center-addressZh").append("地址/Add: " + addressZh);
+            $("#preview .modal-body-center-addressEn").append(addressEn);
+            $("#preview .modal-body-center-tel").append("电话/Tel: " + tel);
+            $("#preview .modal-body-center-fax").append("传真/Fax: " + fax);
+            $("#preview .modal-body-center-website").append("网址/Web: " + website);
+            $("#preview .modal-body-center-email").append("邮箱/E-mail: " + email);
+
+            $("#preview .modal-body-center-mainproductvalueZh").append(mainProductZh);
+            $("#preview .modal-body-center-mainproductvalueEn").append(mainProductEn);
+            var index = 0;
             for(var p in selectMap){
-                $("#preview .modal-body").append("<h4>"+selectMap[p].parentName+"</h4>");
-                var parent = $("<ul></ul>");
                 for(var i in selectMap[p].items){
-                    parent.append("<li>"+selectMap[p].items[i].subName+"</li>")
+                    if(i==0){
+                        $("#preview .modal-body-center-producttypevalueZh").append(selectMap[p].items[i].parentName + ": ");
+                    }
+                    $("#preview .modal-body-center-producttypevalueZh").append(selectMap[p].items[i].subName);
+                    if((parseInt(i)+1) != parseInt(selectMap[p].items.length)){
+                        $("#preview .modal-body-center-producttypevalueZh").append("，");
+                    }
+                    //parent.append("<li>"+selectMap[p].items[i].subName+"</li>")
                 }
-                $("#preview .modal-body").append(parent);
+                for(var k in selectMap[p].items){
+                    if(k==0){
+                        $("#preview .modal-body-center-producttypevalueEn").append(selectMap[p].items[k].parentNameEn + ": ");
+                    }
+                    $("#preview .modal-body-center-producttypevalueEn").append(selectMap[p].items[k].subNameEn);
+                    if((parseInt(k)+1) != parseInt(selectMap[p].items.length)){
+                        $("#preview .modal-body-center-producttypevalueEn").append(", ");
+                    }
+                }
+
+                var arr = Object.keys(selectMap);
+                var lengthValue = arr.length;
+                if((parseInt(index)+1) != parseInt(lengthValue)){
+                    $("#preview .modal-body-center-producttypevalueZh").append(" ；");
+                    $("#preview .modal-body-center-producttypevalueEn").append("; ");
+                }
+                index++;
             }
 
             $("#preview").modal();

@@ -118,7 +118,7 @@ public class ImportExportService extends ExhibitorService {
 	 * @param customers
 	 * @return
 	 */
-	public List<ExportCustomerInfo> exportCustomer(List<WCustomer> customers) {
+	public List<ExportCustomerInfo> exportCustomer(List<WCustomer> customers, int flag) {
 		List<ExportCustomerInfo> exportCustomerInfos = new ArrayList<ExportCustomerInfo>();
 		if(customers.size() > 0){
 			for(WCustomer customer:customers){
@@ -150,6 +150,20 @@ public class ImportExportService extends ExhibitorService {
 					exportCustomerInfo.setCountryString("");
 				}
 				BeanUtils.copyProperties(customer, exportCustomerInfo);
+				if(flag == 1){
+					if(StringUtils.isNotEmpty(customer.getProvince())){
+						WProvince province = countryProvinceService.loadProvinceById(Integer.parseInt(customer.getProvince()));
+						if(province != null){
+							exportCustomerInfo.setAddress(province.getChineseName() + customer.getCity() + customer.getAddress());
+						}
+					}
+				}else {
+					if("Male".equalsIgnoreCase(customer.getSex())){
+						exportCustomerInfo.setName("ATTN: Mr. " + customer.getFirstName() + ", " + customer.getPosition());
+					}else{
+						exportCustomerInfo.setName("ATTN: Ms. " + customer.getFirstName() + ", " + customer.getPosition());
+					}
+				}
 				exportCustomerInfos.add(exportCustomerInfo);
 			}
 		}
@@ -182,6 +196,32 @@ public class ImportExportService extends ExhibitorService {
         }
         return exportContacts;
     }
+
+	public List<ExportContact> exportContactsEx() {
+		List<ExportContact> exportContacts = new ArrayList<ExportContact>();
+		List<TContact> contacts = contactManagerService.loadAllContact();
+		if(contacts != null){
+			for(TContact contact:contacts){
+				ExportContact exportContact = new ExportContact();
+				BeanUtils.copyProperties(contact,exportContact);
+				exportContacts.add(exportContact);
+			}
+		}
+		return exportContacts;
+	}
+
+	public List<ExportExhibitorJoiner> exportExhibitorJoinersEx() {
+		List<ExportExhibitorJoiner> exportExhibitorJoiners = new ArrayList<ExportExhibitorJoiner>();
+		List<TExhibitorJoiner> joiners = joinerManagerService.loadAllExhibitorJoiner();
+		if(joiners != null){
+			for(TExhibitorJoiner joiner:joiners){
+				ExportExhibitorJoiner exportExhibitorJoiner = new ExportExhibitorJoiner();
+				BeanUtils.copyProperties(joiner,exportExhibitorJoiner);
+				exportExhibitorJoiners.add(exportExhibitorJoiner);
+			}
+		}
+		return exportExhibitorJoiners;
+	}
 
 	/**
 	 * 导出展商参展人员列表

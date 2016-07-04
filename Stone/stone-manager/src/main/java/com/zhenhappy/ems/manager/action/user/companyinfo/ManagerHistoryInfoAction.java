@@ -84,10 +84,22 @@ public class ManagerHistoryInfoAction extends BaseAction {
         return "/user/companyinfo/foreignCustomer";
     }
 
+    //门襟系统数据
+    @RequestMapping(value = "placketSystemData")
+    public String placketSystemData(){
+        return "/user/companyinfo/placketSystemData";
+    }
+
     //分享管理
     @RequestMapping(value = "managerShareInfo")
     public String managerShareInfo(){
         return "/user/companyinfo/managerShareInfo";
+    }
+
+    //地图试验
+    @RequestMapping(value = "mapTest")
+    public String mapTest(){
+        return "/user/companyinfo/mapTest";
     }
 
     /**
@@ -107,6 +119,27 @@ public class ManagerHistoryInfoAction extends BaseAction {
         TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
         if(userInfo != null){
             ImportHistoryCustomerResponse report = historyCustomerService.importHistoryCustomer(importFile, userInfo1, inlandOrForeign);
+            return report;
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 导入门襟系统数据
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value="companyinfo/placketSystemData", method={RequestMethod.POST,RequestMethod.GET})
+    public ImportHistoryCustomerResponse importPlacketSystemData(@RequestParam MultipartFile file,
+                                                          @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) throws IOException {
+        File importFile = callCenterUpload(file, "\\import", FilenameUtils.getBaseName(file.getOriginalFilename()) + new Date().getTime() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+        TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+        TUserInfo userInfo1 = userInfoService.findOneUserInfo(userInfo.getId());
+        if(userInfo != null){
+            ImportHistoryCustomerResponse report = historyCustomerService.importPlacketSystemData(importFile, userInfo1);
             return report;
         }else {
             return null;
@@ -539,7 +572,7 @@ public class ManagerHistoryInfoAction extends BaseAction {
             }
             List<ExportHistoryCustomerInfo> exportCustomer = historyCustomerService.exportHistoryInlandCustomer(customers);
             model.put("list", exportCustomer);
-            String[] titles = new String[] { "类别", "公司", "地址", "姓名", "职位", "手机", "邮箱", "座机", "传真",  "网址", "备注" };
+            String[] titles = new String[] { "类别", "公司", "地址", "联系人", "职位", "手机", "邮箱", "座机", "传真",  "网址", "备注" };
             model.put("titles", titles);
             String[] columns = new String[] { "cateory", "company", "address", "contact", "position", "telphone", "email", "fixtelphone", "fax", "website", "remark" };
             model.put("columns", columns);

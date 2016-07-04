@@ -2,10 +2,6 @@ package com.zhenhappy.ems.manager.action.user;
 
 import java.util.Date;
 
-import com.zhenhappy.ems.dto.Principle;
-import com.zhenhappy.ems.entity.TExhibitorMsg;
-import com.zhenhappy.ems.service.ExhibitorService;
-import com.zhenhappy.ems.service.MsgService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -64,7 +60,7 @@ public class ArticleAction extends BaseAction {
     
     @RequestMapping(value = "article")
     public ModelAndView directToArticle() {
-        ModelAndView modelAndView = new ModelAndView("/user/article");
+        ModelAndView modelAndView = new ModelAndView("/WEB-INF/tpl/user/article/article.jsp");
         return modelAndView;
     }
     

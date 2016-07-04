@@ -28,6 +28,7 @@ public class QueryExhibitor {
 	private Integer area;
 	private Integer group;
 	private String contractId;
+	private String exhibitor_type;
 
 	public QueryExhibitor() {
 		super();
@@ -45,7 +46,8 @@ public class QueryExhibitor {
 						  Integer tag,
 						  Integer group,
 						  String boothNumber,
-						  String exhibitionArea) {
+						  String exhibitionArea,
+						  String exhibitor_type) {
 		super();
 		this.eid = eid;
 		this.username = username;
@@ -60,6 +62,36 @@ public class QueryExhibitor {
 		this.tag = tag;
 		this.area = area;
 		this.group = group;
+		this.exhibitor_type= exhibitor_type;
+	}
+
+	public QueryExhibitor(Integer eid,
+						  String username,
+						  String password,
+						  Integer area,
+						  String company,
+						  String companye,
+						  Integer country,
+						  Integer province,
+						  Integer isLogout,
+						  Integer tag,
+						  Integer group,
+						  String exhibitionArea,
+						  String exhibitor_type) {
+		super();
+		this.eid = eid;
+		this.username = username;
+		this.password = password;
+		this.company = company;
+		this.companye = companye;
+		this.country = country;
+		this.province = province;
+		this.isLogout = isLogout;
+		this.exhibitionArea = exhibitionArea;
+		this.tag = tag;
+		this.area = area;
+		this.group = group;
+		this.exhibitor_type= exhibitor_type;
 	}
 
 	public Integer getEid() {
@@ -236,5 +268,13 @@ public class QueryExhibitor {
 
 	public void setContractId(String contractId) {
 		this.contractId = contractId;
+	}
+
+	public String getExhibitor_type() {
+		return exhibitor_type;
+	}
+
+	public void setExhibitor_type(String exhibitor_type) {
+		this.exhibitor_type = exhibitor_type;
 	}
 }

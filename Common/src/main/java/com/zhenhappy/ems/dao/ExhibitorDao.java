@@ -10,4 +10,6 @@ import com.zhenhappy.ems.entity.TExhibitor;
 public interface ExhibitorDao extends BaseDao<TExhibitor> {
 	public List<TExhibitor> loadExhibitorsByEids(Integer[] eids);
 	public List<TExhibitor> loadExhibitorsByEidsAndFlag(Integer[] eids, int flag);
+	public List<TExhibitor> loadAllExhibitorsByTagAndRole(int tag, Integer type);
+	public List<TExhibitor> loadAllExhibitorsByType(Integer type);
 }

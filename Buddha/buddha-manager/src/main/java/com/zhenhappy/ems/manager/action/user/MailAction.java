@@ -6,6 +6,7 @@ import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.dto.GetMailSendDetailsResponse;
 import com.zhenhappy.ems.dto.Principle;
+import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
 import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 import com.zhenhappy.ems.manager.service.CustomerTemplateService;
@@ -93,16 +94,16 @@ public class MailAction extends BaseAction {
 
     @ResponseBody
     @RequestMapping(value = "emailAllInlandCustomers", method = RequestMethod.POST)
-    public BaseResponse emailAllInlandCustomers(@ModelAttribute QueryCustomerRequest request,
-                                                 @RequestParam(value = "cids", defaultValue = "") Integer[] eids) {
+    public BaseResponse emailAllInlandCustomers(@RequestParam(value = "cids", defaultValue = "") Integer[] eids,
+                                                @RequestParam(value = "rabbi") Integer rabbi) {
         BaseResponse baseResponse = new BaseResponse();
         List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
         try {
             Email email = new Email();
             if(eids[0] == -1)
-                customers = customerInfoManagerService.loadAllInlandCustomer();
+                customers = customerInfoManagerService.loadAllRabbiCustomer(1, rabbi);
             else
-                customers = customerInfoManagerService.loadSelectedCustomers(eids);
+                customers = customerInfoManagerService.loadSelectedCustomers(eids, rabbi);
             if(customers.size()>0) {
                 ReadWriteEmailAndMsgFile.creatTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
                 for(int i=0;i<customers.size();i++) {
@@ -116,7 +117,7 @@ public class MailAction extends BaseAction {
                         ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
                         ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境内邮箱为：" + customer.getEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.foshiEmailFileName);
                         //log.info("======给境内邮箱为：" + customer.getEmail() + "账号发邮件======");
-                        if(customer.getIsProfessional()) {
+                        if(customer.getIsProfessional() == 1) {
                             email.setFlag(1);//专业采购商
                         } else {
                             email.setFlag(0);//展会观众
@@ -159,16 +160,16 @@ public class MailAction extends BaseAction {
 
     @ResponseBody
     @RequestMapping(value = "emailAllForeignCustomers", method = RequestMethod.POST)
-    public BaseResponse emailAllForeignCustomers(@ModelAttribute QueryCustomerRequest request,
-                                                @RequestParam(value = "cids", defaultValue = "") Integer[] cids) {
+    public BaseResponse emailAllForeignCustomers(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                 @RequestParam(value = "rabbi") Integer rabbi) {
         BaseResponse baseResponse = new BaseResponse();
         List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
         try {
             Email email = new Email();
             if(cids[0] == -1)
-                customers = customerInfoManagerService.loadAllInlandCustomer();
+                customers = customerInfoManagerService.loadAllRabbiCustomer(2, rabbi);
             else
-                customers = customerInfoManagerService.loadSelectedCustomers(cids);
+                customers = customerInfoManagerService.loadSelectedCustomers(cids, rabbi);
 
             if(customers.size()>0) {
                 ReadWriteEmailAndMsgFile.creatTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
@@ -183,7 +184,7 @@ public class MailAction extends BaseAction {
                         ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.foshiEmailFileName);
                         ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境外邮箱为：" + customer.getEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.foshiEmailFileName);
                         //log.info("======给境外邮箱为：" + customer.getEmail() + "账号发邮件======");
-                        if(customer.getIsProfessional()) {
+                        if(customer.getIsProfessional() == 1) {
                             email.setFlag(1);//专业采购商
                         } else {
                             email.setFlag(0);//展会观众
@@ -226,8 +227,8 @@ public class MailAction extends BaseAction {
 
     @ResponseBody
     @RequestMapping(value = "msgAllInlandCustomers", method = RequestMethod.POST)
-    public BaseResponse msgAllInlandCustomers(@ModelAttribute QueryCustomerRequest request,
-                                                @RequestParam(value = "cids", defaultValue = "") Integer[] eids) {
+    public BaseResponse msgAllInlandCustomers(@RequestParam(value = "cids", defaultValue = "") Integer[] eids,
+                                              @RequestParam(value = "rabbi") Integer rabbi) {
         BaseResponse baseResponse = new BaseResponse();
         List<TVisitorInfo> customers = new ArrayList<TVisitorInfo>();
         List<TVisitorTemplate> customerTemplatesList = new ArrayList<TVisitorTemplate>();
@@ -235,9 +236,9 @@ public class MailAction extends BaseAction {
         String mobileSubject = "";
         try {
             if(eids[0] == -1)
-                customers = customerInfoManagerService.loadAllInlandCustomer();
+                customers = customerInfoManagerService.loadAllRabbiCustomer(1, rabbi);
             else
-                customers = customerInfoManagerService.loadSelectedCustomers(eids);
+                customers = customerInfoManagerService.loadSelectedCustomers(eids, rabbi);
             customerTemplatesList = customerTemplaeService.loadAllCustomerTemplate();
             if(customerTemplatesList != null && customerTemplatesList.size()>0){
                 for(int k=0;k<customerTemplatesList.size();k++){
@@ -256,17 +257,17 @@ public class MailAction extends BaseAction {
                     TVisitorMsgLog visitorMsgLog = new TVisitorMsgLog();
                     TVisitorInfo customer = customers.get(i);
                     EmailPattern pattern = new EmailPattern();
-                    if(pattern.isMobileNO(customer.getMobile())) {
+                    if(pattern.isMobileNO(customer.getMobilePhone())) {
                         SimpleDateFormat bartDateFormat = new SimpleDateFormat("yyyy年MM月dd日 EEE HH:mm:ss");
                         Date date = new Date();
                         String str = bartDateFormat.format(date);
                         ReadWriteEmailAndMsgFile.setFileContentIsNull();
                         ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.foshiMsgFileName);
-                        ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境内手机号为：" + customer.getMobile() + "发短信。", ReadWriteEmailAndMsgFile.foshiMsgFileName);
+                        ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给境内手机号为：" + customer.getMobilePhone() + "发短信。", ReadWriteEmailAndMsgFile.foshiMsgFileName);
                         //log.info("======给境内手机号为：" + customer.getMobile() + "发短信======");
                         String mobileContentTemp = mobileContent;
                         mobileContent = mobileContent.replace("@@_CHECKINGNUMBER_@@",customer.getCheckingNo());
-                        sendMsgByAsynchronousMode(customer.getMobile(), mobileContent);
+                        sendMsgByAsynchronousMode(customer.getMobilePhone(), mobileContent);
                         visitorMsgLog.setMsgContent(mobileContent);
                         mobileContent = mobileContentTemp;
                     }
@@ -278,7 +279,7 @@ public class MailAction extends BaseAction {
                     visitorMsgLog.setGUID("");
                     visitorMsgLog.setMsgSubject(mobileSubject);
                     visitorMsgLog.setMsgFrom("");
-                    visitorMsgLog.setMsgTo(customer.getMobile());
+                    visitorMsgLog.setMsgTo(customer.getMobilePhone());
                     visitorMsgLog.setStatus(0);
                     visitorMsgLog.setCustomerID(customer.getId());
                     visitorLogMsgService.insertLogMsg(visitorMsgLog);
@@ -357,5 +358,28 @@ public class MailAction extends BaseAction {
         }
         modelAndView.addObject("email", email);
         return modelAndView;
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "emailBuddhaFairCustomer", method = RequestMethod.POST)
+    public BaseResponse emailBuddhaFairCustomer(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse baseResponse = new BaseResponse();
+        TVisitorInfo visitorInfo = customerInfoManagerService.loadCustomerInfoById(cids[0]);
+        if(visitorInfo.getCountry() == 44){
+            if("1".equals(visitorInfo.getRabbi())) {
+                emailAllInlandCustomers(cids, 1);
+            }else{
+                emailAllInlandCustomers(cids, 0);
+            }
+        }else {
+            if("1".equals(visitorInfo.getRabbi())) {
+                emailAllForeignCustomers(cids, 1);
+            }else{
+                emailAllForeignCustomers(cids, 0);
+            }
+        }
+        return baseResponse;
     }
 }

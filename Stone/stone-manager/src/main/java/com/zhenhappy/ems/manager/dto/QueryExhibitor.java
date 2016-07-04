@@ -17,6 +17,7 @@ public class QueryExhibitor {
 	private Date lastLoginTime;
 	private String lastLoginIp;
 	private Integer isLogout;
+	private Integer isLogin;
 	private Integer createUser;
 	private Date createTime;
 	private Integer updateUser;
@@ -55,7 +56,8 @@ public class QueryExhibitor {
 						  String companye,
 						  Integer country,
 						  Integer province, 
-						  Integer isLogout, 
+						  Integer isLogout,
+						  Integer isLogin,
 						  Integer tag, 
 						  Integer group,
 						  String boothNumber,
@@ -70,6 +72,7 @@ public class QueryExhibitor {
 		this.country = country;
 		this.province = province;
 		this.isLogout = isLogout;
+		this.isLogin= isLogin;
 		this.boothNumber = boothNumber;
 		this.exhibitionArea = exhibitionArea;
 		this.tag = tag;
@@ -252,5 +255,13 @@ public class QueryExhibitor {
 
 	public void setContractId(String contractId) {
 		this.contractId = contractId;
+	}
+
+	public Integer getIsLogin() {
+		return isLogin;
+	}
+
+	public void setIsLogin(Integer isLogin) {
+		this.isLogin = isLogin;
 	}
 }

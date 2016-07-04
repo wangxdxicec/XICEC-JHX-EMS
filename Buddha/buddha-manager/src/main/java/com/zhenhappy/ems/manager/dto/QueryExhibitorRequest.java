@@ -14,6 +14,8 @@ public class QueryExhibitorRequest extends EasyuiRequest {
 	private Integer tag;
 	private Integer area;
 	private Integer group;
+	private Integer type;  //0：表示普通展商；1：表示素食展展商；2：表示泰国展展商
+	private Integer pre;   //1：表示预登记
 
 	public String getBoothNumber() {
 		return boothNumber;
@@ -87,4 +89,19 @@ public class QueryExhibitorRequest extends EasyuiRequest {
 		this.group = group;
 	}
 
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public Integer getPre() {
+		return pre;
+	}
+
+	public void setPre(Integer pre) {
+		this.pre = pre;
+	}
 }

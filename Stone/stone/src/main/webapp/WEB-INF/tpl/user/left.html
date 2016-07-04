@@ -13,7 +13,27 @@
         cursor: pointer;
     }
 
+    .leftNavAdvise {
+        height: 36px;
+        padding-left: 20px;
+        font-size: 16px;
+        line-height: 36px;
+        position: relative;
+        border-bottom: 1px #dfdfdf solid;
+        color: #888888;
+        cursor: pointer;
+    }
+
     .leftNav i {
+        height: 13px;
+        width: 13px;
+        position: absolute;
+        right: 28px;
+        bottom: 10px;
+        background-image: url("${resource}/images/nav3.jpg");
+    }
+
+    .leftNavAdvise i {
         height: 13px;
         width: 13px;
         position: absolute;
@@ -33,6 +53,11 @@
     }
 
     .leftNav a,.leftNav a:visited,.leftNav a:hover{
+        color: #888888;
+        text-decoration: none;
+    }
+
+    .leftNavAdvise a,.leftNav a:visited,.leftNav a:hover{
         color: #888888;
         text-decoration: none;
     }
@@ -65,7 +90,7 @@
         background-image: url("${resource}/images/nav2.jpg");
     }
 </style>
-<#assign exhibitor_data_end_html = "${exhibitor_data_end_html}">
+<#assign exhibitor_data_end_html = "${tExhibitorTime.company_Info_Data_End_Html}">
 <div style="float: left;width: 234px;min-height: 200px;background-color: #ffffff">
     <div id="leftExhibitor" class="leftNav">
         <#if rc.locale=="zh_CN">
@@ -105,11 +130,11 @@
             <i></i>
         </div>
     </#if>
-    <div id="leftAdvise" class="leftNav">
+    <div id="leftAdvise" class="leftNavAdvise">
         <#if rc.locale=="zh_CN">
-            <a href="${base}/resource/2016厦门石材展广告招租函.pdf" target="_blank" class=""><@spring.message "module.advise"/></a>
+            <a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a>
         <#else>
-            <a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf" target="_blank" class=""><@spring.message "module.advise"/></a>
+            <a target="_blank" href="${base}/resource/Advertise Here-Xiamen Stone Fair 2016.pdf"><@spring.message "module.advise"/></a>
         </#if>
         <i></i>
     </div>
@@ -144,6 +169,14 @@
         })
 
         $(".leftNav").mouseout(function(){
+            $(this).removeClass("hover");
+        })
+
+        $(".leftNavAdvise").mouseover(function(){
+            $(this).addClass("hover");
+        })
+
+        $(".leftNavAdvise").mouseout(function(){
             $(this).removeClass("hover");
         })
     })

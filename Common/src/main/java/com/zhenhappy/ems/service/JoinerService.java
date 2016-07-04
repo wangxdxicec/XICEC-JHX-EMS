@@ -3,6 +3,7 @@ package com.zhenhappy.ems.service;
 import com.zhenhappy.ems.dao.JoinerDao;
 import com.zhenhappy.ems.entity.TExhibitorJoiner;
 import com.zhenhappy.ems.entity.TExhibitorJoinerEx;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -58,7 +59,20 @@ public class JoinerService {
      * @return
      */
     public List<TExhibitorJoiner> queryAllJoinersByEid(Integer eid){
-        List<TExhibitorJoiner> joiners = hibernateTemplate.find("from TExhibitorJoiner where eid = ? order by isDelete",new Object[]{eid});
+        String hql = "from TExhibitorJoiner where eid = " + eid;
+        List<TExhibitorJoiner> joiners = hibernateTemplate.find(hql,new Object[]{});
+        return joiners;
+    }
+
+    /**
+     * query all joiners in exhibitor.
+     * @param eid
+     * @param flag 1：表示未激活参展列表；2：表示已激活参展列表
+     * @return
+     */
+    public List<TExhibitorJoiner> queryAllJoinersByEid(Integer eid, Integer flag){
+        String hql = "from TExhibitorJoiner where eid = " + eid +" and " + (flag == 1?"isDelete = 1":"isDelete = 0") + " order by isDelete";
+        List<TExhibitorJoiner> joiners = hibernateTemplate.find(hql,new Object[]{});
         return joiners;
     }
 
@@ -69,6 +83,47 @@ public class JoinerService {
     public List<TExhibitorJoinerEx> queryAllJoiners(){
         List<TExhibitorJoinerEx> joiners = new ArrayList<TExhibitorJoinerEx>();
         List<Map<String, Object>> items = jdbcTemplate.queryForList("select e.company, b.booth_number, j.name, j.position, j.telphone, j.email from t_exhibitor_joiner j, t_exhibitor_info e, t_exhibitor_booth b where j.eid = e.eid and e.eid = b.eid");
+        for (Map<String, Object> item : items) {
+            TExhibitorJoinerEx joiner = new TExhibitorJoinerEx();
+            joiner.setCompany((String) item.get("company"));
+            joiner.setName((String) item.get("name"));
+            joiner.setPosition((String) item.get("position"));
+            joiner.setEmail((String) item.get("email"));
+            joiner.setTelphone((String) item.get("telphone"));
+            joiner.setExhibitorPosition((String) item.get("booth_number"));
+            joiners.add(joiner);
+        }
+
+        return joiners;
+    }
+
+    /**
+     * query all joiners in exhibitor.
+     * @return
+     */
+    public List<TExhibitorJoinerEx> queryAllJoinersByTagAndRole(Integer tag, Integer type, TUserInfo userInfo){
+        List<TExhibitorJoinerEx> joiners = new ArrayList<TExhibitorJoinerEx>();
+        List<Map<String, Object>> items;
+        if(userInfo != null){
+            if(userInfo.getRoleId() > 2){
+                tag = userInfo.getOwnerId();
+            }
+        }
+        String typeCondition = "";
+        if(type == 1){
+            typeCondition = " and t.exhibitor_type = 1 ";
+        }else if(type == 2){
+            typeCondition = " and t.exhibitor_type = 2 ";
+        }else if(type == 0){
+            typeCondition = " and (t.exhibitor_type = '' or  t.exhibitor_type is null) ";
+        }
+        if(tag == -1){
+            items = jdbcTemplate.queryForList("select e.company, b.booth_number, j.name, j.position, j.telphone, j.email from t_exhibitor_joiner j, t_exhibitor_info e, t_exhibitor_booth b ,t_exhibitor t " +
+                    "where j.eid = e.eid and e.eid = b.eid and t.eid = e.eid " + typeCondition);
+        }else{
+            items = jdbcTemplate.queryForList("select e.company, b.booth_number, j.name, j.position, j.telphone, j.email from t_exhibitor_joiner j, t_exhibitor_info e, t_exhibitor_booth b,t_exhibitor t " +
+                    "where t.tag=" + tag + " and j.eid = e.eid and e.eid = b.eid and e.eid = t.eid "  + typeCondition);
+        }
         for (Map<String, Object> item : items) {
             TExhibitorJoinerEx joiner = new TExhibitorJoinerEx();
             joiner.setCompany((String) item.get("company"));

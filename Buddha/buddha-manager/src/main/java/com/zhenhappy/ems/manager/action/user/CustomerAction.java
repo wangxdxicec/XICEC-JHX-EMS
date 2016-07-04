@@ -1,7 +1,11 @@
 package com.zhenhappy.ems.manager.action.user;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import com.zhenhappy.ems.entity.TVisitorInfo;
+import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -114,13 +118,13 @@ public class CustomerAction extends BaseAction {
     //==================佛事展新增需求=================
     @RequestMapping(value = "inlandCustomer")
     public ModelAndView directToInlandCustomer() {
-        ModelAndView modelAndView = new ModelAndView("user/customer/inlandCustomer");
+        ModelAndView modelAndView = new ModelAndView("/WEB-INF/tpl/user/customer/inlandCustomer.jsp");
         return modelAndView;
     }
 
     @RequestMapping(value = "foreignCustomer")
     public ModelAndView directToForeignCustomer() {
-        ModelAndView modelAndView = new ModelAndView("user/customer/foreignCustomer");
+        ModelAndView modelAndView = new ModelAndView("/WEB-INF/tpl/user/customer/foreignCustomer.jsp");
         return modelAndView;
     }
 
@@ -144,6 +148,25 @@ public class CustomerAction extends BaseAction {
     }
 
     /**
+     * 分页查询国内法师
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryInlandRabbiCustomersByPage")
+    public QueryCustomerResponse queryInlandRabbiCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryInlandRabbiCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query queryInland CustomersByPage error.", e);
+        }
+        return response;
+    }
+
+    /**
      * 分页查询国外客商
      *
      * @param request
@@ -158,6 +181,83 @@ public class CustomerAction extends BaseAction {
         } catch (Exception e) {
             response.setResultCode(1);
             log.error("query queryForeign CustomersByPage error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询国外法师
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryForeignRabbiCustomersByPage")
+    public QueryCustomerResponse queryForeignRabbiCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryForeignRabbiCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query queryForeign CustomersByPage error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 显示客商详细页面
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "directToCustomerInfo")
+    public ModelAndView directToCustomerInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/customer/customerInfo");
+        modelAndView.addObject("id", id);
+        modelAndView.addObject("customer", customerInfoManagerService.loadCustomerInfoById(id));
+        return modelAndView;
+    }
+
+    /**
+     * 修改客商是否专业
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerProfessional", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerProfessional(@ModelAttribute QueryCustomerRequest request,
+                                                   @RequestParam(value = "id", defaultValue = "")Integer id,
+                                                   @RequestParam(value = "type")Integer type) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.modifyCustomerProfessional(request, id, type);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer professional error: ", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 普通客商与法师相互转化
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerNormalOrRabbi", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerNormalOrRabbi(@ModelAttribute QueryCustomerRequest request,
+                                                   @RequestParam(value = "id", defaultValue = "")Integer id) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.modifyCustomerNormalOrRabbi(request, id);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer norimal or rabbi error: ", e);
+            response.setResultCode(1);
         }
         return response;
     }

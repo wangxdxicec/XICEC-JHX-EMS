@@ -1002,7 +1002,9 @@
 				}else if (row.infoFlag == 2){
 					return 'color:red;font-weight:bold;';	//必填项缺失-红色
 				}else if (row.infoFlag == 1){
-					return 'color:blue;font-weight:bold;';	//老账号完整-蓝色
+					return 'color:green;font-weight:bold;';	//账号信息完整-绿色
+				} else if(row.infoFlag == 5) {
+					return 'color:black;font-weight:bold;';	//账号刚激活，但未登录的
 				}
 			},
             onDblClickRow: function (index, field, value) {

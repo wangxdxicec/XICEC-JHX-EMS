@@ -76,7 +76,8 @@ public class MailAction {
 
     @RequestMapping(value = "retrySendMail")
     @ResponseBody
-    public BaseResponse retrySendMail(@RequestParam(value = "mid") Integer mid, @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+    public BaseResponse retrySendMail(@RequestParam(value = "mid") Integer mid,
+                                      @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         BaseResponse baseResponse = new BaseResponse();
         try {
             Email email = new Email();

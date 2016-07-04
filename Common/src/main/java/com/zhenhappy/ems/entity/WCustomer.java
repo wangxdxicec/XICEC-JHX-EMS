@@ -52,11 +52,13 @@ public class WCustomer implements java.io.Serializable {
 	private Integer sendEmailNum;
 	private Integer sendMsgNum;
 	private Date sendEmailDate;
+	private Date sendMsgDate;
 	private Boolean isDisabled;
 	private String guid;
 	private Integer isProfessional;
 	private Boolean isjudged;
 	private Boolean isMobile;
+	private Integer isActivated;
 
 	// Constructors
 
@@ -78,7 +80,8 @@ public class WCustomer implements java.io.Serializable {
 					 String fax, String faxCode2, String website, String remark,
 					 String createdIp, Date createdTime, String updatedIp,
 					 Date updateTime, Integer sendEmailNum,Integer sendMsgNum,
-					 Date sendEmailDate, Boolean isDisabled, String guid, Integer isProfessional, Boolean isjudged, Boolean isMobile) {
+					 Date sendEmailDate, Date sendMsgDate, Boolean isDisabled, String guid, Integer isProfessional, Boolean isjudged,
+					 Boolean isMobile, Integer isActivated) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -110,11 +113,13 @@ public class WCustomer implements java.io.Serializable {
 		this.sendEmailNum = sendEmailNum;
 		this.sendMsgNum = sendMsgNum;
 		this.sendEmailDate = sendEmailDate;
+		this.sendMsgDate = sendMsgDate;
 		this.isDisabled = isDisabled;
 		this.guid = guid;
 		this.isProfessional = isProfessional;
 		this.isjudged = isjudged;
 		this.isMobile = isMobile;
+		this.isActivated = isActivated;
 	}
 
 	// Property accessors
@@ -443,4 +448,21 @@ public class WCustomer implements java.io.Serializable {
 		this.sendMsgNum = sendMsgNum;
 	}
 
+	@Column(name = "SendMsgDate", length = 23)
+	public Date getSendMsgDate() {
+		return sendMsgDate;
+	}
+
+	public void setSendMsgDate(Date sendMsgDate) {
+		this.sendMsgDate = sendMsgDate;
+	}
+
+	@Column(name = "IsActivated")
+	public Integer getIsActivated() {
+		return isActivated;
+	}
+
+	public void setIsActivated(Integer isActivated) {
+		this.isActivated = isActivated;
+	}
 }

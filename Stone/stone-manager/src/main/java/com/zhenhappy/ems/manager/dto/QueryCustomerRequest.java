@@ -16,10 +16,12 @@ public class QueryCustomerRequest extends EasyuiRequest {
 	private String telephone;
 	private String email;
 	private String createTime;
+	private String updateTime;
 	private String website;
 	private String fax;
 	private Integer isProfessional;
 	private Integer inlandOrForeign;  //1:表示国内客商  2：表示国外客商
+	private Integer isActivated;
 
 	public Integer getId() {
 		return id;
@@ -147,5 +149,21 @@ public class QueryCustomerRequest extends EasyuiRequest {
 
 	public void setIsProfessional(Integer isProfessional) {
 		this.isProfessional = isProfessional;
+	}
+
+	public String getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public Integer getIsActivated() {
+		return isActivated;
+	}
+
+	public void setIsActivated(Integer isActivated) {
+		this.isActivated = isActivated;
 	}
 }

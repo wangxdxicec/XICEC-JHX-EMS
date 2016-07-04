@@ -158,12 +158,30 @@ public class HistoryCustomerService extends ExhibitorService {
 		}
 	}
 
+	/**
+	 * 导入客商信息
+	 * @param importFile
+	 * @param flag 1表示xlsx格式，即国内；2表示xls即国外
+	 * @return
+	 * @throws IOException
+	 */
 	public ImportHistoryCustomerResponse importHistoryCustomer(File importFile, TUserInfo userInfo, Integer flag) {
 		if(flag == 1){
 			return importInlandHistoryCustomer(importFile, userInfo);
 		}else{
 			return importForeignHistoryCustomer(importFile, userInfo);
 		}
+	}
+
+	/**
+	 * 导入门襟系统数据
+	 * @param importFile
+	 * @return
+	 * @throws IOException
+	 */
+	public ImportHistoryCustomerResponse importPlacketSystemData(File importFile, TUserInfo userInfo) {
+		//这里根据门襟系统的表结构进行处理，只导入石材展期间的数据
+		return importInlandHistoryCustomer(importFile, userInfo);
 	}
 
 	public ImportHistoryCustomerResponse importInlandHistoryCustomer(File importFile, TUserInfo userInfo) {
@@ -649,7 +667,11 @@ public class HistoryCustomerService extends ExhibitorService {
 		} else {
 			THistoryCustomer tHistoryCustomer = new THistoryCustomer();
 			tHistoryCustomer.setIsDelete(0);
-			tHistoryCustomer.setCountry(Integer.parseInt(request.getCountry()));
+			if(null != request.getCountry()){
+				tHistoryCustomer.setCountry(Integer.parseInt(request.getCountry()));
+			}else {
+				tHistoryCustomer.setCountry(44);
+			}
 			tHistoryCustomer.setTelphone(request.getTelphone());
 			tHistoryCustomer.setWebsite(request.getWebsite());
 			tHistoryCustomer.setAddress(request.getAddress());
@@ -756,7 +778,7 @@ public class HistoryCustomerService extends ExhibitorService {
 			if (request.getOwner() != null) {
 				conditions.add(" e.owner = " + request.getOwner().intValue() + " ");
 			}
-		}else if(userInfo.getRoleId() == 6) {    //表示国外资料库管理员
+		}else if(userInfo.getRoleId() == 6 || userInfo.getRoleId() == 2) {    //表示国外资料库管理员
 			//表示显示所有国外资料库管理员,所以不做处理
 		}else {
 			if(request.getOwner() == null){

@@ -65,12 +65,12 @@
     <div style="color: #f1b426;font-size: 16px;border-bottom: 1px #dbdbdb solid;line-height: 32px;font-weight: bolder"><@spring.message "products.title"/></div>
     <#if rc.locale=="zh_CN">
         <div class="alert alert-warning">
-            ${exhibitor_data_end_html2016}.12.15截止，采购商可通过产品信息进行针对性地搜索。
+            ${tExhibitorTime.setCompany_Info_Insert_Submit_Deadline_Zh}截止，采购商可通过产品信息进行针对性地搜索。
         </div>
         <#else>
             <div class="alert alert-warning">
                 Purchasers are allowed to search by products.<br/>
-                Submitting Deadline: Dec 15, ${exhibitor_data_end_html2016}
+                Submitting Deadline: ${tExhibitorTime.setCompany_Info_Insert_Submit_Deadline_En}
             </div>
     </#if>
     <div>

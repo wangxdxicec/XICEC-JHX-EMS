@@ -139,7 +139,7 @@ public class DataReportAction extends BaseAction {
         }
         else {
             List<WCustomer> visitorInfos = customerInfoManagerService.loadAllExhibitorsByDate(province, strToDate(begindate), strToDate(enddate));
-            List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(visitorInfos);
+            List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(visitorInfos, -1);
             model.put("list", exportCustomer);
             String[] titles = new String[] { "公司中文名", "姓名", "性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
             model.put("titles", titles);

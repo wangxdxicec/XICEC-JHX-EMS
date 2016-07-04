@@ -111,7 +111,9 @@
 		<table style="width: 320px;margin: 20px auto">
 			<tr>
 				<td style="width: 70px;text-align: left">导入模版：</td>
-				<td style="width: 90px;text-align: left"><input type="file" name="file" id="file" /></td>
+				<td style="width: 90px;text-align: left">
+					<input type="file" name="file" id="file" />
+				</td>
 			</tr>
 			<input type="hidden" value="1" name="inlandOrForeign">
 		</table>
@@ -143,7 +145,7 @@
 </div>
 
 <!-- 资料重复提示对话框 -->
-<div id="repeatDiv" class="easyui-dialog" iconCls="icon-search" style="width:850px;height:700px; padding: 5px" closed="true">
+<div id="repeatDiv" class="easyui-dialog" iconCls="icon-search" data-options="width: $(this).width() * 0.75, height: $(this).height() * 0.86" closed="true">
 	<div style="height: 360px;">
 		<table id="willImportTable" title="要导入的资料" class="easyui-datagrid" fitColumns="true" rownumbers="true" fit="true">
 		</table>
@@ -157,7 +159,7 @@
 <!-- 修改资料对话框 -->
 <div id="modifyCustomerInfoDlg" data-options="iconCls:'icon-edit',modal:true">
 	<form id="modifyCustomerInfoForm"  name="modifyCustomerInfoForm">
-		<table style="width: 400px;margin: 20px auto">
+		<table style="width: 380px;margin: 20px auto">
 			<tr>
 				<th style="width: 90px;text-align: right">类别：</th>
 				<td><input class="easyui-validatebox" type="text" value="" name="cateory"></td>
@@ -341,7 +343,7 @@
 			$.ajax({
 				url:"${base}/user/ignoreHistoryForeignCustomersToExcel",
 				type:"POST",
-				data:{"cids":checkedItems, "type":2},
+				data:{"cids":checkedItems, "type":1},
 				dataType:"json",
 				traditional: true,
 				success : function(result) {

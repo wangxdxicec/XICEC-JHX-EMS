@@ -4,11 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
+import com.zhenhappy.ems.entity.WCountry;
 import com.zhenhappy.ems.entity.WCustomer;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.entity.WCustomerEx;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.util.EmailPattern;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,6 +40,8 @@ public class CustomerAction extends BaseAction {
 
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
+    @Autowired
+    private CountryProvinceService countryProvinceService;
 
     /**
      * 显示客商详细页面
@@ -47,7 +53,17 @@ public class CustomerAction extends BaseAction {
     public ModelAndView directToCustomerInfo(@RequestParam("id") Integer id) {
         ModelAndView modelAndView = new ModelAndView("user/customer/customerInfo");
         modelAndView.addObject("id", id);
-        modelAndView.addObject("customer", customerInfoManagerService.loadCustomerInfoById(id));
+        WCustomer wCustomer = customerInfoManagerService.loadCustomerInfoById(id);
+        WCustomerEx wCustomerEx = new WCustomerEx();
+        if(wCustomer != null){
+            int countryIndex = wCustomer.getCountry();
+            WCountry country = countryProvinceService.loadCountryById(countryIndex);
+            if(country != null){
+                BeanUtils.copyProperties(wCustomer, wCustomerEx);
+                wCustomerEx.setCountryValue(country.getChineseName());
+            }
+        }
+        modelAndView.addObject("customer", wCustomerEx);
         modelAndView.addObject("customerSurvey", customerInfoManagerService.loadCustomerSurveyInfoById(id));
         /*modelAndView.addObject("exhibitor", exhibitorManagerService.loadExhibitorByEid(eid));
         modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(eid));
@@ -129,6 +145,28 @@ public class CustomerAction extends BaseAction {
         BaseResponse response = new BaseResponse();
         try {
             customerInfoManagerService.modifyCustomerProfessional(request, id);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 激活或注销客商信息
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "setCustomerActiveOrUnactive", method = RequestMethod.POST)
+    public BaseResponse setCustomerActiveOrUnactive(@ModelAttribute QueryCustomerRequest request,
+                                                    @RequestParam(value = "id", defaultValue = "")Integer id) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.setCustomerActiveOrUnactive(request, id);
         } catch (DuplicateUsernameException e) {
             response.setResultCode(2);
             response.setDescription(e.getMessage());

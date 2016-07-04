@@ -44,10 +44,11 @@ public class JoinerAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "queryJoiners", method = RequestMethod.POST)
-    public QueryJoinersResponse queryJoiners(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+    public QueryJoinersResponse queryJoiners(@RequestParam("flag") Integer flag,
+                                             @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         QueryJoinersResponse response = new QueryJoinersResponse();
         try {
-            List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid());
+            List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid(), flag);
             for(TExhibitorJoiner j:joiners) {
                 j.setName(replaceBlank(j.getName()));
                 j.setPosition(replaceBlank(j.getPosition()));

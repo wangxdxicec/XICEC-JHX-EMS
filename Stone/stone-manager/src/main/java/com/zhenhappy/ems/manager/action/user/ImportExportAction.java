@@ -136,13 +136,13 @@ public class ImportExportAction extends BaseAction {
 			customers = customerInfoManagerService.loadAllInlandCustomer();
 		else
 			customers = customerInfoManagerService.loadSelectedCustomers(cids);
-		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
+		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers, 1);
 		model.put("list", exportCustomer);
-		String[] titles = new String[] { "公司中文名", "姓名", "性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
+		String[] titles = new String[] { "预约登记号", "公司", "地址", "联系人", "职位", "性别", "手机", "邮箱", "座机", "传真", "网址", "登记时间","修改时间", "备注" };
 		model.put("titles", titles);
-		String[] columns = new String[] { "company", "name", "sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "remark" };
+		String[] columns = new String[] { "checkingNo", "company", "address", "name", "position", "sex","phone", "email", "tel", "faxString",  "website", "createdTime", "updateTime", "remark" };
 		model.put("columns", columns);
-		Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20};
+		Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20};
 		model.put("columnWidths", columnWidths);
 		model.put("fileName", "客商基本信息.xls");
 		model.put("sheetName", "客商基本信息");
@@ -162,13 +162,13 @@ public class ImportExportAction extends BaseAction {
 			customers = customerInfoManagerService.loadAllForeignCustomer();
 		else
 			customers = customerInfoManagerService.loadSelectedCustomers(cids);
-		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
+		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers, 2);
 		model.put("list", exportCustomer);
-		String[] titles = new String[] { "公司中文名", "姓名", "性别", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址", "备注" };
+		String[] titles = new String[] { "预约登记号", "国家", "公司中文名", "性别+姓名+职位", "地址", "邮箱", "网址", "城市", "手机", "电话", "传真", "登记时间","修改时间","备注" };
 		model.put("titles", titles);
-		String[] columns = new String[] { "company", "name", "sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address", "remark" };
+		String[] columns = new String[] { "checkingNo","countryString", "company", "name", "address", "email", "website", "city", "phone", "tel", "faxString", "createdTime", "updateTime", "remark" };
 		model.put("columns", columns);
-		Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20};
+		Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20};
 		model.put("columnWidths", columnWidths);
 		model.put("fileName", "客商基本信息.xls");
 		model.put("sheetName", "客商基本信息");
@@ -699,24 +699,24 @@ public class ImportExportAction extends BaseAction {
 		Map model = new HashMap();
 		List<WCustomer> customers = new ArrayList<WCustomer>();
 		customers = customerInfoManagerService.loadCustomerByYearOrTime(request,fieldYear, fieldTime, inlandOrForeign);
-		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers);
+		List<ExportCustomerInfo> exportCustomer = importExportService.exportCustomer(customers, inlandOrForeign);
 		if(inlandOrForeign == 1){
 			model.put("list", exportCustomer);
-			String[] titles = new String[] { "公司中文名", "姓名","预约登记号" ,"性别", "职位", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址","登记时间","修改时间", "备注" };
+			String[] titles = new String[] { "预约登记号", "公司", "地址", "联系人", "职位", "性别", "手机", "邮箱", "座机", "传真", "网址", "登记时间","修改时间", "备注" };
 			model.put("titles", titles);
-			String[] columns = new String[] { "company", "name", "checkingNo","sex", "position", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address","createdTime","updateTime", "remark" };
+			String[] columns = new String[] { "checkingNo", "company", "address", "name", "position", "sex","phone", "email", "tel", "faxString",  "website", "createdTime", "updateTime", "remark" };
 			model.put("columns", columns);
-			Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+			Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20};
 			model.put("columnWidths", columnWidths);
 			model.put("fileName", "国内客商基本信息.xls");
 			model.put("sheetName", "国内客商基本信息");
 		}else {
 			model.put("list", exportCustomer);
-			String[] titles = new String[] { "公司中文名", "姓名","预约登记号", "性别", "国家", "城市", "邮箱", "手机", "电话", "传真", "网址", "地址","登记时间","修改时间", "备注" };
+			String[] titles = new String[] { "预约登记号", "国家", "公司中文名", "性别+姓名+职位", "地址", "邮箱", "网址", "城市", "手机", "电话", "传真", "登记时间","修改时间","备注" };
 			model.put("titles", titles);
-			String[] columns = new String[] { "company", "name", "checkingNo","sex", "countryString", "city", "email", "phone", "tel", "faxString",  "website", "address","createdTime","updateTime", "remark" };
+			String[] columns = new String[] { "checkingNo","countryString", "company", "name", "address", "email", "website", "city", "phone", "tel", "faxString", "createdTime", "updateTime", "remark" };
 			model.put("columns", columns);
-			Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+			Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20,20,20,20,20,20,20};
 			model.put("columnWidths", columnWidths);
 			model.put("fileName", "国外客商基本信息.xls");
 			model.put("sheetName", "国外客商基本信息");

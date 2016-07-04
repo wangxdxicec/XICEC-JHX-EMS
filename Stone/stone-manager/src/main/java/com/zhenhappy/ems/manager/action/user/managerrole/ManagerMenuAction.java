@@ -12,6 +12,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "user")
 @SessionAttributes(value = ManagerPrinciple.MANAGERPRINCIPLE)
 public class ManagerMenuAction extends BaseAction {
+    //前台展商时间参数设置
+    @RequestMapping(value = "resetExhibitorTime")
+    public String resetExhibitorTime(){
+        return "user/managerreset/exhibitor_time";
+    }
+
+    //重置展商列表颜色
+    @RequestMapping(value = "managerReset")
+    public String managerReset(){
+        return "user/managerreset/resetview";
+    }
+
     //展商列表菜单
     @RequestMapping(value = "exhibitorIndex")
     public String exhibitorIndex(){
@@ -105,7 +117,7 @@ public class ManagerMenuAction extends BaseAction {
     //角色管理
     @RequestMapping("roleIndex")
     public String roleIndex(){
-        return "user/managerrole//role";
+        return "user/managerrole/role";
     }
 
     //用户管理

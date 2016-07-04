@@ -2,12 +2,15 @@ package com.zhenhappy.ems.manager.action.user;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhenhappy.ems.dao.JoinerDao;
+import com.zhenhappy.ems.entity.TExhibitorJoiner;
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.service.ImportExportService;
+import com.zhenhappy.ems.manager.util.JXLExcelView;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,14 +30,6 @@ import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.WCountry;
 import com.zhenhappy.ems.entity.WProvince;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.ActiveExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.AddExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.BindBoothRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorInfoRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
@@ -69,6 +64,10 @@ public class ExhibitorAction extends BaseAction {
     private ImportExportAction importExportAction;
     @Autowired
     private SystemConfig systemConfig;
+    @Autowired
+    private JoinerDao joinerDao;
+    @Autowired
+    private ImportExportService importExportService;
 
     /**
      * 分页查询展商列表
@@ -507,5 +506,73 @@ public class ExhibitorAction extends BaseAction {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 导出所有参展人员列表
+     * @param principle
+     */
+    @RequestMapping(value = "exportJoinerList", method = RequestMethod.POST)
+    public ModelAndView exportJoinerList(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        Map model = new HashMap();
+        List<TExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitorList();
+
+        List<ExportExhibitorJoiner> exportExhibitorJoiners = importExportService.exportExhibitorJoiners(exhibitors);
+        model.put("list", exportExhibitorJoiners);
+        String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "名字", "职位", "电话", "邮箱" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "boothNumber", "company", "companye", "name", "position", "telphone", "email" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "展商参展人员信息.xls");
+        model.put("sheetName", "展商参展人员信息");
+        return new ModelAndView(new JXLExcelView(), model);
+
+    }
+
+    /**
+     * 导出所有联系人员列表
+     * @param principle
+     */
+    @RequestMapping(value = "exportContactList", method = RequestMethod.POST)
+    public ModelAndView exportContactList(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        Map model = new HashMap();
+        List<TExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitorList();
+
+        List<ExportContact> exportContacts = importExportService.exportContacts(exhibitors);
+        model.put("list", exportContacts);
+        String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "名字", "职位", "电话", "邮箱", "地址" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "boothNumber", "company", "companye", "name", "position", "phone", "email", "address" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{20,20,20,20,20,20,20,20};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "展商联系人信息.xls");
+        model.put("sheetName", "展商联系人信息");
+        return new ModelAndView(new JXLExcelView(), model);
+    }
+
+    /**
+     * 重置参展人员列表
+     * @param principle
+     */
+    @ResponseBody
+    @RequestMapping(value = "resetJoinerListToDefault", method = RequestMethod.POST)
+    public BaseResponse resetJoinerListToDefault(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            List<TExhibitorJoiner> joiners = joinerDao.queryByHql("from TExhibitorJoiner", new Object[]{});
+            for(TExhibitorJoiner joiner: joiners){
+                joiner.setIsDelete(1);
+                joiner.setAdminUpdateTime(new Date());
+                joinerDao.update(joiner);
+            }
+            response.setResultCode(0);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            e.printStackTrace();
+        }
+        return response;
     }
 }

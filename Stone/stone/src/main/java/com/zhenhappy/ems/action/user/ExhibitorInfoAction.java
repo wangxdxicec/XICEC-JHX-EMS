@@ -2,14 +2,13 @@ package com.zhenhappy.ems.action.user;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zhenhappy.ems.action.BaseAction;
+import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dto.*;
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.entity.TExhibitorMeipai;
-import com.zhenhappy.ems.service.ExhibitorService;
-import com.zhenhappy.ems.service.MeipaiService;
-import com.zhenhappy.ems.service.MsgService;
-import com.zhenhappy.ems.service.ProductService;
+import com.zhenhappy.ems.service.*;
+import com.zhenhappy.ems.stonetime.TExhibitorTime;
 import com.zhenhappy.ems.sys.Constants;
 import com.zhenhappy.system.SystemConfig;
 import org.apache.commons.io.FileUtils;
@@ -17,6 +16,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,6 +60,9 @@ public class ExhibitorInfoAction extends BaseAction {
 
     private static Logger log = Logger.getLogger(ExhibitorInfoAction.class);
 
+    @Autowired
+    private ExhibitorDao exhibitorDao;
+
     /**
      * redirect to information manager.service page.
      *
@@ -98,17 +101,26 @@ public class ExhibitorInfoAction extends BaseAction {
             	productTypeChecks = exhibitorService.loadAllProductTypesWithCheck(exhibitorInfo.getEinfoid());
 			}
             if (locale.equals(Locale.US)) {
-                for (ProductType productType : productTypes) {
+                /*for (ProductType productType : productTypes) {
                     productType.setTypeName(productType.getTypeNameEN());
                     for (ProductType type : productType.getChildrenTypes()) {
                         type.setTypeName(type.getTypeNameEN());
                     }
-                }
+                }*/
                 modelAndView.setViewName("/user/info/update_en");
             } else {
                 modelAndView.setViewName("/user/info/update");
             }
 			TExhibitor exhibitor = exhibitorService.getExhibitorByEid(exhibitorId);
+            //wangxd 2016-06-24  若账号刚激活，需要登录进基本信信界面，后台颜色才会更新
+            exhibitor.setIsLogin(1);
+            exhibitorDao.update(exhibitor);
+
+            ExhibitorBooth booth = exhibitorService.loadBoothInfo(exhibitor.getEid());
+            if(booth != null){
+                modelAndView.addObject("booth", booth);
+            }
+
             modelAndView.addObject("exhibitor", exhibitor);
 			modelAndView.addObject("area", exhibitor.getArea());
             modelAndView.addObject("types", productTypes);
@@ -139,12 +151,12 @@ public class ExhibitorInfoAction extends BaseAction {
             List<ProductType> productTypes = exhibitorService.loadAllProductTypes();
             List<ProductTypeCheck> productTypeChecks = exhibitorService.loadAllProductTypesWithCheck(exhibitorInfo.getEinfoid());
             if (locale.equals(Locale.US)) {
-                for (ProductType productType : productTypes) {
+                /*for (ProductType productType : productTypes) {
                     productType.setTypeName(productType.getTypeNameEN());
                     for (ProductType type : productType.getChildrenTypes()) {
                         type.setTypeName(type.getTypeNameEN());
                     }
-                }
+                }*/
                 modelAndView.setViewName("/user/info/update_en");
                 modelAndView.addObject("alert", "Add Success");
             } else {
@@ -208,12 +220,12 @@ public class ExhibitorInfoAction extends BaseAction {
             List<ProductType> productTypes = exhibitorService.loadAllProductTypes();
             List<ProductTypeCheck> productTypeChecks = exhibitorService.loadAllProductTypesWithCheck(exhibitorInfo.getEinfoid());
             if (locale.equals(Locale.US)) {
-                for (ProductType productType : productTypes) {
+                /*for (ProductType productType : productTypes) {
                     productType.setTypeName(productType.getTypeNameEN());
                     for (ProductType type : productType.getChildrenTypes()) {
                         type.setTypeName(type.getTypeNameEN());
                     }
-                }
+                }*/
                 modelAndView.setViewName("/user/info/update_en");
                 modelAndView.addObject("alert", "Modify Success");
             } else {

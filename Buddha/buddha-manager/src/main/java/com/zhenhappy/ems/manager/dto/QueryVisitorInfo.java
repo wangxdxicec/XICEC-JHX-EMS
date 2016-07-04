@@ -48,7 +48,7 @@ public class QueryVisitorInfo {
 	private Boolean isRecieveDoc;
 	private Boolean isMobile;
 	private Boolean isjudged;
-	private Boolean isProfessional;
+	private Integer isProfessional;
 	private Boolean isAccommodation;
 	private Boolean isDisabled;
 	private Boolean isReaded;
@@ -71,6 +71,10 @@ public class QueryVisitorInfo {
 	private String tmp_V_position3;
 	private String tmp_V_contact3;
 	private String guid;
+	private Integer govement;
+	private String rabbi;
+	private Integer sendEmailFlag;
+	private Integer sendMsgFlag;
 
 	/** default constructor */
 	public QueryVisitorInfo() {
@@ -91,7 +95,7 @@ public class QueryVisitorInfo {
 							String fax, String faxCode2, String website, String remark,
 							String createIp, Date createTime, String updateIp,
 							Date updateTime, Integer sendEmailNum,Date sendEmailTime,
-							Boolean isDisabled, String guid) {
+							Boolean isDisabled, String guid, Integer isGovement, String isRabbi) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -124,10 +128,12 @@ public class QueryVisitorInfo {
 		this.sendEmailTime = sendEmailTime;
 		this.isDisabled = isDisabled;
 		this.guid = guid;
+		this.govement = isGovement;
+		this.rabbi = isRabbi;
 	}
 
 	public QueryVisitorInfo(Integer id, String firstName, String company, String city, String address,
-							String mobile, String tel, String email, Date createTime) {
+							String mobile, String tel, String email, Date createTime, Integer isGovement, String isRabbi, boolean isMobile) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -137,10 +143,13 @@ public class QueryVisitorInfo {
 		this.telephone = tel;
 		this.email = email;
 		this.createTime = createTime;
+		this.govement = isGovement;
+		this.rabbi = isRabbi;
+		this.isMobile = isMobile;
 	}
 
 	public QueryVisitorInfo(Integer id, String firstName, String company, Integer country, String address,
-							String mobile, String tel, String email, Date createTime) {
+							String mobile, String tel, String email, Date createTime, Integer isGovement, String isRabbi, boolean isMobile) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -150,6 +159,9 @@ public class QueryVisitorInfo {
 		this.telephone = tel;
 		this.email = email;
 		this.createTime = createTime;
+		this.govement = isGovement;
+		this.rabbi = isRabbi;
+		this.isMobile = isMobile;
 	}
 
 	public QueryVisitorInfo(Integer id, String email, String checkingNo,
@@ -162,13 +174,13 @@ public class QueryVisitorInfo {
 						String createIp, Date createTime, String updateIp,
 						Date updateTime, Integer sendEmailNum,Date sendEmailTime, Integer sendMsgNum,Date sendMsgTime,
 						String langFlag,String visitDate,String beenToFair,String beenToRole,Boolean isRecieveEmail,
-						Boolean isRecieveDoc,Boolean isMobile,Boolean isjudged,Boolean isProfessional,Boolean isAccommodation,
+						Boolean isRecieveDoc,Boolean isMobile,Boolean isjudged,Integer isProfessional,Boolean isAccommodation,
 						Boolean isDisabled, Boolean isReaded,
 						String tmp_Country,String tmp_Postcode,String tmp_Interest,String tmp_InterestOthers,
 						String tmp_Knowfrom,String tmp_KnowfromOthers,String tmp_V_name1,String tmp_V_title1,
 						String tmp_V_position1,String tmp_V_contact1,String tmp_V_name2,String tmp_V_title2,
 						String tmp_V_position2,String tmp_V_contact2,String tmp_V_name3,String tmp_V_title3,
-						String tmp_V_position3,String tmp_V_contact3,String guid) {
+						String tmp_V_position3,String tmp_V_contact3,String guid, Integer isGovement, String isRabbi) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -234,6 +246,8 @@ public class QueryVisitorInfo {
 		this.tmp_V_position3 = tmp_V_position3;
 		this.tmp_V_contact3 = tmp_V_contact3;
 		this.guid = guid;
+		this.govement = isGovement;
+		this.rabbi = isRabbi;
 	}
 
 	public Integer getId() {
@@ -572,11 +586,11 @@ public class QueryVisitorInfo {
 		this.isjudged = isjudged;
 	}
 
-	public Boolean getProfessional() {
+	public Integer getProfessional() {
 		return isProfessional;
 	}
 
-	public void setProfessional(Boolean professional) {
+	public void setProfessional(Integer professional) {
 		isProfessional = professional;
 	}
 
@@ -754,5 +768,37 @@ public class QueryVisitorInfo {
 
 	public void setGuid(String guid) {
 		this.guid = guid;
+	}
+
+	public Integer getGovement() {
+		return this.govement;
+	}
+
+	public void setGovement(Integer govement) {
+		this.govement = govement;
+	}
+
+	public String getRabbi() {
+		return rabbi;
+	}
+
+	public void setRabbi(String rabbi) {
+		rabbi = rabbi;
+	}
+
+	public Integer getSendEmailFlag() {
+		return sendEmailFlag;
+	}
+
+	public void setSendEmailFlag(Integer sendEmailFlag) {
+		this.sendEmailFlag = sendEmailFlag;
+	}
+
+	public Integer getSendMsgFlag() {
+		return sendMsgFlag;
+	}
+
+	public void setSendMsgFlag(Integer sendMsgFlag) {
+		this.sendMsgFlag = sendMsgFlag;
 	}
 }

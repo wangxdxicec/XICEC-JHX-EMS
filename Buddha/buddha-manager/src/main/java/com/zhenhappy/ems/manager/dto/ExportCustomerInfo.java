@@ -1,11 +1,11 @@
 package com.zhenhappy.ems.manager.dto;
 
-import com.zhenhappy.ems.entity.WCustomer;
+import com.zhenhappy.ems.entity.TVisitorInfo;
 
 /**
  * Created by wujianbin on 2014-12-13.
  */
-public class ExportCustomerInfo extends WCustomer {
+public class ExportCustomerInfo extends TVisitorInfo {
 	private String name;
 	private String countryString;
 	private String phone;

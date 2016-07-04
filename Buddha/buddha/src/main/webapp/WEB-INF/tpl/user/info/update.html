@@ -75,7 +75,7 @@
             <div class="row-fluid">
                 <#include "/common/message.ftl" />
                 <p class="text-error">1、<@spring.message "info.notice.one"/></p>
-                <p class="text-error">2、<@spring.message "info.notice.two"/></p>
+                <p class="text-error">2、请于<font style="color:#FF0000; font-weight:bolder">${tExhibitorTime.exhibitor_Info_Submit_Deadline}</font><@spring.message "info.notice.two"/></p>
                 <p class="text-error">3、<@spring.message "info.notice.three"/></p>
                 <p class="text-error">4、<@spring.message "info.notice.four"/></p>
                 <form class="form-horizontal" id="infoform" action="${base}/user/updateinfo" method="post" role="form"

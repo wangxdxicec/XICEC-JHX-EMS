@@ -40,9 +40,6 @@
                 <db.password>123456</db.password>
                 <appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/buddha</appendix>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>product</id>
@@ -53,6 +50,9 @@
                 <db.password>gogo03Jhx</db.password>
                 <appendix>C:\Program Files\Apache Software Foundation\appendix\Buddha</appendix>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 
@@ -118,7 +118,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
-                    <warName>buddha</warName>
+                    <warName>ROOT</warName>
                 </configuration>
             </plugin>
             <plugin>

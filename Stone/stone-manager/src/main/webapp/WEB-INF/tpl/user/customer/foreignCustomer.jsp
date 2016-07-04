@@ -57,10 +57,10 @@
 					<span id="smobilePhone" class="sortable">手机</span><br/>
 					<input id="customersMobilePhone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'telephone', width: $(this).width() / 8">
+				<%--<th data-options="field: 'telephone', width: $(this).width() / 8">
 					<span id="stelephone" class="sortable">电话</span><br/>
 					<input id="customersTelephone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-				</th>
+				</th>--%>
 				<th data-options="field: 'email', width: $(this).width() / 8">
 					<span id="semail" class="sortable">邮箱</span><br/>
 					<input id="customersEmail" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
@@ -69,12 +69,24 @@
 					<span id="screatedTime" class="sortable">登记时间</span><br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
+				<th data-options="field: 'updateTime', formatter:formatDatebox, width: $(this).width() / 8">
+					<span id="supdateTime" class="sortable">修改时间</span><br/>
+					<input id="updateTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
 				<th data-options="field: 'isProfessional', formatter: formatStatus, width: $(this).width() / 7">
 					<span id="sisProfessional" class="sortable">状态</span><br/>
 					<select id="customerIsProfessional" style="width:104%;height:21px;" onchange="filter();">
 						<option selected value="">全部</option>
 						<option value="0">普通</option>
 						<option value="1">专业</option>
+					</select>
+				</th>
+				<th data-options="field: 'isActivated', formatter: formatActiviteStatus, width: $(this).width() / 7">
+					<span id="sisActivated" class="sortable">状态</span><br/>
+					<select id="customerIsActivated" style="width:104%;height:21px;" onchange="filter();">
+						<option selected value="">全部</option>
+						<option value="0">注销</option>
+						<option value="1">激活</option>
 					</select>
 				</th>
 			</tr>
@@ -271,6 +283,14 @@
 		}
 	}
 
+	function formatActiviteStatus(val, row) {
+		if (val == 0) {
+			return '注销';
+		} else {
+			return '激活';
+		}
+	}
+
 	Date.prototype.format = function (format)
 	{
 		var o = {
@@ -298,9 +318,10 @@
 			country : document.getElementById("customersCountry").value,
 			address : document.getElementById("customersAddress").value,
 			mobilePhone : document.getElementById("customersMobilePhone").value,
-			telephone : document.getElementById("customersTelephone").value,
+			/*telephone : document.getElementById("customersTelephone").value,*/
 			email : document.getElementById("customersEmail").value,
 			createdTime : document.getElementById("createdTime").value,
+			updateTime: document.getElementById("updateTime").value,
 			sort : sort,
 			order : order
 		});
@@ -323,17 +344,23 @@
 		if(document.getElementById("customersMobilePhone").value != ""){
 			filterParm += '&mobilePhone=' + encodeURI(document.getElementById("customersMobilePhone").value);
 		}
-		if(document.getElementById("customersTelephone").value != ""){
+		/*if(document.getElementById("customersTelephone").value != ""){
 			filterParm += '&telephone=' + encodeURI(document.getElementById("customersTelephone").value);
-		}
+		}*/
 		if(document.getElementById("customersEmail").value != ""){
 			filterParm += '&email=' + encodeURI(document.getElementById("customersEmail").value);
 		}
 		if(document.getElementById("createdTime").value != ""){
 			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
 		}
+		if(document.getElementById("updateTime").value != ""){
+			filterParm += '&updateTime=' + encodeURI(document.getElementById("updateTime").value);
+		}
 		if(document.getElementById("customerIsProfessional").value != ""){
 			filterParm += '&isProfessional=' + document.getElementById("customerIsProfessional").value;
+		}
+		if(document.getElementById("customerIsActivated").value != ""){
+			filterParm += '&isActivated=' + document.getElementById("customerIsActivated").value;
 		}
 		filterParm += '&inlandOrForeign=2';
 		$('#customers').datagrid('options').url = '${base}/user/queryStoneCustomersByPage' + filterParm;
@@ -468,9 +495,10 @@
 					country : document.getElementById("customersCountry").value,
 					address : document.getElementById("customersAddress").value,
 					mobilePhone : document.getElementById("customersMobilePhone").value,
-					telephone : document.getElementById("customersTelephone").value,
+					/*telephone : document.getElementById("customersTelephone").value,*/
 					email : document.getElementById("customersEmail").value,
 					createdTime : document.getElementById("createdTime").value,
+					updateTime: document.getElementById("updateTime").value,
 					sort : sortForeign,
 					order : orderForeign
 				});
@@ -483,9 +511,10 @@
 					country : document.getElementById("customersCountry").value,
 					address : document.getElementById("customersAddress").value,
 					mobilePhone : document.getElementById("customersMobilePhone").value,
-					telephone : document.getElementById("customersTelephone").value,
+					/*telephone : document.getElementById("customersTelephone").value,*/
 					email : document.getElementById("customersEmail").value,
 					createdTime : document.getElementById("createdTime").value,
+					updateTime: document.getElementById("updateTime").value,
 					sort : sortForeign,
 					order : orderForeign
 				});
@@ -498,9 +527,10 @@
 					country : document.getElementById("customersCountry").value,
 					address : document.getElementById("customersAddress").value,
 					mobilePhone : document.getElementById("customersMobilePhone").value,
-					telephone : document.getElementById("customersTelephone").value,
+					/*telephone : document.getElementById("customersTelephone").value,*/
 					email : document.getElementById("customersEmail").value,
 					createdTime : document.getElementById("createdTime").value,
+					updateTime: document.getElementById("updateTime").value,
 					sort : null,
 					order : null
 				});
@@ -515,9 +545,10 @@
 			country : document.getElementById("customersCountry").value,
 			address : document.getElementById("customersAddress").value,
 			mobilePhone : document.getElementById("customersMobilePhone").value,
-			telephone : document.getElementById("customersTelephone").value,
+			/*telephone : document.getElementById("customersTelephone").value,*/
 			email : document.getElementById("customersEmail").value,
 			createdTime : document.getElementById("createdTime").value,
+			updateTime: document.getElementById("updateTime").value,
 			sort : sort,
 			order : order
 		});

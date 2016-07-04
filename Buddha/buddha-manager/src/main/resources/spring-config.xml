@@ -124,7 +124,7 @@
 	<bean id="mailSender" name="mailSender"
 		class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host">
-			<value>mail.buddhafair.com</value>
+			<value>smtp.exmail.qq.com</value>
 			<!--<value>smtp.163.com</value>-->
 		</property>
 		<property name="javaMailProperties">
@@ -138,7 +138,7 @@
 			<!--<value>hxscsd@163.com</value>-->
 		</property>
 		<property name="password">
-			<value>jhx5959618</value>
+			<value>Jhx5959618</value>
 			<!--<value>dilimic120</value>-->
 		</property>
 	</bean>

@@ -71,19 +71,19 @@ public class CustomerInfoManagerService {
 		List<String> conditions = new ArrayList<String>();
 		try {
 			if (StringUtils.isNotEmpty(request.getFirstName())) {
-				conditions.add(" e.firstName like '%" + new String(request.getFirstName().getBytes("ISO-8859-1"),"utf-8") + "%'");
+				conditions.add(" (e.firstName like '%" + request.getFirstName() + "%' OR e.firstName like '%" + new String(request.getFirstName().getBytes("ISO-8859-1"),"GBK") + "%' OR e.firstName like '%" + new String(request.getFirstName().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 			}
 			if (StringUtils.isNotEmpty(request.getCompany())) {
-				conditions.add(" e.company like '%" +new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%'");
+				conditions.add(" (e.company like '%" + request.getCompany() + "%' OR e.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"GBK") + "%' OR e.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 			}
 			if (StringUtils.isNotEmpty(request.getCity())) {
-				conditions.add(" e.city like '%" + new String(request.getCity().getBytes("ISO-8859-1"),"utf-8") + "%'");
+				conditions.add(" (e.city like '%" + request.getCity() + "%' OR e.city like '%" + new String(request.getCity().getBytes("ISO-8859-1"),"GBK") + "%' OR e.city like '%" + new String(request.getCity().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 			}
 			if (request.getCountry() != null) {
 				conditions.add(" e.country = " + request.getCountry().intValue() + " ");
 			}
 			if (StringUtils.isNotEmpty(request.getAddress())) {
-				conditions.add(" e.address like '%" +new String(request.getAddress().getBytes("ISO-8859-1"),"utf-8") + "%'");
+				conditions.add(" (e.address like '%" + request.getAddress() + "%' OR e.address like '%" + new String(request.getAddress().getBytes("ISO-8859-1"),"GBK") + "%' OR e.address like '%" + new String(request.getAddress().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 			}
 			if (StringUtils.isNotEmpty(request.getMobilePhone())) {
 				conditions.add(" e.mobilePhone like '%" + new String(request.getMobilePhone().getBytes("ISO-8859-1"),"utf-8") + "%'");
@@ -94,14 +94,21 @@ public class CustomerInfoManagerService {
 			if (request.getCreateTime() != null) {
 				conditions.add(" e.createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
 			}
-			if (request.getEmail() != null) {
-				conditions.add(" e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			if (StringUtils.isNotEmpty(request.getEmail())) {
+				conditions.add(" (e.email like '%" + request.getEmail() + "%' OR e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"GBK") + "%' OR e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 			}
 			if(request.getIsProfessional() != null){
 				if (request.getIsProfessional() == 1) {
 					conditions.add(" e.isProfessional=1 ");
 				} else if(request.getIsProfessional() == 0) {
 					conditions.add(" e.isProfessional=0 ");
+				}
+			}
+			if(request.getIsActivated() != null){
+				if (request.getIsActivated() == 1) {
+					conditions.add(" e.isActivated=1 ");
+				} else if(request.getIsActivated() == 0) {
+					conditions.add(" e.isActivated=0 ");
 				}
 			}
 		} catch (UnsupportedEncodingException e) {
@@ -117,14 +124,18 @@ public class CustomerInfoManagerService {
 		if(StringUtils.isNotEmpty(conditionsSql)){
 			conditionsSqlNoOrder = " where " + conditionsSql;
 		}
+		String conditionsSqlOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlOrder = " where " + conditionsSql + " order by e.updateTime desc";
+		}
 		Page page = new Page();
 		page.setPageSize(request.getRows());
 		page.setPageIndex(request.getPage());
 		List<WCustomer> exhibitors = customerInfoDao.queryPageByHQL("select count(*) from WCustomer e" + conditionsSqlNoOrder,
 				"select new com.zhenhappy.ems.manager.dto.QueryCustomerInfo(e.id, e.firstName, e.company,"
 						+  (request.getInlandOrForeign() == 1 ? "e.city" : "e.country")
-						+ ", e.address, e.mobilePhone, e.telephone, e.email, e.createdTime, e.isProfessional) "
-						+ "from WCustomer e"  + conditionsSqlNoOrder, new Object[]{}, page);
+						+ ", e.address, e.mobilePhone, e.telephone, e.email, e.createdTime, e.updateTime, e.isProfessional, e.isActivated) "
+						+ "from WCustomer e"  + conditionsSqlOrder, new Object[]{}, page);
 		QueryCustomerResponse response = new QueryCustomerResponse();
 		response.setResultCode(0);
 		response.setRows(exhibitors);
@@ -684,6 +695,16 @@ public class CustomerInfoManagerService {
 		if (StringUtils.isNotEmpty(request.getCreateTime())) {
 			conditions.add(" (createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"GBK") + "%' OR createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%') ");
 		}
+		if (StringUtils.isNotEmpty(request.getUpdateTime())) {
+			conditions.add(" (updateTime like '%" + new String(request.getUpdateTime().getBytes("ISO-8859-1"),"GBK") + "%' OR updateTime like '%" + new String(request.getUpdateTime().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if(request.getIsActivated() != null){
+			if (request.getIsActivated() == 1) {
+				conditions.add(" isActivated=1 ");
+			} else if(request.getIsActivated() == 0) {
+				conditions.add(" isActivated=0 ");
+			}
+		}
 		String conditionsSql = StringUtils.join(conditions, " and ");
 		String conditionsSqlNoOrder = "";
 		if(StringUtils.isNotEmpty(conditionsSql)){
@@ -844,10 +865,28 @@ public class CustomerInfoManagerService {
 	public void modifyCustomerProfessional(QueryCustomerRequest request, Integer id) throws Exception {
 		WCustomer customer = customerInfoDao.query(id);
 		if(customer != null){
-			if(customer.getIsProfessional() == 1) {
-				customer.setIsProfessional(0);
-			} else {
+			if(null == customer.getIsProfessional() || customer.getIsProfessional() == 0) {
 				customer.setIsProfessional(1);
+			} else {
+				customer.setIsProfessional(0);
+			}
+			customerInfoDao.update(customer);
+		}
+	}
+
+	/**
+	 * 激活或注销客商信息
+	 * @param request
+	 * @throws Exception
+	 */
+	@Transactional
+	public void setCustomerActiveOrUnactive(QueryCustomerRequest request, Integer id) throws Exception {
+		WCustomer customer = customerInfoDao.query(id);
+		if(customer != null){
+			if(null == customer.getIsActivated() ||customer.getIsActivated() == 0) {
+				customer.setIsActivated(1);
+			} else {
+				customer.setIsActivated(0);
 			}
 			customerInfoDao.update(customer);
 		}
@@ -959,7 +998,12 @@ public class CustomerInfoManagerService {
 		if(StringUtils.isNotEmpty(fieldYear)){
 			int thisYearValue = Integer.parseInt(fieldYear);
 			int lastYearValue = thisYearValue - 1;
-			String yearHql = " w.createdTime between '" + lastYearValue + "-03-10' " + " and '" + thisYearValue + "-03-09'";
+			String yearHql = "";
+			if(Integer.parseInt(fieldTime) == 1) {
+				yearHql = " w.updateTime between '" + lastYearValue + "-03-10' " + " and '" + thisYearValue + "-03-09'";
+			} else {
+				yearHql = " w.createdTime between '" + lastYearValue + "-03-10' " + " and '" + thisYearValue + "-03-09'";
+			}
 			conditions.add(yearHql);
 		}
 		if(inlandOrForeign == 1){
