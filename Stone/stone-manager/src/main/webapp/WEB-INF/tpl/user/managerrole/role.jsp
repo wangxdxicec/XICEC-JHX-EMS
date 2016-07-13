@@ -228,7 +228,7 @@
 </div>
 
 <!-- 权限菜单表格树 -->
-<div id="dlg2" class="easyui-dialog" style="width: 300px;height: 450px;padding: 10px 20px"
+<div id="dlg2" class="easyui-dialog" style="width: 350px;height: 650px;padding: 10px 20px"
      closed="true" buttons="#dlg2-buttons">
     <ul id="tree" class="easyui-tree"></ul>
 </div>

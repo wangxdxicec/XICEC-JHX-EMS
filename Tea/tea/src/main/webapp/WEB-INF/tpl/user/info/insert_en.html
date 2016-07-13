@@ -67,8 +67,12 @@
         <#include "/user/left.html" />
         <div class="span9">
             <div class="row-fluid">
-                <#include "/common/message.ftl" />
-                <@spring.message "info.notice"/>
+                <p class="text-error">
+                1.Please fill in this form carefully, all the information you submit here will be used in the Official Catalogue of Xiamen Tea Fair 2015.</br>
+                2.Deadline for submitting your company's information is ${tExhibitorTime.exhibitor_Info_Submit_Deadline_En}.</br>
+                3.If you could not submit information successfully, please download the form, fill it and send it back to us via Email info@teafair.com.cn , or Fax +86 592 5959611.</br>
+                4.Your products will be showed on the Exhibitors List 2015 as soon as you finish the Company Information. Please fill in at your earliest time.
+                </p>
                 <form class="form-horizontal" id="infoform" action="${base}/user/info" method="post" role="form"
                       enctype="multipart/form-data">
                     <h3 class="form-signin-heading"><@spring.message "info.insert.exhibition.title"/></h3>

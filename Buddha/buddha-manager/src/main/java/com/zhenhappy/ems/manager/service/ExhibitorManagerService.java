@@ -432,8 +432,12 @@ public class ExhibitorManagerService extends ExhibitorService {
 					if(StringUtils.isNotEmpty(exhibitorMeipai.getMeipaiEn()))  boothNumAndMeipai.setMeipaiEn(exhibitorMeipai.getMeipaiEn());
 					else boothNumAndMeipai.setMeipaiEn("");
 				}
-				if(StringUtils.isEmpty(booth.getBoothNumber()) && StringUtils.isEmpty(exhibitorMeipai.getMeipai()) && StringUtils.isEmpty(exhibitorMeipai.getMeipaiEn())) continue;
-				else boothNumAndMeipais.add(boothNumAndMeipai);
+				if(StringUtils.isEmpty(booth.getBoothNumber()) && exhibitorMeipai != null
+                        && StringUtils.isEmpty(exhibitorMeipai.getMeipai())
+                        && StringUtils.isEmpty(exhibitorMeipai.getMeipaiEn()))
+                    continue;
+				else
+                    boothNumAndMeipais.add(boothNumAndMeipai);
 			}
 		}
 		return boothNumAndMeipais;
@@ -607,7 +611,9 @@ public class ExhibitorManagerService extends ExhibitorService {
     	if(eid != null){
     		TExhibitorBooth booth = new TExhibitorBooth();
             booth.setBoothNumber(request.getBoothNumber().trim().replace(" ", ""));
-            booth.setExhibitionArea(request.getBoothNumber().trim().replace(" ", "").substring(0,1) + "厅");
+            if(StringUtil.isNotEmpty(request.getBoothNumber())){
+                booth.setExhibitionArea(request.getBoothNumber().trim().replace(" ", "").substring(0,1) + "厅");
+            }
             booth.setEid(eid);
             booth.setMark("");
             booth.setCreateTime(new Date());

@@ -8,69 +8,104 @@
     <link rel="stylesheet" type="text/css" href="${base}/resource/jquery-easyui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="${base}/resource/jquery-easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="${base}/resource/style/main.css">
+    <script type="text/javascript" src="${base}/resource/jquery-easyui/treegrid-dnd.js"></script>
     <script type="text/javascript" src="${base}/resource/jquery-easyui/jquery.min.js"></script>
     <script type="text/javascript" src="${base}/resource/jquery-easyui/jquery.easyui.min.js"></script>
     <script type="text/javascript" src="${base}/resource/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
 
     <script type="text/javascript">
         var url;
+        var menuMoveFlag = false;
         $(document).ready(function () {
-            // 加载左树菜单
-            $("#tree").tree({
-                lines: true,
-                url: 'menuTree?parentId=-1',
-                method: 'post',
-                onLoadSuccess: function () {
-                    $("#tree").tree('expandAll');
-                },
-                onClick: function (node) {
-                    if (node.text == '安全退出') {
-                        logout();
-                    } else if (node.text == '修改密码') {
-                        openPasswordUpdateDialog();
-                    } else if (node.attributes.menuUrl) {
-                        openTab(node);
+            $.ajax({
+                url: "${base}/user/getCurrentMenuMove",
+                type: "post",
+                dataType: "json",
+                traditional: true,
+                success: function (data) {
+                    if (data.resultCode == 0) {
+                        var menuMoveValue = parseInt(data.description);
+                        if(1 == menuMoveValue){
+                            menuMoveFlag = true;
+                        }else{
+                            menuMoveFlag = false;
+                        }
+                        // 加载左树菜单
+                        $("#tree").tree({
+                            //lines: true,
+                            dnd: menuMoveFlag,   //支持拖动功能，但刷新后又会还原回去
+                            url: 'menuTree?parentId=-1',
+                            method: 'post',
+                            onLoadSuccess: function () {
+                                $("#tree").tree('expandAll');
+                            },
+                            onClick: function (node) {
+                                if (node.text == '安全退出') {
+                                    logout();
+                                } else if (node.text == '修改密码') {
+                                    openPasswordUpdateDialog();
+                                } else if (node.attributes.menuUrl) {
+                                    openTab(node);
+                                }
+                            },
+                            onDrop: function(targetNode, source, point){
+                                var targetId = $("#tree").tree('getNode', targetNode).id;
+                                $.ajax({
+                                    url: 'changeMenuLevel',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {
+                                        sourceId: source.id,
+                                        targetId: targetId,
+                                        point: point
+                                    }
+                                });
+                            }
+                        });
+
+                        // 退出登录
+                        function logout() {
+                            $.messager.confirm('系统提示', '您确定要退出系统吗？', function (r) {
+                                if (r) {
+                                    window.location.href = 'logout.htm';
+                                }
+                            });
+                        }
+
+                        // 打开修改密码的窗体
+                        function openPasswordUpdateDialog() {
+                            url = "updatePassword.htm";
+                            $("#dlg").dialog("open").dialog("setTitle", "修改密码");
+                        }
+
+                        /**左边的菜单点击显示
+                         如果存在（即已经打开了），选中他
+                         如果不存在则打开他
+                         */
+                        function openTab(node) {
+                            if ($("#tabs").tabs("exists", node.text)) {
+                                $("#tabs").tabs("select", node.text);
+                            } else {
+                                var content = "<iframe frameborder=0 scrolling='auto' style='width:100%;height:100%' src=" + node.attributes.menuUrl + "></iframe>"
+                                $("#tabs").tabs("add", {
+                                    title: node.text,
+                                    iconCls: node.iconCls,
+                                    closable: true,
+                                    content: content
+                                });
+                            }
+                            bindTabEvent();
+                        }
+
+                        bindTabEvent();
+                        bindTabMenuEvent();
+                    } else if (data.resultCode > 1) {
+                        $.messager.alert('错误', '服务器错误');
+                    } else {
+                        $.messager.alert('错误', '查询菜单移动属性失败');
                     }
                 }
             });
-
-            // 退出登录
-            function logout() {
-                $.messager.confirm('系统提示', '您确定要退出系统吗？', function (r) {
-                    if (r) {
-                        window.location.href = 'logout.htm';
-                    }
-                });
-            }
-
-            // 打开修改密码的窗体
-            function openPasswordUpdateDialog() {
-                url = "updatePassword.htm";
-                $("#dlg").dialog("open").dialog("setTitle", "修改密码");
-            }
-
-            /**左边的菜单点击显示
-             如果存在（即已经打开了），选中他
-             如果不存在则打开他
-             */
-            function openTab(node) {
-                if ($("#tabs").tabs("exists", node.text)) {
-                    $("#tabs").tabs("select", node.text);
-                } else {
-                    var content = "<iframe frameborder=0 scrolling='auto' style='width:100%;height:100%' src=" + node.attributes.menuUrl + "></iframe>"
-                    $("#tabs").tabs("add", {
-                        title: node.text,
-                        iconCls: node.iconCls,
-                        closable: true,
-                        content: content
-                    });
-                }
-                bindTabEvent();
-            }
-
-            bindTabEvent();
-            bindTabMenuEvent();
-
         });
 
         function bindTabEvent() {

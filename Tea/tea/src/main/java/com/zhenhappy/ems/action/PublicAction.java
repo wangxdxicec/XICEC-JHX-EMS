@@ -1,10 +1,16 @@
 package com.zhenhappy.ems.action;
 
+import com.zhenhappy.ems.buddhatime.TExhibitorBuddhaTime;
+import com.zhenhappy.ems.dto.ExhibitorBooth;
 import com.zhenhappy.ems.dto.LoginRequest;
 import com.zhenhappy.ems.dto.LoginResponse;
 import com.zhenhappy.ems.dto.Principle;
 import com.zhenhappy.ems.entity.TExhibitor;
+import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.service.ExhibitorService;
+import com.zhenhappy.ems.service.ExhibitorTeaTimeService;
+import com.zhenhappy.ems.teatime.ExhibitorTeaTimeManagerService;
+import com.zhenhappy.ems.teatime.TExhibitorTeaTime;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +36,9 @@ public class PublicAction {
     @Autowired
     private ExhibitorService exhibitorService;
 
+    @Autowired
+    private ExhibitorTeaTimeService exhibitorTimeService;
+
     private static Logger log = Logger.getLogger(PublicAction.class);
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -54,10 +63,18 @@ public class PublicAction {
         LoginResponse response = new LoginResponse();
         try {
             TExhibitor exhibitor = exhibitorService.getExhibitorByUsernamePassword(request.getUsername(), request.getPassword());
+            TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(exhibitor.getEid());
             if (exhibitor == null||exhibitor.getIsLogout().intValue()==1) {
                 response.setResultCode(1);
             } else {
+                ExhibitorBooth booth = exhibitorService.loadBoothInfo(exhibitor.getEid());
                 httpServletRequest.getSession().setAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE, new Principle(exhibitor));
+                httpServletRequest.getSession().setAttribute("boothInfo", booth);
+                httpServletRequest.getSession().setAttribute("exhibitorInfo", exhibitorInfo);
+                //加载前台界面相关时间对象
+                TExhibitorTeaTime tExhibitorTime = exhibitorTimeService.loadExhibitorTime();
+                httpServletRequest.getSession().setAttribute("tExhibitorTime", tExhibitorTime);
+
                 response.setResultCode(0);
             }
             httpServletRequest.getSession().setAttribute("zone",request.getArea());

@@ -60,7 +60,7 @@ public class ArticleAction extends BaseAction {
     
     @RequestMapping(value = "article")
     public ModelAndView directToArticle() {
-        ModelAndView modelAndView = new ModelAndView("/user/article");
+        ModelAndView modelAndView = new ModelAndView("/WEB-INF/tpl/user/article/article.jsp");
         return modelAndView;
     }
     

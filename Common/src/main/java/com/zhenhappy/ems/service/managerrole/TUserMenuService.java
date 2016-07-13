@@ -103,7 +103,7 @@ public class TUserMenuService {
 		if(menuIds != null && menuIds.length>0){
 			for(int i=0;i<menuIds.length;i++){
 				int id = Integer.parseInt(menuIds[i]);
-				List<TUserMenu> tempList = userMenuDao.queryByHql("from TUserMenu where parentId = ? and menuId = ?", new Object[]{parentId,id});
+				List<TUserMenu> tempList = userMenuDao.queryByHql("from TUserMenu where parentId = ? and menuId = ? ", new Object[]{parentId,id});
 				userMenuList.addAll(tempList);
 			}
 		}

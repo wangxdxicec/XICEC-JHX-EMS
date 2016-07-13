@@ -2,22 +2,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
+    <!--<parent>
         <artifactId>XICEC-EMS</artifactId>
         <groupId>com.zhenhappy.ems</groupId>
         <version>1.2-SNAPSHOT</version>
-    </parent>
+    </parent>-->
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>tea-manager</artifactId>
+    <groupId>com.zhenhappy.ems</groupId>
+    <version>1.2-SNAPSHOT</version>
     <packaging>war</packaging>
-	
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>3.0.5.RELEASE</spring.version>
+        <framework.log.level>WARN</framework.log.level>
+        <system.log.level>DEBUG</system.log.level>
+    </properties>
+
     <profiles>
         <profile>
             <id>local</id>
             <properties>
                 <log.path>D:\Users\Tea\manager\log\</log.path>
-                <db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=Tea</db.url>
+                <db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=tea</db.url>
                 <db.username>sa</db.username>
                 <db.password>123456</db.password>
                 <appendix>D:\Users\Tea</appendix>
@@ -27,7 +36,7 @@
             <id>dev</id>
             <properties>
                 <log.path>/Users/Kristine-Mac/Documents/Workspaces/appendix/tea/manager/log/</log.path>
-                <db.url>jdbc\:jtds\:sqlserver\://117.28.237.21\:29953;DatabaseName\=Tea</db.url>
+                <db.url>jdbc\:jtds\:sqlserver\://127.0.0.1\:1433;DatabaseName\=tea</db.url>
                 <db.username>sa</db.username>
                 <db.password>123456</db.password>
                 <appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/tea</appendix>
@@ -41,8 +50,8 @@
             <properties>
                 <log.path>C:\Program Files\Apache Software Foundation\appendix\tea\manager\log\</log.path>
                 <db.url>jdbc\:jtds\:sqlserver\://10.33.0.224\:1433;DatabaseName\=tea</db.url>
-                <db.username>sa</db.username>
-                <db.password>JhxSQL03</db.password>
+                <db.username>Jhx03SA</db.username>
+                <db.password>gogo03Jhx</db.password>
                 <appendix>C:\Program Files\Apache Software Foundation\appendix\tea</appendix>
             </properties>
         </profile>
@@ -92,23 +101,63 @@
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
-            <version>2.6.13</version>
+            <version>2.6.12</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.7.0</version>
         </dependency>
-        <dependency>
-			<groupId>taobe.tec.jcc.JChineseConvertor</groupId>
-			<artifactId>jcc</artifactId>
-			<version>0.7.3</version>
-		</dependency>
 		<dependency>
 			<groupId>net.coobird</groupId>
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.7</version>
 		</dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <classifier>jdk15</classifier>
+            <version>2.4</version>
+        </dependency>
+
+        <!-- 导入java ee jar 包 -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+        </dependency>
+
+        <!-- mybatis核心包 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.2.6</version>
+        </dependency>
+
+        <!-- mybatis/spring包 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.15-beta1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-excelant</artifactId>
+            <version>3.15-beta1</version>
+        </dependency>
     </dependencies>
 
     <build>

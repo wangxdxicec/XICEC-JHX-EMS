@@ -12,6 +12,8 @@ import com.zhenhappy.ems.manager.tag.WriterUtil;
 import com.zhenhappy.ems.service.managerrole.TUserInfoService;
 import com.zhenhappy.ems.service.managerrole.TUserMenuService;
 import com.zhenhappy.ems.service.managerrole.TUserRoleService;
+import com.zhenhappy.ems.stonetime.ExhibitorTimeDao;
+import com.zhenhappy.ems.stonetime.TExhibitorTime;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,6 +46,8 @@ public class LoginAction extends BaseAction {
     private TUserRoleService roleService;
     @Autowired
     private TUserMenuService userMenuService;
+    @Autowired
+    private ExhibitorTimeDao exhibitorTimeDao;
 
     /**
      * process login.
@@ -66,6 +70,7 @@ public class LoginAction extends BaseAction {
                 admin.setRoleName(tUserRole.getRoleName());
                 principle.setAdmin(admin);
                 principle.setCurrentOperationIds(tUserRole.getOperationIds());
+
                 request.setAttribute("userName", username);
                 request.setAttribute("password", password);
                 request.getSession().setAttribute("currentUser", admin);  // 当前用户信息

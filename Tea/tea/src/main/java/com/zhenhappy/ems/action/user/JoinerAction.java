@@ -39,10 +39,12 @@ public class JoinerAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "queryJoiners", method = RequestMethod.POST)
-    public QueryJoinersResponse queryJoiners(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+    public QueryJoinersResponse queryJoiners(@RequestParam("flag") Integer flag,
+                                             @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         QueryJoinersResponse response = new QueryJoinersResponse();
         try {
-            List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid());
+            //List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid());
+            List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid(), flag);
             response.setJoiners(joiners);
             Integer area = jdbcTemplate.queryForInt("select exhibition_area from [t_exhibitor] where eid = ?",new Object[] { principle.getExhibitor().getEid() });
             if(area != null) response.setArea(area);

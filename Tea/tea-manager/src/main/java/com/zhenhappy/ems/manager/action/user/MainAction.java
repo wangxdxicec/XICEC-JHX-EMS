@@ -23,7 +23,7 @@ public class MainAction extends BaseAction {
      */
     @RequestMapping(value = "main", method = RequestMethod.GET)
     public ModelAndView main() {
-        ModelAndView modelAndView = new ModelAndView("/user/main");
+        ModelAndView modelAndView = new ModelAndView("/user/main/main");
         return modelAndView;
     }
 }

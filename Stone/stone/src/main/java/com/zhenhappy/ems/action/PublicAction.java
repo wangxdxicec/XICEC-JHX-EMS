@@ -6,6 +6,7 @@ import com.zhenhappy.ems.dto.LoginResponse;
 import com.zhenhappy.ems.dto.Principle;
 import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.ems.entity.TExhibitor;
+import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.ExhibitorTimeService;
 import com.zhenhappy.ems.service.MailService;
@@ -76,8 +77,10 @@ public class PublicAction {
                 response.setResultCode(1);
             } else {
                 ExhibitorBooth booth = exhibitorService.loadBoothInfo(exhibitor.getEid());
+                TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(exhibitor.getEid());
                 httpServletRequest.getSession().setAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE, new Principle(exhibitor));
                 httpServletRequest.getSession().setAttribute("boothInfo", booth);
+                httpServletRequest.getSession().setAttribute("exhibitorInfo", exhibitorInfo);
                 if (exhibitor.getArea() != null) {
                     httpServletRequest.getSession().setAttribute("zone", exhibitor.getArea());
                 } else {

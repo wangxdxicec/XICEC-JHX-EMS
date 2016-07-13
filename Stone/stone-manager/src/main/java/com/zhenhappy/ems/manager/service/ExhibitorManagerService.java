@@ -857,9 +857,6 @@ public class ExhibitorManagerService extends ExhibitorService {
     @Transactional
     public void enableExhibitor(Integer[] eids, Integer adminId) {
     	if(eids != null){
-            Page page = new Page();
-            page.setPageSize(10);
-            page.setPageIndex(1);
             for (Integer eid:eids){
                 TExhibitor exhibitor = exhibitorDao.query(eid);
                 exhibitor.setIsLogout(0);
@@ -868,15 +865,6 @@ public class ExhibitorManagerService extends ExhibitorService {
                 exhibitor.setIsLogin(0);
                 getHibernateTemplate().update(exhibitor);
             }
-//    		List<TExhibitor> exhibitors = exhibitorDao.loadExhibitorsByEids(eids);
-//    		if(exhibitors.size() > 0){
-//    			for(TExhibitor exhibitor:exhibitors){
-//            		exhibitor.setIsLogout(0);
-//            		exhibitor.setUpdateUser(adminId);
-//            		exhibitor.setUpdateTime(new Date());
-//            		getHibernateTemplate().update(exhibitor);
-//            	}
-//    		}
     	}
     }
 

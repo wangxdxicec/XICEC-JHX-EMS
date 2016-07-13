@@ -47,31 +47,57 @@
         <#include "/user/left.html" />
         <div class="span9">
             <!--<div class="alert alert-success">选择展商所属产品分类</div>-->
-            <@spring.message "joiner.notice"/>
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><@spring.message "info.joiner.participants.title"/></h3>
-                </div>
-                <div class="panel-body" style="min-height: 400px">
-                    <div>
-                        <button id="addJoiner" type="button" class="btn btn-success"><@spring.message "info.joiner.participants.add"/></button>
-                    </div>
-                    <table class="table table-striped" style="margin-top: 10px">
-                        <thead>
-                        <tr>
-                            <th style="width: 100px"><@spring.message "info.joiner.participants.table.name"/></th>
-                            <th><@spring.message "info.joiner.participants.table.phone"/></th>
-                            <th><@spring.message "info.joiner.participants.table.email"/></th>
-                            <th><@spring.message "info.joiner.participants.table.position"/></th>
-                            <th style="width: 150px"><@spring.message "info.joiner.participants.table.option"/></th>
-                        </tr>
-                        </thead>
-                        <tbody id="datas">
+            <p class="text-error">
+                <#if rc.locale=="zh_CN">
+                    1、厦门国际茶博会官方App正在开发中，您的手机号码将作为您的登录账号。为了您使用的方便，请提交参展人员相应的手机号，请勿重复使用同一号码。</br>
+                    2、请于 <font style="color:red;font-weight:bold">${tExhibitorTime.exhibitor_Info_Submit_Deadline_Zh}</font> 前填写并提交，逾期将不再制作“展位证”。</br>
+                    3、如遇网络等问题无法提交，请将以下表格内容发送至：info@teafair.com.cn。
+                <#else>
+                    1.The official App of Xiamen Tea Fair is under construction. E-mail Address will be your Account. For your convenience, please don't fill in the same E-mail.</br>
+                    2.For the preparation of the Exhibitor Pass, please fill the names and titles of the exhibitors who are representing your booth.</br>
+                    3.Deadline for submitting this form is: ${tExhibitorTime.exhibitor_Info_Submit_Deadline_Zh}.</br>
+                    4.For any problem, please contact: info@teafair.com.cn.
+                </#if>
+            </p>
 
-                        </tbody>
-                    </table>
-                </div>
+            <div>
+                <button id="addJoiner" type="button" class="btn btn-warning pull-right"><@spring.message "info.joiner.participants.add"/></button>
             </div>
+
+            <table width="100%" class="table table-striped" style="margin-top: 5px" align="center">
+                <tr>
+                    <td>
+                        <table id="newjoinertable" width="70%" align="left" style="margin-left:20%; border:solid #A70D0D; border-width:1px 1px 1px 1px;">
+                            <thead>
+                            <tr>
+                                <th style="width: 100%"><!--<div style="padding-top:7px; box-sizing:border-box;  color:white; background-image: url(/resource/joiner/joiner_red.png); width: 210px; height: 45px; " align="center">--><div align="center"><@spring.message "info.joiner.participants.table.newjoiner"/></div>
+                                    <table class="table" width="100%">
+                                        <tbody id="newdatas">
+
+                                        </tbody>
+                                    </table>
+                                </th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </td>
+                    <td>
+                        <table id="oldjoinertable" width="70%" align="right" style="margin-right:20%; border:solid #26A732; border-width:1px 1px 1px 1px;">
+                            <thead>
+                            <tr>
+                                <th style="width: 100%;"><!--<div style="padding-top:7px; box-sizing:border-box; color:white; background-image: url(/resource/joiner/joiner_green.png); width: 210px; height: 45px" align="center">--><div align="center"><@spring.message "info.joiner.participants.table.oldjoiner"/></div>
+                                    <table class="table" width="100%">
+                                        <tbody id="olddatas">
+
+                                        </tbody>
+                                    </table>
+                                </th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </td>
+                </tr>
+            </table>
             <!--/row-->
         </div>
         <!--/span-->
@@ -215,6 +241,8 @@
 </div>
 <script>
     var joiners = null;
+    var oldjoiners = null;
+    var newjoiners = null;
     var joiner = null;
     var area = 0;
     (function ($) {
@@ -237,29 +265,24 @@
         };
     })(jQuery);
     function loadData() {
-        $("#datas").html("")
+        $("#olddatas").html("")
         $.ajax({
             url: "${base}/user/queryJoiners",
             type: "POST",
-            data: {},
             dataType: "json",
+            data: {"flag": "1"},
             success: function (data) {
                 if (data.resultCode == 0) {
                     area = data.area;
-                    joiners = data.joiners;
+                    oldjoiners = data.joiners;
                     for (var i in data.joiners) {
-                        var joiner = joiners[i];
-                        $("#datas").append('<tr joiner="' + i + '"><td>' + joiner.name + '</td>'
-                                +'<td>' + joiner.telphone + '</td>'
-                                +'<td>' + joiner.email + '</td>'
-                                +'<td>' + joiner.position + '</td>'
-                                +'<td><button name="viewJoiner" type="button" class="btn btn-success" style="margin-right: 10px"><@spring.message "info.joiner.participants.table.view"/></button>'
-                                    +'<button name="deleteJoiner" type="button" class="btn btn-danger"><@spring.message "info.joiner.participants.table.delete"/></button>'
-                                +'</td>'
-                            +'</tr>')
+                        var joiner = oldjoiners[i];
+                        $("#olddatas").append('<tr joiner="' + i + '">&nbsp;&nbsp;<td width="40%;">' + '<a href="#" name="activateJoiner"><img src=\"${base}/resource/plus.png\"/></a></td>'
+                                + "    " + '&nbsp;&nbsp;<td width="60%;"><button name="oldviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
                     }
-                    $("[name='viewJoiner']").click(function () {
-                        joiner = joiners[parseInt($(this).parent().parent().attr("joiner"))];
+
+                    $("[name='oldviewJoiner']").click(function () {
+                        joiner = oldjoiners[parseInt($(this).parent().parent().attr("joiner"))];
                         $("#modifyJoinerForm input").val("");
                         $("[name='name']").val(joiner.name);
                         $("[name='position']").val(joiner.position);
@@ -268,6 +291,30 @@
                         $("[name='id']").val(joiner.id);
                         $("[name='eid']").val(joiner.eid);
                         $("#modifyJoinerDialog").modal();
+                    });
+                    $("[name='activateJoiner']").click(function () {
+                        joiner = oldjoiners[parseInt($(this).parent().parent().attr("joiner"))];
+                        var data = $("#addJoinerForm").serializeJson();
+                        data.id = joiner.id;
+                        data.eid = joiner.eid;
+                        data.name = joiner.name;
+                        data.email = joiner.email;
+                        data.position = joiner.position;
+                        data.telphone = joiner.telphone;
+                        if(joiner.isDelete == 0) data.isDelete = 1;
+                        else data.isDelete = 0;
+                        $.ajax({
+                            data: $.toJSON(data),
+                            type: "POST",
+                            url: "${base}/user/saveJoiner",
+                            success: function (data) {
+                                if (data.resultCode == 0) {
+                                    $("#addJoinerForm input").val("");
+                                    loadData();
+                                    $("#joiner").modal("hide");
+                                }
+                            }
+                        });
                     });
 
                     $("[name='deleteJoiner']").click(function () {
@@ -295,6 +342,90 @@
                 } else {
                     alert(words.loadDataFailure);
                 }
+            }
+        });
+
+        $("#newdatas").html("")
+        $.ajax({
+            url: "${base}/user/queryJoiners",
+            type: "POST",
+            dataType: "json",
+            data: {"flag": "2"},
+            success: function (data) {
+                if (data.resultCode == 0) {
+                    area = data.area;
+                    newjoiners = data.joiners;
+                    for (var i in data.joiners) {
+                        var joiner = newjoiners[i];
+                        $("#newdatas").append('<tr joiner="' + i + '">&nbsp;&nbsp;<td width="40%;">' + '<a href="#" name="unactivateJoiner"><img src=\"${base}/resource/minus.png\"/></a></td>'
+                                + "    " + '&nbsp;&nbsp;<td width="60%;"><button name="newviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
+                    }
+                    $("[name='newviewJoiner']").click(function () {
+                        joiner = newjoiners[parseInt($(this).parent().parent().attr("joiner"))];
+                        $("#modifyJoinerForm input").val("");
+                        $("[name='name']").val(joiner.name);
+                        $("[name='position']").val(joiner.position);
+                        $("[name='telphone']").val(joiner.telphone);
+                        $("[name='email']").val(joiner.email);
+                        $("[name='id']").val(joiner.id);
+                        $("[name='eid']").val(joiner.eid);
+                        $("#modifyJoinerDialog").modal();
+                    });
+
+                    $("[name='unactivateJoiner']").click(function () {
+                        joiner = newjoiners[parseInt($(this).parent().parent().attr("joiner"))];
+                        var data = $("#addJoinerForm").serializeJson();
+                        data.id = joiner.id;
+                        data.eid = joiner.eid;
+                        data.name = joiner.name;
+                        data.email = joiner.email;
+                        data.position = joiner.position;
+                        data.telphone = joiner.telphone;
+                        if(joiner.isDelete == 0) data.isDelete = 1;
+                        else data.isDelete = 0;
+                        $.ajax({
+                            data: $.toJSON(data),
+                            type: "POST",
+                            url: "${base}/user/saveJoiner",
+                            success: function (data) {
+                                if (data.resultCode == 0) {
+                                    $("#addJoinerForm input").val("");
+                                    loadData();
+                                    $("#joiner").modal("hide");
+                                }
+                            }
+                        });
+                    });
+
+                    $("[name='deleteJoiner']").click(function () {
+                        joiner = newjoiners[parseInt($(this).parent().parent().attr("joiner"))];
+                        $("#confirm").modal();
+                        $("#confirmDelete").unbind("click");
+                        $("#confirmDelete").click(function () {
+                            $.ajax({
+                                url: "${base}/user/deleteJoiner",
+                                type: "post",
+                                dataType: "json",
+                                data: {"jid": $("#id").val()},
+                                success: function (result) {
+                                    if (result.resultCode == 0) {
+                                        $("#confirm").modal('hide');
+                                        $("#modifyJoinerDialog").modal('hide');
+                                        alert(words.operateSuccess);
+                                        loadData();
+                                    } else {
+                                        alert(words.operateFailure);
+                                    }
+                                }
+                            });
+                        });
+                    });
+                } else {
+                    alert(words.loadDataFailure);
+                }
+            },
+            error: function (data) {
+                alert("错误");
             }
         });
     }

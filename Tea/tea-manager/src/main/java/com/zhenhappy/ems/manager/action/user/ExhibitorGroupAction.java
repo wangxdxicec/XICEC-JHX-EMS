@@ -36,7 +36,7 @@ public class ExhibitorGroupAction extends BaseAction {
     
     @RequestMapping(value = "exhibitorGroup")
     public ModelAndView directToExhibitorGroup() {
-        ModelAndView modelAndView = new ModelAndView("/user/group");
+        ModelAndView modelAndView = new ModelAndView("/WEB-INF/tpl/user/group/group.jsp");
         return modelAndView;
     }
     

@@ -73,14 +73,19 @@
 <body>
 <#include "/user/header.html" />
 <!-- /.navbar -->
-
+<#assign exhibitor_data_end_html = "${tExhibitorTime.tea_Fair_Data_End_Html}">
 <div class="container-fluid">
     <div class="row-fluid" style="width:1000px;margin:0px auto">
         <#include "/user/left.html" />
+        <#include "/common/message.ftl" />
         <div class="span9">
             <div class="row-fluid">
-                <#include "/common/message.ftl" />
-                <@spring.message "info.notice"/>
+                <p class="text-error">
+                1.Please fill in this form carefully, all the information you submit here will be used in the Official Catalogue of Xiamen Tea Fair 2015.</br>
+                2.Deadline for submitting your company's information is ${tExhibitorTime.exhibitor_Info_Submit_Deadline_En}.</br>
+                3.If you could not submit information successfully, please download the form, fill it and send it back to us via Email info@teafair.com.cn , or Fax +86 592 5959611.</br>
+                4.Your products will be showed on the Exhibitors List 2015 as soon as you finish the Company Information. Please fill in at your earliest time.
+                </p>
                 <form class="form-horizontal" id="infoform" action="${base}/user/updateinfo" method="post" role="form"
                       enctype="multipart/form-data">
                     <h3 class="form-signin-heading"><@spring.message "info.update.exhibition.title"/></h3>
@@ -112,7 +117,7 @@
                         <label for="inputFax" class="control-label"><@spring.message "info.update.exhibition.fax"/></label>
 
                         <div class="controls">
-                            <input placeholder="country number" id="inputFax" catValidate="required:true" name="faxCountryNumber" type="text" style="width: 25px;" />-<input placeholder="area number" catValidate="required:true" id="faxAreaNumber" name="faxAreaNumber" type="text" style="width: 40px;" />-<input catValidate="required:true" placeholder="phone number" id="faxNumber" name="faxNumber" type="text" style="width: 102px;" /><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>
+                            <input placeholder="country number" id="inputFax" catValidate="required:false" name="faxCountryNumber" type="text" style="width: 25px;" />-<input placeholder="area number" catValidate="required:false" id="faxAreaNumber" name="faxAreaNumber" type="text" style="width: 40px;" />-<input catValidate="required:false" placeholder="phone number" id="faxNumber" name="faxNumber" type="text" style="width: 102px;" /><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>
                         </div>
                     </div>
                     <div class="control-group">
@@ -186,7 +191,8 @@
 
                         <div class="controls">
                             <input type="file" name="companyLogo1" style="width: 220px;" class="form-control" id="inputLogo1"
-                                   placeholder='<@spring.message "info.update.exhibition.logo"/>'>
+                                   placeholder='<@spring.message "info.update.exhibition.logo"/>' onchange="change(1)">
+                            <span><font color="red">File size less than 200k(support jpg or jpeg format)</font></span>
                         </div>
                     </div>
                     <div class="control-group">
@@ -194,7 +200,8 @@
 
                         <div class="controls">
                             <input type="file" name="companyLogo2" style="width: 220px;" class="form-control" id="inputLogo2"
-                                   placeholder='<@spring.message "info.update.exhibition.logo"/>'>
+                                   placeholder='<@spring.message "info.update.exhibition.logo"/>' onchange="change(2)">
+                            <span><font color="red">File size less than 200k(support jpg or jpeg format)</font></span>
                         </div>
                     </div>
                     <div class="control-group">
@@ -256,15 +263,16 @@
                             <!--</#list>-->
                         <!--</div>-->
                     <!--</div>-->
-                    <div class="control-group">
-                        <button type="button" name="saveButton" style="margin-top: 15px" class="btn btn-warning"><@spring.message "info.modifypassword.save" /></button>
-                        <input name="einfoid" value="${newinfo.einfoid!""}" type="hidden">
-                        <input name="logo" value="${newinfo.logo!""}" type="hidden">
-                        <input name="classjson" id="classjson" type="hidden">
-                        <input name="brandsData" id="brandsData" type="hidden">
-                        <input name="phone" type="hidden" />
-                        <input name="fax" type="hidden" />
-                    </div>
+                    <#if exhibitor_data_end_html?date gt .now?date>
+                        <button type="button" style="margin-top: 10px;" name="previewCatagory" class="btn btn-warning"><@spring.message "info.update.exhibition.preview"/></button>
+                        <button type="button" style="margin-top: 10px;margin-left: 10px" id="saveButton" name="saveButton" class="btn btn-warning"><@spring.message "info.modifypassword.save"/></button>
+                    </#if>
+                    <input name="einfoid" value="${newinfo.einfoid!""}" type="hidden">
+                    <input name="logo" value="${newinfo.logo!""}" type="hidden">
+                    <input name="classjson" id="classjson" type="hidden">
+                    <input name="brandsData" id="brandsData" type="hidden">
+                    <input name="phone" type="hidden" />
+                    <input name="fax" type="hidden" />
                 </form>
             </div>
             <!--/row-->
@@ -278,6 +286,47 @@
 </div>
 <#include "/footer.html" />
 <!--/.container-->
+
+    <div class="modal hide fade" id="preview" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-head">
+                    <img src="${base}/resource/exhibitor_info_head.png">
+                </div>
+                <div class="modal-body-center-booth" style="margin-left: 30px; margin-right: 70px; margin-top: 10px;"></div>
+                <div class="modal-body-center-logo" style="margin-left: 70px; margin-right: 70px;">
+                    <#if newinfo?exists>
+                        <#if newinfo.logo?exists && newinfo.logo!=''>
+                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="${base}/user/logoImg?eid=${newinfo.eid}&page=0" id="previewLogoShow1" name="preview1" />
+                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="${base}/user/logoImg?eid=${newinfo.eid}&page=1" id="previewLogoShow2" name="preview2" />
+                        <#else>
+                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="previewLogo" class="img-rounded" />
+                        </#if>
+                    <#else>
+                        <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="previewLogo" class="img-rounded" />
+                    </#if>
+                </div>
+
+                <div class="modal-body-center-companyZh" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-companyEn" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-addressZh" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-addressEn" style="margin-left: 135px; margin-right: 70px;"></div>
+                <div class="modal-body-center-tel" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-fax" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-website" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-email" style="margin-left: 70px; margin-right: 70px;"></div>
+                <div class="modal-body-center-mainproduct" style="margin-left: 70px;margin-top: 15px; margin-right: 70px;">主营产品/Special Products: </div>
+                <div class="modal-body-center-mainproductvalueEn" style="margin-left: 70px; margin-right: 70px;"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "close"/></button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 <script>
     $(document).ready(function(){
         $("#leftInfo").parent().parent().parent().parent().prev().addClass("left_current");
@@ -381,6 +430,78 @@
     });
 </script>
 <script>
+    function change(index) {
+        var pic = "";
+        var file = "";
+        if(index == 1){
+            pic = document.getElementById("previewLogo1");
+            file = document.getElementById("inputLogo1");
+        } else if(index == 2) {
+            pic = document.getElementById("previewLogo2");
+            file = document.getElementById("inputLogo2");
+        }
+        var ext = file.value.substring(file.value.lastIndexOf(".")+1).toLowerCase();
+
+        // gif在IE浏览器暂时无法显示
+        if(ext!='jpg' && ext!='jpeg'){
+            alert("File must be in JPG or JPEG format！"); return;
+        }
+
+        var  browserCfg = {};
+        var ua = window.navigator.userAgent;
+        if (ua.indexOf("MSIE")>=1){
+            browserCfg.ie = true;
+        }else if(ua.indexOf("Firefox")>=1){
+            browserCfg.firefox = true;
+        }else if(ua.indexOf("Chrome")>=1){
+            browserCfg.chrome = true;
+        }
+
+        var filesize = 0;
+        if(browserCfg.firefox || browserCfg.chrome ){
+            filesize = file.files[0].size;
+        }else if(browserCfg.ie){
+            //转到JAVA后台处理
+        }
+
+        if(filesize/1024 > 1024){
+            alert("文件大小超过1M，请重新选择图片！");
+            return;
+        }
+        // IE浏览器
+        if(document.all){
+            file.select();
+            var reallocalpath = document.selection.createRange().text;
+            var ie6 = /msie 6/i.test(navigator.userAgent);
+            // IE6浏览器设置img的src为本地路径可以直接显示图片
+            if(ie6){
+                pic.src = reallocalpath;
+            }else{
+                // 非IE6版本的IE由于安全问题直接设置img的src无法显示本地图片，但是可以通过滤镜来实现
+                pic.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='image',src=\"" + reallocalpath + "\")";
+                // 设置img的src为base64编码的透明图片 取消显示浏览器默认图片
+                pic.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+            }
+        }else{
+            html5Reader(file, index);
+        }
+    }
+
+    function html5Reader(file, index){
+        var file = file.files[0];
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(e){
+            if(index == 1){
+                var pic = document.getElementById("previewLogo1");
+                pic.src = this.result;
+            }else if(index == 2) {
+                var pic = document.getElementById("previewLogo2");
+                pic.src = this.result;
+            }
+        }
+    }
+
     selected = eval('${selected}');
     function initShowSelectedCount() {
         $("[name='selectedCount']").each(function () {
@@ -450,7 +571,6 @@
         });
         //save event
         $("[name='saveButton']").click(function () {
-
             nowSelected = new Array();
             request = {"selected": nowSelected}
             //find all selected
@@ -499,6 +619,57 @@
             $("#infoform").submit();
         });
 
+        $("[name='previewCatagory']").click(function(){
+            var boothNum  = "";
+            <#if booth?exists>
+                <#if booth.boothNumber?exists>
+                    boothNum = '${booth.boothNumber}';
+                </#if>
+            </#if>
+            var productSelectValue = "";
+            $("#product_en-multiple-select option:selected").each(function(){
+                productSelectValue = productSelectValue + $(this).text() + ","; //这里得到的就是
+            });
+            if(productSelectValue != ""){
+                var lastIndex = productSelectValue.lastIndexOf(",");
+                productSelectValue = productSelectValue.substr(0,lastIndex);
+            }
+
+            $("#preview .modal-body-center-booth").html("");
+            $("#preview .modal-body-center-companyZh").html("");
+            $("#preview .modal-body-center-companyEn").html("");
+            $("#preview .modal-body-center-addressZh").html("");
+            $("#preview .modal-body-center-addressEn").html("");
+            $("#preview .modal-body-center-tel").html("");
+            $("#preview .modal-body-center-fax").html("");
+            $("#preview .modal-body-center-website").html("");
+            $("#preview .modal-body-center-email").html("");
+            $("#preview .modal-body-center-mainproductvalueEn").html("");
+
+
+            $("#preview .modal-body-center-booth").append(boothNum);
+            var companyNameZh = $("[name='company']").val();
+            var companyNameEn = $("[name='companyEn']").val();
+            var addressZh = $("[name='address']").val();
+            var addressEn = $("[name='addressEn']").val();
+            var tel = $("[name='phoneCountryNumber']").val()+"-"+$("[name='areaNumber']").val()+"-"+$("[name='phoneNumber']").val();
+            var fax = $("[name='faxCountryNumber']").val()+"-"+$("[name='faxAreaNumber']").val()+"-"+$("[name='faxNumber']").val();
+            var website = $("[name='website']").val();
+            var email = $("[name='email']").val();
+            $("#preview .modal-body-center-companyZh").append("<b>" + companyNameZh + "</b>");
+            $("#preview .modal-body-center-companyEn").append("<b>" + companyNameEn + "</b>");
+            $("#preview .modal-body-center-addressZh").append("地址/Add: " + addressZh);
+            $("#preview .modal-body-center-addressEn").append(addressEn);
+            $("#preview .modal-body-center-tel").append("电话/Tel: " + tel);
+            $("#preview .modal-body-center-fax").append("传真/Fax: " + fax);
+            $("#preview .modal-body-center-website").append("网址/Web: " + website);
+            $("#preview .modal-body-center-email").append("邮箱/E-mail: " + email);
+
+            $("#preview .modal-body-center-mainproductvalueEn").append(productSelectValue);
+
+            $("#preview").modal();
+        });
+
         $("#addBrandButton").click(function(){
             var item = '<div name="brand_item" class="alert alert-success" style="width: 250px"><button type="button" class="close" data-dismiss="alert">&times;</button><input type="text" style="width: 200px;height: 20px" /></div>';
             $("#brands").append(item);
@@ -517,7 +688,7 @@
                     document.getElementById("mainProductEn").value = document.getElementById("mainProductEn").value + ',' + $(this).val();
                 });
                 document.getElementById("mainProductEn").value = document.getElementById("mainProductEn").value.substr(1,document.getElementById("mainProductEn").value.length);
-                console.log(document.getElementById("mainProductEn").value);
+                //console.log(document.getElementById("mainProductEn").value);
                 document.getElementById("mainProduct").value = document.getElementById("mainProductEn").value;
             }
         });

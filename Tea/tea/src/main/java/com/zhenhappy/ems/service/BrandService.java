@@ -1,6 +1,7 @@
 package com.zhenhappy.ems.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.dto.ProductDto;
 import com.zhenhappy.ems.entity.TBrand;
 import com.zhenhappy.ems.entity.TExhibitor;
@@ -33,6 +34,8 @@ public class BrandService {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ExhibitorInfoDao exhibitorInfoDao;
 
     public List<TBrand> loadBrandsByEid(Integer eid) {
         List<TBrand> brands = hibernateTemplate.find("from TBrand where eid = ? and isDefault=0", eid);
@@ -100,7 +103,10 @@ public class BrandService {
         TProduct product = productService.addProduct(productDto, einfoId, filenames);
         if(brandId==null){
             TBrand brand = new TBrand();
-            brand.setBrandName(exhibitor.getCompany());
+            if(exhibitor != null) {
+                TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
+                brand.setBrandName(exhibitorInfo.getCompany());
+            }
             brand.setCreateTime(new Date());
             brand.setEid(exhibitor.getEid());
             brand.setIsDefault(1);
@@ -111,4 +117,16 @@ public class BrandService {
         jdbcTemplate.execute("insert into t_brand_product values(" + product.getId() + "," + brandId + ")");
     }
 
+    /**
+     * 根据eid查询展商基本信息
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public TExhibitorInfo loadExhibitorInfoByEid(Integer eid) {
+        if(eid != null){
+            List<TExhibitorInfo> exhibitorInfo = exhibitorInfoDao.queryByHql("from TExhibitorInfo where eid=?", new Object[]{ eid });
+            return exhibitorInfo.size() > 0 ? exhibitorInfo.get(0) : null;
+        }else return null;
+    }
 }

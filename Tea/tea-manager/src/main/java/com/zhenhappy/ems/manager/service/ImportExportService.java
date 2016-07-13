@@ -6,6 +6,7 @@ import com.zhenhappy.ems.manager.dto.ExportExhibitorJoiner;
 import com.zhenhappy.ems.manager.dto.ImportExhibitorsRequest;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorInfo;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
+import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.ExhibitorService;
 
 import com.zhenhappy.ems.service.InvoiceService;
@@ -27,7 +28,6 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
-import taobe.tec.jcc.JChineseConvertor;
 
 /**
  * Created by wujianbin on 2014-08-25.
@@ -89,8 +89,8 @@ public class ImportExportService extends ExhibitorService {
 				}else{
 					QueryExhibitorInfo queryExhibitorInfo = new QueryExhibitorInfo();
 					queryExhibitorInfo.setBoothNumber(exhibitorManagerService.loadBoothNum(exhibitor.getEid()));
-					queryExhibitorInfo.setCompany(exhibitor.getCompany());
-					queryExhibitorInfo.setCompanyEn(exhibitor.getCompanye());
+					queryExhibitorInfo.setCompany(exhibitorInfo.getCompany());
+					queryExhibitorInfo.setCompanyEn(exhibitorInfo.getCompanyEn());
 					queryExhibitorInfos.add(queryExhibitorInfo);
 				}
 			}
@@ -107,6 +107,7 @@ public class ImportExportService extends ExhibitorService {
 		List<ExportExhibitorJoiner> exportExhibitorJoiners = new ArrayList<ExportExhibitorJoiner>();
 		if(exhibitors != null){
 			for(TExhibitor exhibitor:exhibitors){
+				TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
 				List<TExhibitorJoiner> joiners = joinerManagerService.loadExhibitorJoinerByEid(exhibitor.getEid());
 				String booth_number = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
 				if(joiners != null){
@@ -114,8 +115,8 @@ public class ImportExportService extends ExhibitorService {
 						ExportExhibitorJoiner exportExhibitorJoiner = new ExportExhibitorJoiner();
 						BeanUtils.copyProperties(joiner, exportExhibitorJoiner);
 						exportExhibitorJoiner.setBoothNumber(booth_number);
-						exportExhibitorJoiner.setCompany(exhibitor.getCompany());
-						exportExhibitorJoiner.setCompanye(exhibitor.getCompanye());
+						exportExhibitorJoiner.setCompany(exhibitorInfo.getCompany());
+						exportExhibitorJoiner.setCompanye(exhibitorInfo.getCompanyEn());
 						exportExhibitorJoiners.add(exportExhibitorJoiner);
 					}
 				}
@@ -256,11 +257,13 @@ public class ImportExportService extends ExhibitorService {
 					report.add("第" + (j+1) + "行有问题,原因:公司中文名"+ company +"或英文名"+ companye +"存在重复");
 					continue;//公司中文名或英文名存在重复
 				}
-				exhibitor.setCompany(company);
+				//exhibitor.setCompany(company);
 				exhibitorInfo.setCompany(company);
-				exhibitor.setCompanye(companye);
+				exhibitorInfo.setCompany(company);
+				//exhibitor.setCompanye(companye);
 				exhibitorInfo.setCompanyEn(companye);
-				exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
+				//exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
+				exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(company.trim()));
 				if(request.getCountry() != null) exhibitor.setCountry(request.getCountry());
 				if(request.getProvince() != null) exhibitor.setProvince(request.getProvince());
 				if(request.getArea() != null) exhibitor.setArea(request.getArea());
@@ -320,7 +323,7 @@ public class ImportExportService extends ExhibitorService {
 					/*茶博会需求开始*/
 //					if(StringUtils.isNotEmpty(exhibitor.getCompany())) exhibitor.setCompany("");
 //					if(StringUtils.isNotEmpty(exhibitor.getCompanye())) exhibitor.setCompanye("");
-					File destFile = new File(destDir + "\\" + exhibitor.getCompany().replaceAll("/", "") + exhibitor.getCompanye().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
+					File destFile = new File(destDir + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(exhibitorInfo.getLogo().replaceAll("/", "\\\\\\\\")));
 					/*茶博会需求结束*/
 					if(destFile != null) FileUtils.copyFile(srcFile, destFile);
 				}
@@ -330,11 +333,12 @@ public class ImportExportService extends ExhibitorService {
 
 	public void WriteStringToFile(String str, String filePath) {
 		try {
-			FileOutputStream fos = new FileOutputStream(filePath);
-			fos.write(str.getBytes());
-			fos.close();
+			if(filePath != null || StringUtils.isNotEmpty(filePath)) {
+				FileOutputStream fos = new FileOutputStream(filePath);
+				fos.write(str.getBytes());
+				fos.close();
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

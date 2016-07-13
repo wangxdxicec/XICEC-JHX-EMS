@@ -40,6 +40,14 @@
     .language a,.language a:visited,.language a:hover{
         color: #000000;
     }
+
+    .companyInfo{
+        float: right;height: 39px;line-height: 39px;overflow: hidden
+    }
+
+    .companyInfoValue{
+        float: left;height: 39px;line-height: 39px;max-width: 200px;overflow: hidden; white-space:nowrap; text-overflow:ellipsis;
+    }
 </style>
 <div style="width:100%;margin-top: 0px;background-color: #ffffff">
     <div style="width:962px;height:178px; margin:0px auto; background-image:url(${resource}/images/header.jpg);position: relative">
@@ -54,13 +62,13 @@
         </div>
         <div style="margin-left: 223px;position: absolute">
             <#if rc.locale=="zh_CN">
-                <#--<div style="font-size: 32px;line-height: 50px;margin-top: 40px;color: #4a7716;font-weight: bold"><@spring.message "banner.one"/></div>-->
-                <#--<div style="font-size: 28px;line-height: 35px;color: #bf8108;letter-spacing: 2px;font-weight: bold"><@spring.message "banner.two"/></div>-->
-                <#--<div style="font-size: 18px;line-height: 30px;color: #666666;margin-top: 10px;margin-left: 40px;"><@spring.message "banner.three"/></div>-->
-                <img src="${resource}/images/tittle_cn.jpg">
+                <div style="font-size: 34px;line-height: 50px;margin-top: 40px;color: #4a7716;font-weight: bold">${tExhibitorTime.tea_Fair_Show_Year}&nbsp;<@spring.message "banner.one"/></div>
+                <div style="font-size: 30px;line-height: 35px;color: #bf8108;letter-spacing: 2px;font-weight: bold">${tExhibitorTime.tea_Fair_Show_Year}&nbsp;<@spring.message "banner.two"/></div>
+                <div style="font-size: 20px;line-height: 30px;color: #666666;margin-top: 10px;margin-left: 40px;">${tExhibitorTime.tea_Fair_Show_Date_Zh}&nbsp;<@spring.message "banner.three"/></div>
+                <!--<img src="${resource}/images/tittle_cn.jpg">-->
             <#else>
-                <div style="font-size: 24px;line-height: 50px;margin-top: 40px;color: #4a7716;font-weight: bold"><@spring.message "banner.one"/></div>
-                <div style="font-size: 20px;line-height: 35px;color: #bf8108;;font-weight: bold"><@spring.message "banner.two"/></div>
+                <div style="font-size: 24px;line-height: 50px;margin-top: 40px;color: #4a7716;font-weight: bold"><@spring.message "banner.one"/>&nbsp;${tExhibitorTime.tea_Fair_Show_Year}</div>
+                <div style="font-size: 20px;line-height: 35px;color: #bf8108;;font-weight: bold"><@spring.message "banner.two"/>&nbsp;${tExhibitorTime.tea_Fair_Show_Year}</div>
                 <div style="font-size: 14px;line-height: 30px;color: #666666;margin-top: 0px;margin-left: 40px;"><@spring.message "banner.three"/></div>
             </#if>
         </div>
@@ -74,8 +82,7 @@
         <font id="gewei" style="color:#666666;position: absolute;right: 25px;bottom: 10px;">0</font>
     </div>
 </div>
-<div class="new_header"
-     style="height:39px; background-image:url(${resource}/images/tea_index_11.gif); background-repeat:repeat-x;position: relative">
+<div class="new_header" style="height:39px; background-image:url(${resource}/images/tea_index_11.gif); background-repeat:repeat-x;position: relative">
     <div style="width:962px; height:100%; margin:0px auto;">
         <table style="height:100%; border-width:0px; margin-left:43px; border-spacing:0px" border="0">
             <tr style=" border-width:0px">
@@ -100,18 +107,18 @@
                         </tr>
                     </table>
                 </td>
-                <td style="position: absolute;top: 10px;right: 300px;color: #000000;">
+                <td style="position: absolute;right: 150px;color: #000000;">
                     <#if rc.locale=="zh_CN">
                         <#if boothInfo?exists>
-                            <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.company!""} (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
+                            <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo?exists>&nbsp;&nbsp;${exhibitorInfo.company}</#if></div> (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
                         <#else>
-                            <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.company!""}</div>
+                            <div class="companyInfo"><#if exhibitorInfo?exists>${exhibitorInfo.company}</#if></div>
                         </#if>
                     <#else>
                         <#if boothInfo?exists>
-                            <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.companye!""} (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
+                            <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo?exists>${exhibitorInfo.companyEn}&nbsp;</#if></div> (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
                         <#else>
-                            <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.companye!""}</div>
+                            <div class="companyInfo"><#if exhibitorInfo?exists>${exhibitorInfo.companyEn}</#if></div>
                         </#if>
                     </#if>
                 </td>
@@ -122,7 +129,7 @@
 <div style="height: 40px;width: 100%;background-color: #eeeeee;"></div>
 <script>
     $(document).ready(function(){
-        var kaishi = new Date("2015-10-15");
+        var kaishi = new Date('${tExhibitorTime.tea_Fair_Show_Begin_Date}');
         var now = new Date();
         var day = ((kaishi.getTime()-now.getTime())/1000/60/60/24);
         var dayString = Math.ceil(day)+"";

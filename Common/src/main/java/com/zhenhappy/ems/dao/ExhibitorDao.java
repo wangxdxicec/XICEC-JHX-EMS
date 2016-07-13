@@ -12,4 +12,5 @@ public interface ExhibitorDao extends BaseDao<TExhibitor> {
 	public List<TExhibitor> loadExhibitorsByEidsAndFlag(Integer[] eids, int flag);
 	public List<TExhibitor> loadAllExhibitorsByTagAndRole(int tag, Integer type);
 	public List<TExhibitor> loadAllExhibitorsByType(Integer type);
+	public List<TExhibitor> loadAllExhibitorsByLogType(Integer type);
 }

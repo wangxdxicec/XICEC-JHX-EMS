@@ -61,6 +61,29 @@
             text-decoration: none;
         }
 
+        .adviseboxOn {
+            cursor: pointer;
+            width: 315px;
+            height: 170px;
+            float: left;
+            background-image: url('${resource}/images/bak1.gif')
+        }
+
+        .adviseboxOn a, .adviseboxOn a:hover, .adviseboxOn a:visited {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .adviseboxOff {
+            cursor: pointer;
+            width: 315px;
+            height: 170px;
+            float: left;
+            background-image: url('${resource}/images/bak2.gif')
+        }
+        .adviseboxOff a, .adviseboxOff a:hover, .adviseboxOff a:visited {
+            color: #888888;
+            text-decoration: none;
+        }
         /* 微信1 */
         .FixedRight1 {width:75px; height:190px; overflow:hidden; position:fixed; _position:absolute; bottom:230px; left:0px; z-index:100000001;}
         .FixedRight1 {left:auto; right:10px;}
@@ -135,8 +158,12 @@
 
             <div class="boxClose" style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                    <!--<h4><a href="${base}/user/products.html"><@spring.message "module.product"/></a></h4>-->
-                    <!--<h6><a href="${base}/user/products.html"><@spring.message "module.product.desc"/></a></h6>-->
+                    <!--<h4><a href="${base}/user/products.html"><@spring.message "module.product"/></a></h4>
+                    <#if rc.locale=="zh_CN">
+                        <h6><a href="${base}/user/products.html">${tExhibitorTime.participant_List_Submit_Deadline_Zh}<@spring.message "module.product.desc"/></a></h6>
+                    <#else>
+                        <h6><a href="${base}/user/products.html">${tExhibitorTime.participant_List_Submit_Deadline_En}<@spring.message "module.product.desc"/></a></h6>
+                    </#if>-->
                     <h4><a href="#"><@spring.message "module.product"/></a></h4>
                     <h6><a href="#"><@spring.message "module.product.desc"/></a></h6>
                 </div>
@@ -177,14 +204,14 @@
                         </div>
                     </div>
             </#if>
-            <div class="boxOff" style="margin-left: 14px">
+            <div class="adviseboxOff" style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <#if rc.locale=="zh_CN">
                         <h4><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a></h4>
                         <h6><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf">${tExhibitorTime.advertisement_Submit_Deadline_Zh}截止</a></h6>
-                        <#else>
-                            <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank"><@spring.message "module.advise"/></a></h4>
-                            <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank">Submitting Deadline: ${tExhibitorTime.advertisement_Submit_Deadline_En}</a></h6>
+                    <#else>
+                        <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank"><@spring.message "module.advise"/></a></h4>
+                        <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank">Submitting Deadline: ${tExhibitorTime.advertisement_Submit_Deadline_En}</a></h6>
                     </#if>
                 </div>
             </div>
@@ -257,9 +284,6 @@
     <!--</div>-->
 <!--</#if>-->
 
-
-
-
 <#include "/footer.html" />
 <script>
     $(document).ready(function () {
@@ -281,8 +305,20 @@
         $(".boxOn,.boxOff").mouseover(function () {
             $(".boxOn").removeClass("boxOn").addClass("boxOff");
             $(this).addClass("boxOn").removeClass("boxOff");
+            $(".adviseboxOn").removeClass("adviseboxOn").addClass("adviseboxOff");
+            $(this).addClass("adviseboxOn").removeClass("adviseboxOff");
         })
         $(".boxOn,.boxOff").click(function(){
+            window.location.href = $(this).find("a").attr("href");
+        })
+
+        $(".adviseboxOn,.adviseboxOff").mouseover(function () {
+            $(".boxOn").removeClass("boxOn").addClass("boxOff");
+            $(this).addClass("boxOn").removeClass("boxOff");
+            $(".adviseboxOn").removeClass("adviseboxOn").addClass("adviseboxOff");
+            $(this).addClass("adviseboxOn").removeClass("adviseboxOff");
+        })
+        $(".adviseboxOn,.adviseboxOff").click(function(){
             //window.location.href = $(this).find("a").attr("href");
         })
     });

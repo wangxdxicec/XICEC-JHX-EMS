@@ -35,7 +35,7 @@ public class ExhibitorBuddhaTimeManagerService {
 	 */
 	@Transactional
 	public List<TExhibitorBuddhaTime> loadAllExhibitorTime() {
-	    List<TExhibitorBuddhaTime> tExhibitorTimes = exhibitorTimeDao.queryByHql("from TExhibitorBuddhaTime", new Object[]{});
+	    List<TExhibitorBuddhaTime> tExhibitorTimes = exhibitorTimeDao.queryByHql("from TExhibitorTeaTime", new Object[]{});
 	    return tExhibitorTimes;
 	}
 

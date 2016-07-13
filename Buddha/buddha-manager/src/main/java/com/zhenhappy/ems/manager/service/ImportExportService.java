@@ -107,8 +107,6 @@ public class ImportExportService extends ExhibitorService {
 				}else{
 					QueryExhibitorInfo queryExhibitorInfo = new QueryExhibitorInfo();
 					queryExhibitorInfo.setBoothNumber(exhibitorManagerService.loadBoothNum(exhibitor.getEid()));
-					queryExhibitorInfo.setCompany(exhibitorInfo.getCompany());
-					queryExhibitorInfo.setCompanyEn(exhibitorInfo.getCompanyEn());
 					queryExhibitorInfos.add(queryExhibitorInfo);
 				}
 			}

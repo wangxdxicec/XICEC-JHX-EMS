@@ -53,12 +53,12 @@ public class ReadXLS {
 							exhibitor.setUsername(cell.getContents());
 							exhibitor.setPassword(cell.getContents());
 							break;
-						case 2:	//公司名称(中文)
+						/*case 2:	//公司名称(中文)
 							exhibitor.setCompany(cell.getContents());
 							break;
 						case 3:	//公司名称(英文)
 							exhibitor.setCompanye(cell.getContents());
-							break;
+							break;*/
 						case 4:	//电话
 							exhibitorInfo.setPhone(cell.getContents());
 							break;

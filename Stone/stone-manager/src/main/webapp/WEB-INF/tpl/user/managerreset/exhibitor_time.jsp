@@ -48,104 +48,120 @@
 	</style>
 </head>
 <body  onload="queryExhibitorTimeData()">
-<table align="center">
-	<tr>
-		<td style="width: 300px">公司基本信息截止时间（中文）：</td>
-		<td>
-			<input id="company_Info_Submit_Deadline_Zh" style="width:60%;" type="text" />
-		</td>
+<div style="height: auto;" class="easyui-panel" title="时间参数">
+	<table align="center" style="margin-left: 10px;margin-top: 5px">
+		<tr>
+			<td style="width: 300px">公司基本信息截止时间（中文）：</td>
+			<td>
+				<input id="company_Info_Submit_Deadline_Zh" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">公司基本信息截止时间（英文）：</td>
-		<td>
-			<input id="company_Info_Submit_Deadline_En" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">参展人员证件办理截止时间（中文）：</td>
-		<td>
-			<input id="participant_List_Submit_Deadline_Zh" style="width:60%;" type="text" />
-		</td>
+			<td style="width: 300px">公司基本信息截止时间（英文）：</td>
+			<td>
+				<input id="company_Info_Submit_Deadline_En" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">参展人员证件办理截止时间（中文）：</td>
+			<td>
+				<input id="participant_List_Submit_Deadline_Zh" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">参展人员证件办理截止时间（英文）：</td>
-		<td>
-			<input id="participant_List_Submit_Deadline_En" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">发票信息办理截止时间（中文）：</td>
-		<td>
-			<input id="invoice_Information_Submit_Deadline_Zh" style="width:60%;" type="text" />
-		</td>
+			<td style="width: 300px">参展人员证件办理截止时间（英文）：</td>
+			<td>
+				<input id="participant_List_Submit_Deadline_En" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">发票信息办理截止时间（中文）：</td>
+			<td>
+				<input id="invoice_Information_Submit_Deadline_Zh" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">发票信息办理截止时间（英文）：</td>
-		<td>
-			<input id="invoice_Information_Submit_Deadline_En" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">广告预订办理截止时间（中文）：</td>
-		<td>
-			<input id="advertisement_Submit_Deadline_Zh" style="width:60%;" type="text" />
-		</td>
+			<td style="width: 300px">发票信息办理截止时间（英文）：</td>
+			<td>
+				<input id="invoice_Information_Submit_Deadline_En" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">广告预订办理截止时间（中文）：</td>
+			<td>
+				<input id="advertisement_Submit_Deadline_Zh" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">广告预订办理截止时间（英文）：</td>
-		<td>
-			<input id="advertisement_Submit_Deadline_En" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">公司基本信息创建截止时间（中文）：</td>
-		<td>
-			<input id="company_Info_Insert_Submit_Deadline_Zh" style="width:60%;" type="text" />
-		</td>
+			<td style="width: 300px">广告预订办理截止时间（英文）：</td>
+			<td>
+				<input id="advertisement_Submit_Deadline_En" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">公司基本信息创建截止时间（中文）：</td>
+			<td>
+				<input id="company_Info_Insert_Submit_Deadline_Zh" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">公司基本信息创建截止时间（英文）：</td>
-		<td>
-			<input id="company_Info_Insert_Submit_Deadline_En" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">Visa信息登记截止时间（中文）：</td>
-		<td>
-			<input id="visa_Info_Submit_Deadline_Zh" style="width:60%;" type="text" />
-		</td>
+			<td style="width: 300px">公司基本信息创建截止时间（英文）：</td>
+			<td>
+				<input id="company_Info_Insert_Submit_Deadline_En" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">Visa信息登记截止时间（中文）：</td>
+			<td>
+				<input id="visa_Info_Submit_Deadline_Zh" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">Visa信息登记截止时间（英文）：</td>
-		<td>
-			<input id="visa_Info_Submit_Deadline_En" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">展会登记截止时间：</td>
-		<td>
-			<input id="stone_fair_end_year" style="width:60%;" type="text" />
-		</td>
+			<td style="width: 300px">Visa信息登记截止时间（英文）：</td>
+			<td>
+				<input id="visa_Info_Submit_Deadline_En" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">展会登记截止时间：</td>
+			<td>
+				<input id="stone_fair_end_year" style="width:60%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">展会登记开始时间：</td>
-		<td>
-			<input id="stone_fair_begin_year" style="width:60%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">展会开展时间（中文）：</td>
-		<td>
-			<input id="stone_Fair_Show_Date_Zh" style="width:70%;" type="text" />
-		</td>
+			<td style="width: 300px">展会登记开始时间：</td>
+			<td>
+				<input id="stone_fair_begin_year" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">展会开展时间（中文）：</td>
+			<td>
+				<input id="stone_Fair_Show_Date_Zh" style="width:70%;" type="text"/>
+			</td>
 
-		<td style="width: 300px">展会开展时间（英文）：</td>
-		<td>
-			<input id="stone_Fair_Show_Date_En" style="width:70%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 300px">展会登记截止时间（另一种格式）：</td>
-		<td>
-			<input id="company_Info_Data_End_Html" style="width:60%;" type="text" />
-		</td>
-	</tr>
-</table>
-<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
-	<button type="button" class="btn btn-primary" id="saveData">确认修改</button>
+			<td style="width: 300px">展会开展时间（英文）：</td>
+			<td>
+				<input id="stone_Fair_Show_Date_En" style="width:70%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">展会登记截止时间（另一种格式）：</td>
+			<td>
+				<input id="company_Info_Data_End_Html" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+	</table>
+	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
+		<button type="button" class="btn btn-primary" id="saveData">确认修改</button>
+	</div>
+</div>
+
+<div style="height: auto;" class="easyui-panel" title="菜单移动">
+	<table style="margin-left: 10px;margin-top: 5px">
+		<tr>
+			<td style="width: 300px">菜单移动开关：</td>
+			<td>
+				<input id="menu_move_switch" name="menu_move_switch" type="checkbox">
+			</td>
+		</tr>
+	</table>
+	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
+		<button type="button" class="btn btn-primary" id="saveSwitchData">确认修改</button>
+	</div>
 </div>
 <script>
 	function queryExhibitorTimeData() {
@@ -175,6 +191,11 @@
 						document.getElementById("visa_Info_Submit_Deadline_En").value = map.visa_Info_Submit_Deadline_En;
 						document.getElementById("stone_Fair_Show_Date_Zh").value = map.stone_Fair_Show_Date_Zh;
 						document.getElementById("stone_Fair_Show_Date_En").value = map.stone_Fair_Show_Date_En;
+						if(map.menu_move_switch == 1){
+							$(":checkbox[name='menu_move_switch']").prop("checked", true);
+						}else{
+							$(":checkbox[name='menu_move_switch']").prop("checked", false);
+						}
 					}
 				}
 			}
@@ -217,6 +238,40 @@
 								$.messager.show({
 									title: '成功',
 									msg: '修改时间参数成功',
+									timeout: 2000,
+									showType: 'slide'
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		$("#saveSwitchData").click(function () {
+			var value;
+			if($(":checkbox[name='menu_move_switch']").is(':checked')){
+				value = 1;
+			} else{
+				value = 0;
+			}
+			$.messager.confirm('确认修改','你确定要设置菜单移动属性?',function(r){
+				if (r){
+					$.ajax({
+						url: "${base}/user/modifyExhibitorMenuMove",
+						type: "post",
+						dataType: "json",
+						traditional: true,
+						data: {"menu_move_switch": value},
+						success: function (data) {
+							if (data.resultCode == 1) {
+								$.messager.alert('错误', '更新菜单移动属性失败错误');
+							} else if (data.resultCode > 1) {
+								$.messager.alert('错误', '服务器错误');
+							} else {
+								queryExhibitorTimeData();
+								$.messager.show({
+									title: '成功',
+									msg: '修改菜单移动属性成功',
 									timeout: 2000,
 									showType: 'slide'
 								});

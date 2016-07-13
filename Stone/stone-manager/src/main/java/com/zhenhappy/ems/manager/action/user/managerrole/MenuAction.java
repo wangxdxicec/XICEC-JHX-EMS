@@ -2,9 +2,12 @@ package com.zhenhappy.ems.manager.action.user.managerrole;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhenhappy.ems.dao.managerrole.TUserMenuDao;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.entity.managerrole.TUserMenu;
 import com.zhenhappy.ems.entity.managerrole.TUserOperation;
 import com.zhenhappy.ems.entity.managerrole.TUserRole;
+import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
 import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.manager.tag.WriterUtil;
 import com.zhenhappy.ems.service.managerrole.TUserMenuService;
@@ -13,11 +16,14 @@ import com.zhenhappy.ems.service.managerrole.TUserRoleService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -26,6 +32,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("user")
+@SessionAttributes(ManagerPrinciple.MANAGERPRINCIPLE)
 public class MenuAction {
     private TUserMenu menu;
     private TUserOperation operation;
@@ -33,6 +40,11 @@ public class MenuAction {
     private TUserMenuService menuService;
     @Autowired
     private TUserOperationService operationService;
+    @Autowired
+    private TUserMenuDao userMenuDao;
+    @Autowired
+    private TUserRoleService roleService;
+
     static Logger logger = Logger.getLogger(MenuAction.class);
 
     @RequestMapping("treeGridMenu")
@@ -221,5 +233,120 @@ public class MenuAction {
             result.put("errorMsg", "对不起，删除失败！");
         }
         WriterUtil.write(response, result.toString());
+    }
+
+    @RequestMapping("changeMenuLevel")
+    public void changeMenuLevel(HttpServletRequest request, HttpServletResponse response,
+                                @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        JSONObject result = new JSONObject();
+        try {
+            Integer sourceId = Integer.parseInt(request.getParameter("sourceId"));
+            Integer targetId = Integer.parseInt(request.getParameter("targetId"));
+            String point = request.getParameter("point");
+            TUserMenu sourceMenu = menuService.findOneUserMenu(sourceId);
+            List<TUserMenu> sourceList = userMenuDao.queryByHql("from TUserMenu where parentId = ? ", new Object[]{sourceId});
+            TUserMenu targetMenu = menuService.findOneUserMenu(targetId);
+            List<TUserMenu> targetList = userMenuDao.queryByHql("from TUserMenu where parentId = ? ", new Object[]{targetId});
+
+            StringBuffer sourceBuf = new StringBuffer();
+            sourceBuf.append("," + sourceMenu.getMenuId());
+            for (TUserMenu menu : sourceList) {
+                sourceBuf.append("," + menu.getMenuId());
+            }
+
+            StringBuffer targetBuf = new StringBuffer();
+            targetBuf.append(targetMenu.getMenuId());
+            for (TUserMenu menu : targetList) {
+                targetBuf.append("," + menu.getMenuId());
+            }
+
+            TUserInfo userInfo = (TUserInfo) principle.getAdmin();
+            TUserRole userRole = roleService.findOneRole(userInfo.getRoleId());
+            String menuIds = userRole.getMenuIds();
+            int targetIndex = menuIds.indexOf(String.valueOf(targetId));
+            String menuIdsTemp = menuIds.substring(0,targetIndex);
+            menuIdsTemp = menuIdsTemp.replace(sourceBuf.toString(), "");
+            StringBuffer menuIdsBuffer = new StringBuffer(menuIdsTemp);
+            String menuReslut = menuIds;
+
+            menuIdsBuffer.append(sourceBuf);
+            if (StringUtil.isNotEmpty(menuIds)){
+                String[] menuIdsArray = menuIds.split(",");
+                if(StringUtil.isNotEmpty(menuIdsBuffer.toString())){
+                    String[] menuIdsBufferArray = menuIdsBuffer.toString().split(",");
+                    String[] resultArray = minus(menuIdsArray, menuIdsBufferArray);
+                    System.out.println("menuIdsBuffer: " + menuIdsBuffer);
+                    for(int i = 0; i < resultArray.length; i++){
+                        menuIdsBuffer.append("," + resultArray[i]);
+                    }
+                    menuReslut = menuIdsBuffer.toString();
+                }
+            }
+
+            menuReslut = menuReslut.replaceAll(",,",",");
+            if(sourceMenu != null){
+                if("append".equals(point)){
+                    sourceMenu.setParentId(targetMenu.getMenuId());
+                    menuService.updateUserMenu(sourceMenu);
+                } else {
+                    if(1 == targetMenu.getParentId()
+                            && sourceMenu.getParentId() != targetMenu.getParentId()) {
+                        sourceMenu.setParentId(targetMenu.getParentId());
+                        menuService.updateUserMenu(sourceMenu);
+                        userRole.setMenuIds(menuReslut);
+                        roleService.updateRole(userRole);
+                    } else {
+                        sourceMenu.setParentId(targetMenu.getMenuId());
+                        menuService.updateUserMenu(sourceMenu);
+                        targetMenu.setState("closed");
+                        menuService.updateUserMenu(targetMenu);
+                    }
+                }
+            }
+            System.out.println("sourceId: " + sourceId + ", targetId: " + targetId + ", point: " + point);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("菜单移动错误", e);
+            result.put("errorMsg", "对不起，移动失败！");
+        }
+        WriterUtil.write(response, result.toString());
+    }
+
+    public static String[] minus(String[] arr1, String[] arr2) {
+        LinkedList<String> list = new LinkedList<String>();
+        LinkedList<String> history = new LinkedList<String>();
+        String[] longerArr = arr1;
+        String[] shorterArr = arr2;
+        //找出较长的数组来减较短的数组
+        if (arr1.length > arr2.length) {
+            longerArr = arr2;
+            shorterArr = arr1;
+        }
+        for (String str : longerArr) {
+            if (!list.contains(str)) {
+                list.add(str);
+            }
+        }
+        for (String str : shorterArr) {
+            if (list.contains(str)) {
+                history.add(str);
+                list.remove(str);
+            } else {
+                if (!history.contains(str)) {
+                    list.add(str);
+                }
+            }
+        }
+
+        String[] result = {};
+        return list.toArray(result);
+    }
+
+    public static void main(String[] args)
+    {
+        String s="1,2,3,4,5,6,7,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,53,54,55,58,59,60,70,71,72,62,63,64,65,66,";
+        System.out.println(s);
+        s = s.replace("70,71,72","");
+        System.out.println(s);
     }
 }

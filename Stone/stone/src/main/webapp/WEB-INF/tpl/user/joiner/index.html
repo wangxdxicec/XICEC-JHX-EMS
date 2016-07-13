@@ -104,13 +104,13 @@
                         <button id="addJoiner" type="button" class="btn btn-warning pull-right"><@spring.message "info.joiner.participants.add"/></button>
                     </div>
 
-                    <table width="100%" class="table table-striped" style="margin-top: 10px" align="center">
+                    <table width="100%" class="table table-striped" style="margin-top: 5px" align="center">
                         <tr>
                             <td>
-                                <table id="newjoinertable" width="70%" align="center">
+                                <table id="newjoinertable" width="70%" align="center" style="border:solid #A70D0D; border-width:1px 1px 1px 1px;">
                                     <thead>
                                     <tr>
-                                        <th style="width: 100%"><@spring.message "info.joiner.participants.table.newjoiner"/>
+                                        <th style="width: 100%"><!--<div style="padding-top:7px; box-sizing:border-box;  color:white; background-image: url(/resource/joiner/joiner_red.png); width: 210px; height: 45px; " align="center">--><div align="center"><@spring.message "info.joiner.participants.table.newjoiner"/></div>
                                             <table class="table" width="100%">
                                                 <tbody id="newdatas">
 
@@ -122,10 +122,10 @@
                                 </table>
                             </td>
                             <td>
-                                <table id="oldjoinertable" width="70%" align="center">
+                                <table id="oldjoinertable" width="70%" align="center" style="border:solid #26A732; border-width:1px 1px 1px 1px;">
                                     <thead>
                                     <tr>
-                                        <th style="width: 100%"><@spring.message "info.joiner.participants.table.oldjoiner"/>
+                                        <th style="width: 100%;"><!--<div style="padding-top:7px; box-sizing:border-box; color:white; background-image: url(/resource/joiner/joiner_green.png); width: 210px; height: 45px" align="center">--><div align="center"><@spring.message "info.joiner.participants.table.oldjoiner"/></div>
                                             <table class="table" width="100%">
                                                 <tbody id="olddatas">
 
@@ -337,8 +337,8 @@
                     oldjoiners = data.joiners;
                     for (var i in data.joiners) {
                         var joiner = oldjoiners[i];
-                        $("#olddatas").append('<tr joiner="' + i + '"><td width="20%;">' + '<a href="#" name="activateJoiner"><img src=\"${base}/resource/plus.png\"/></a></td>'
-                                + "    " + '<td width="50%;"><button name="oldviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
+                        $("#olddatas").append('<tr joiner="' + i + '">&nbsp;&nbsp;<td width="40%;">' + '<a href="#" name="activateJoiner"><img src=\"${base}/resource/plus.png\"/></a></td>'
+                                + "    " + '&nbsp;&nbsp;<td width="60%;"><button name="oldviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
                     }
 
                     $("[name='oldviewJoiner']").click(function () {
@@ -421,8 +421,8 @@
                     newjoiners = data.joiners;
                     for (var i in data.joiners) {
                         var joiner = newjoiners[i];
-                        $("#newdatas").append('<tr joiner="' + i + '"><td width="20%;">' + '<a href="#" name="unactivateJoiner"><img src=\"${base}/resource/minus.png\"/></a></td>'
-                                + "    " + '<td width="50%;"><button name="newviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
+                        $("#newdatas").append('<tr joiner="' + i + '">&nbsp;&nbsp;<td width="40%;">' + '<a href="#" name="unactivateJoiner"><img src=\"${base}/resource/minus.png\"/></a></td>'
+                                + "    " + '&nbsp;&nbsp;<td width="60%;"><button name="newviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
                     }
                     $("[name='newviewJoiner']").click(function () {
                         joiner = newjoiners[parseInt($(this).parent().parent().attr("joiner"))];

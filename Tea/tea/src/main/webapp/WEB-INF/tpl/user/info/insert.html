@@ -67,8 +67,12 @@
         <#include "/user/left.html" />
         <div class="span9">
             <div class="row-fluid">
-                <#include "/common/message.ftl" />
-                <@spring.message "info.notice"/>
+                <p class="text-error">
+                1、以下内容将作为贵公司信息在展会会刊上刊登的唯一依据，请务必准确详细地填写。</br>
+                2、请于 <font style="color:red;font-weight:bold">${tExhibitorTime.exhibitor_Info_Submit_Deadline_Zh}</font> 前填写并提交，逾期将视为自动放弃刊登。</br>
+                3、若遇网络问题无法上传资料，您可以下载表格，填写完整后通过传真0592-5959611或者邮件info@teafair.com.cn的形式，回传至组委会。</br>
+                4、即刻提交，采购商即可第一时间通过2015年参展商目录下设的产品搜索栏获取贵公司信息。
+                </p>
                 <form class="form-horizontal" id="infoform" action="${base}/user/info" method="post" role="form"
                       enctype="multipart/form-data">
                     <h3 class="form-signin-heading"><@spring.message "info.insert.exhibition.title"/></h3>

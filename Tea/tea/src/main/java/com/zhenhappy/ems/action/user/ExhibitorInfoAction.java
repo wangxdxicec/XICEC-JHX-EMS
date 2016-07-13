@@ -2,11 +2,9 @@ package com.zhenhappy.ems.action.user;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zhenhappy.ems.action.BaseAction;
+import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dto.*;
-import com.zhenhappy.ems.entity.TBrand;
-import com.zhenhappy.ems.entity.TExhibitorBooth;
-import com.zhenhappy.ems.entity.TExhibitorInfo;
-import com.zhenhappy.ems.entity.TExhibitorMeipai;
+import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.service.*;
 import com.zhenhappy.ems.sys.Constants;
 import com.zhenhappy.system.SystemConfig;
@@ -64,6 +62,9 @@ public class ExhibitorInfoAction extends BaseAction {
     @Autowired
     private MsgService msgService;
 
+    @Autowired
+    private ExhibitorDao exhibitorDao;
+
     private static Logger log = Logger.getLogger(ExhibitorInfoAction.class);
 
     /**
@@ -77,7 +78,19 @@ public class ExhibitorInfoAction extends BaseAction {
         ModelAndView modelAndView = new ModelAndView();
         Principle principle = (Principle) request.getSession().getAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE);
         Integer exhibitorId = principle.getExhibitor().getEid();
+        ExhibitorBooth booth = exhibitorService.loadBoothInfo(exhibitorId);
+        if(booth != null){
+            modelAndView.addObject("booth", booth);
+        }
         TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(exhibitorId);
+
+        //wangxd 2016-06-24  若账号刚激活，需要登录进基本信信界面，后台颜色才会更新
+        TExhibitor exhibitor = exhibitorService.getExhibitorByEid(exhibitorId);
+        if(exhibitor != null){
+            exhibitor.setIsLogin(1);
+            exhibitorDao.update(exhibitor);
+        }
+
         if (exhibitorInfo == null) {
             List<ProductType> productTypes = exhibitorService.loadAllProductTypes();
 //            List<ProductTypeCheck> productTypeChecks = exhibitorService.loadAllProductTypesWithCheck(exhibitorInfo.getEinfoid());
@@ -90,7 +103,7 @@ public class ExhibitorInfoAction extends BaseAction {
                     }
                 }
                 modelAndView.setViewName("/user/info/insert_en");
-            }else{
+            } else {
                 modelAndView.setViewName("/user/info/insert");
             }
             modelAndView.addObject("types", productTypes);
@@ -106,7 +119,7 @@ public class ExhibitorInfoAction extends BaseAction {
                     }
                 }
                 modelAndView.setViewName("/user/info/update_en");
-            }else{
+            } else {
                 modelAndView.setViewName("/user/info/update");
             }
             List<TBrand> brands = brandService.loadBrandsByEid(exhibitorId);
@@ -124,7 +137,11 @@ public class ExhibitorInfoAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "info", method = RequestMethod.POST)
-    public ModelAndView addInfo(@ModelAttribute(value = "info") TExhibitorInfo exhibitorInfo, @RequestParam("companyLogo") MultipartFile companyLogo, HttpServletRequest request, HttpServletResponse response, Locale locale) throws IOException {
+    public ModelAndView addInfo(@ModelAttribute(value = "info") TExhibitorInfo exhibitorInfo,
+                                @RequestParam("companyLogo") MultipartFile companyLogo,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
+                                Locale locale) throws IOException {
         ModelAndView modelAndView = new ModelAndView();
         try {
             Principle principle = (Principle) request.getSession().getAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE);
@@ -151,6 +168,7 @@ public class ExhibitorInfoAction extends BaseAction {
                 modelAndView.addObject("alert", "添加成功");
                 modelAndView.setViewName("/user/info/update");
             }
+
             List<TBrand> brands = brandService.loadBrandsByEid(principle.getExhibitor().getEid());
             modelAndView.addObject("brands", brands);
             modelAndView.addObject("types", productTypes);
@@ -170,7 +188,12 @@ public class ExhibitorInfoAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "updateinfo", method = RequestMethod.POST)
-    public ModelAndView updateInfo(@ModelAttribute TExhibitorInfo exhibitorInfo, @RequestParam("companyLogo1") MultipartFile companyLogo1, @RequestParam("companyLogo2") MultipartFile companyLogo2, HttpServletRequest request, HttpServletResponse response, Locale locale) throws IOException {
+    public ModelAndView updateInfo(@ModelAttribute TExhibitorInfo exhibitorInfo,
+                                   @RequestParam("companyLogo1") MultipartFile companyLogo1,
+                                   @RequestParam("companyLogo2") MultipartFile companyLogo2,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   Locale locale) throws IOException {
         ModelAndView modelAndView = new ModelAndView();
         String returnStrCn = "修改成功";
         String returnStrEn = "Modify success";
@@ -225,29 +248,30 @@ public class ExhibitorInfoAction extends BaseAction {
             exhibitorInfo.setAdminUpdateTime(info.getAdminUpdateTime());
             exhibitorInfo.setAdminUser(info.getAdminUser());
             exhibitorInfo.setUpdateTime(new Date());
+            exhibitorService.update(exhibitorInfo);
             brandService.updateExhibitorAndBrands(exhibitorInfo);
             exhibitorService.saveExhibitorProductClass(JSONObject.parseObject(exhibitorInfo.getClassjson(), SaveExhibitorSelectRequest.class).getSelected(), exhibitorInfo.getEinfoid());
             List<ProductType> productTypes = exhibitorService.loadAllProductTypes();
             List<ProductTypeCheck> productTypeChecks = exhibitorService.loadAllProductTypesWithCheck(exhibitorInfo.getEinfoid());
             if (locale.equals(Locale.US)) {
-                for (ProductType productType : productTypes) {
+                /*for (ProductType productType : productTypes) {
                     productType.setTypeName(productType.getTypeNameEN());
                     for (ProductType type : productType.getChildrenTypes()) {
                         type.setTypeName(type.getTypeNameEN());
                     }
-                }
-                modelAndView.setViewName("/user/info/update");
+                }*/
+                modelAndView.setViewName("/user/info/update_en");
                 modelAndView.addObject("alert", returnStrEn);
             }else{
                 modelAndView.addObject("alert", returnStrCn);
-                modelAndView.setViewName("/user/info/update_en");
+                modelAndView.setViewName("/user/info/update");
             }
             List<TBrand> brands = brandService.loadBrandsByEid(principle.getExhibitor().getEid());
-            modelAndView.addObject("brands", brands);
             modelAndView.addObject("types", productTypes);
             modelAndView.addObject("selected", JSONObject.toJSONString(productTypeChecks));
             modelAndView.addObject("newinfo", exhibitorInfo);
             modelAndView.addObject("redirect", "/user/info");
+            modelAndView.addObject("brands", brands);
         } catch (Exception e) {
             log.error("update exhibitor information error.", e);
         }
@@ -323,7 +347,9 @@ public class ExhibitorInfoAction extends BaseAction {
      * @param eid
      */
     @RequestMapping(value = "logoImg", method = RequestMethod.GET)
-    public void logoImg(HttpServletResponse response, @RequestParam("eid") Integer eid, @RequestParam(value = "page", defaultValue = "0") Integer page) {
+    public void logoImg(HttpServletResponse response,
+                        @RequestParam("eid") Integer eid,
+                        @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
             String logoFileName = exhibitorService.loadExhibitorInfoByEid(eid).getLogo();
             if(logoFileName.contains(";")){

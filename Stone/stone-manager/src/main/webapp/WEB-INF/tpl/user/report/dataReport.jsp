@@ -15,16 +15,16 @@
         }
 
         input {
-            width: 200px;
-            height: 20px;
+            width: 150px;
+            height: 26px;
         }
 
-        .exhibitors:hover{
+        /*.exhibitors:hover{
             background-color:#6caef5;
         }
         .exhibitors{
             padding:8px;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -52,7 +52,7 @@
             </td>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <td width="120" align="center">
-                <button type="button" class="btn btn-primary" id="showReport" onclick="showReport();">生&nbsp;&nbsp;成&nbsp;&nbsp;报&nbsp;&nbsp;表</button>
+                <button type="button" class="btn btn-sm btn-success" id="showReport" onclick="showReport();">生&nbsp;&nbsp;成&nbsp;&nbsp;报&nbsp;&nbsp;表</button>
             </td>
         </tr>
         <tr>
@@ -77,7 +77,7 @@
             </td>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <td width="120" align="center">
-                <button type="button" class="btn btn-primary" id="exportDataDetail">导出详细数据</button>
+                <button type="button" class="btn btn-sm btn-success" id="exportDataDetail">导出详细数据</button>
             </td>
         </tr>
     </table>
@@ -85,9 +85,9 @@
         <div id="cidParm3"></div>
     </form>
 </table>
-<div id="dataReportRegin" style="height: 100%; width: 100%;border:1px solid #ccc;"></div>
+<div id="dataReportRegin" style="height: 88%; width: 98%;border:1px solid #ccc;" align="center"></div>
 
-<div style="border:1px solid #ccc;">
+<%--<div style="border:1px solid #ccc;" align="center">
     <button type="button" class="btn btn-sm btn-success" onclick="refresh(true)">刷 新</button>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <span class="text-primary">切换主题</span>
@@ -99,7 +99,7 @@
         <option value='dark'>dark</option>
         <option value='blue'>blue</option>
     </select>
-</div>
+</div>--%>
 </body>
 </html>
 <script type="text/javascript">

@@ -104,4 +104,49 @@ public class ExhibitorTimeAction extends BaseAction {
         }
         return response;
     }
+
+    /**
+     * 更新菜单是否移动
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyExhibitorMenuMove")
+    public BaseResponse modifyExhibitorMenuMove(@ModelAttribute QueryExhibitorTimeRequest request,
+                                                @RequestParam(value = "menu_move_switch") Integer menu_move_switch) {
+        BaseResponse response = new BaseResponse();
+        try {
+            exhibitorTimeManagerService.modifyExhibitorMenuMove(menu_move_switch);
+            response.setResultCode(0);
+        } catch (Exception e) {
+            log.error("modify exhibitor time error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 获取菜单是否移动值
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "getCurrentMenuMove")
+    public BaseResponse getCurrentMenuMove(@ModelAttribute QueryExhibitorTimeRequest request) {
+        BaseResponse response = new BaseResponse();
+        try {
+            List<TExhibitorTime> tExhibitorTimes = exhibitorTimeDao.queryByHql("from TExhibitorTime", new Object[]{});
+            if(tExhibitorTimes != null && tExhibitorTimes.size()>0){
+                //加载前台界面菜单项是否支持移动
+                TExhibitorTime tExhibitorTime = tExhibitorTimes.get(0);
+                int menuMoveFlag = tExhibitorTime.getMenu_move_switch();
+                response.setDescription(String.valueOf(menuMoveFlag));
+            }
+            response.setResultCode(0);
+        } catch (Exception e) {
+            log.error("query exhibitor time error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
 }

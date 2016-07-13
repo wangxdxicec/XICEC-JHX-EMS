@@ -50,7 +50,7 @@ public class ExhibitorTimeAction extends BaseAction {
             Page page = new Page();
             page.setPageSize(request.getRows());
             page.setPageIndex(request.getPage());
-            List<TExhibitorBuddhaTime> tExhibitorTimes = exhibitorTimeDao.queryPageByHQL("select count(*) from TExhibitorBuddhaTime", "from TExhibitorBuddhaTime", new Object[]{}, page);
+            List<TExhibitorBuddhaTime> tExhibitorTimes = exhibitorTimeDao.queryPageByHQL("select count(*) from TExhibitorTeaTime", "from TExhibitorTeaTime", new Object[]{}, page);
             response.setResultCode(0);
             response.setRows(tExhibitorTimes);
             response.setTotal(page.getTotalCount());

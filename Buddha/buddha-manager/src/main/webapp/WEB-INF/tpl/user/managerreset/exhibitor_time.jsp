@@ -48,27 +48,29 @@
 	</style>
 </head>
 <body  onload="queryExhibitorTimeData()">
-<table align="center">
-	<tr>
-		<td style="width: 200px">展会开展时间周期：</td>
-		<td>
-			<input id="buddha_Fair_Show_Date" style="width:80%;" type="text" />
-		</td>
+<div style="height: auto;" class="easyui-panel" title="时间参数">
+	<table align="center">
+		<tr>
+			<td style="width: 200px">展会开展时间周期：</td>
+			<td>
+				<input id="buddha_Fair_Show_Date" style="width:80%;" type="text"/>
+			</td>
 
-		<td style="width: 200px">展会信息办理截止时间：</td>
-		<td>
-			<input id="exhibitor_Info_Submit_Deadline" style="width:80%;" type="text" />
-		</td>
-	</tr>
-	<tr>
-		<td style="width: 200px">展会开展时间：</td>
-		<td>
-			<input id="buddha_Fair_Show_Date_Begin" style="width:80%;" type="text" />
-		</td>
-	</tr>
-</table>
-<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
-	<button type="button" class="btn btn-primary" id="saveData">确认修改</button>
+			<td style="width: 200px">展会信息办理截止时间：</td>
+			<td>
+				<input id="exhibitor_Info_Submit_Deadline" style="width:80%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 200px">展会开展时间：</td>
+			<td>
+				<input id="buddha_Fair_Show_Date_Begin" style="width:80%;" type="text"/>
+			</td>
+		</tr>
+	</table>
+	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
+		<button type="button" class="btn btn-primary" id="saveData">确认修改</button>
+	</div>
 </div>
 <script>
 	function queryExhibitorTimeData() {

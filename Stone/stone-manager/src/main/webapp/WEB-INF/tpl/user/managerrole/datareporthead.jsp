@@ -12,9 +12,9 @@
 <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
 <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="${base}/resource/echarts/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="${base}/resource/echarts/css/bootstrap.css">
+<%--<link rel="stylesheet" type="text/css" href="${base}/resource/echarts/css/bootstrap.css">--%>
 <link rel="stylesheet" type="text/css" href="${base}/resource/echarts/css/carousel.css">
-<link rel="stylesheet" type="text/css" href="${base}/resource/echarts/css/echartsHome.css">
+<%--<link rel="stylesheet" type="text/css" href="${base}/resource/echarts/css/echartsHome.css">--%>
 
 <script type="text/javascript" src="${base}/resource/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="${base}/resource/jquery.min.js"></script>

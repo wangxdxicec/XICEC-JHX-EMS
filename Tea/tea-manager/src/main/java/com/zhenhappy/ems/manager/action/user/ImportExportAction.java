@@ -16,6 +16,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.manager.dto.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -23,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,15 +38,12 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
-import com.zhenhappy.ems.entity.TInvoiceApply;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;
 import com.zhenhappy.ems.manager.service.ImportExportService;
 import com.zhenhappy.ems.manager.sys.Constants;
 import com.zhenhappy.ems.manager.util.CreateZip;
 import com.zhenhappy.ems.manager.util.JXLExcelView;
-import com.zhenhappy.ems.service.InvoiceService;
-import com.zhenhappy.ems.service.MeipaiService;
 import com.zhenhappy.system.SystemConfig;
 
 import freemarker.template.Template;
@@ -67,6 +66,8 @@ public class ImportExportAction extends BaseAction {
 	private FreeMarkerConfigurer freeMarker;// 注入FreeMarker模版封装框架
     @Autowired
     private SystemConfig systemConfig;
+    @Autowired
+    private ExhibitorInfoDao exhibitorInfoDao;
 
     /**
      * 导出展商列表到Excel
@@ -74,11 +75,14 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportExhibitorsToExcel", method = RequestMethod.POST)
-    public ModelAndView exportExhibitorsToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+    public ModelAndView exportExhibitorsToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                                @RequestParam(value = "type") Integer type) {
         Map model = new HashMap();
         List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
-        if(eids[0] == -1) exhibitors = exhibitorManagerService.loadAllExhibitors();
-        else exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
+        if(eids[0] == -1)
+            exhibitors = exhibitorManagerService.loadAllExhibitorsByLogType(type);
+        else
+            exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
         List<QueryExhibitorInfo> queryExhibitorInfos = importExportService.exportExhibitor(exhibitors);
         model.put("list", queryExhibitorInfos);
         String[] titles = new String[] { "展位号", "公司中文名", "公司英文名", "电话", "传真", "邮箱", "网址", "中文地址", "英文地址", "邮编", "产品分类", "主营产品(中文)", "主营产品(英文)", "公司简介", "发票抬头", "地税税号" };
@@ -104,22 +108,35 @@ public class ImportExportAction extends BaseAction {
         if(exhibitors != null){
             for(TExhibitor exhibitor:exhibitors){
                 String boothNum = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
+                TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
                 String boothNums[] = boothNum.split(",");
                 if(boothNums.length > 1) {
                     for(String booth:boothNums){
                         QueryExhibitorInfoT queryExhibitorInfoT = new QueryExhibitorInfoT();
                         queryExhibitorInfoT.setEid(exhibitor.getEid());
                         queryExhibitorInfoT.setBoothNumber(booth.trim());
-                        if(StringUtils.isNotEmpty(exhibitor.getCompany())) queryExhibitorInfoT.setCompany(exhibitor.getCompany());
-                        else queryExhibitorInfoT.setCompany(exhibitor.getCompanye());
+                        /*if(StringUtils.isNotEmpty(exhibitor.getCompany()))
+                            queryExhibitorInfoT.setCompany(exhibitor.getCompany());
+                        else
+                            queryExhibitorInfoT.setCompany(exhibitor.getCompanye());*/
+                        if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()))
+                            queryExhibitorInfoT.setCompany(exhibitorInfo.getCompany());
+                        else
+                            queryExhibitorInfoT.setCompany(exhibitorInfo.getCompanyEn());
                         queryExhibitorInfos.add(queryExhibitorInfoT);
                     }
                 }else if(boothNums.length == 1) {
                     QueryExhibitorInfoT queryExhibitorInfoT = new QueryExhibitorInfoT();
                     queryExhibitorInfoT.setEid(exhibitor.getEid());
                     queryExhibitorInfoT.setBoothNumber(boothNum.trim());
-                    if(StringUtils.isNotEmpty(exhibitor.getCompany())) queryExhibitorInfoT.setCompany(exhibitor.getCompany());
-                    else queryExhibitorInfoT.setCompany(exhibitor.getCompanye());
+                    /*if(StringUtils.isNotEmpty(exhibitor.getCompany()))
+                        queryExhibitorInfoT.setCompany(exhibitor.getCompany());
+                    else
+                        queryExhibitorInfoT.setCompany(exhibitor.getCompanye());*/
+                    if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()))
+                        queryExhibitorInfoT.setCompany(exhibitorInfo.getCompany());
+                    else
+                        queryExhibitorInfoT.setCompany(exhibitorInfo.getCompanyEn());
                     queryExhibitorInfos.add(queryExhibitorInfoT);
                 }
             }
@@ -149,23 +166,29 @@ public class ImportExportAction extends BaseAction {
         if(exhibitors != null){
             for(TExhibitor exhibitor:exhibitors){
                 String boothNum = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
+                TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
                 String boothNums[] = boothNum.split(",");
                 if(boothNums.length > 1) {
                     for(String booth:boothNums){
                         QueryExhibitorInfoT queryExhibitorInfoT = new QueryExhibitorInfoT();
                         queryExhibitorInfoT.setEid(exhibitor.getEid());
                         queryExhibitorInfoT.setBoothNumber(booth.trim());
-                        if(StringUtils.isNotEmpty(exhibitor.getCompany())) queryExhibitorInfoT.setCompany(exhibitor.getCompany());
-                        else queryExhibitorInfoT.setCompany(exhibitor.getCompanye());
+                        if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()))
+                            queryExhibitorInfoT.setCompany(exhibitorInfo.getCompany());
+                        else
+                            queryExhibitorInfoT.setCompany(exhibitorInfo.getCompanyEn());
                         queryExhibitorInfos.add(queryExhibitorInfoT);
                     }
                 }else if(boothNums.length == 1) {
                     QueryExhibitorInfoT queryExhibitorInfoT = new QueryExhibitorInfoT();
                     queryExhibitorInfoT.setEid(exhibitor.getEid());
                     queryExhibitorInfoT.setBoothNumber(boothNum.trim());
-                    if(StringUtils.isNotEmpty(exhibitor.getCompany())) queryExhibitorInfoT.setCompany(exhibitor.getCompany());
-                    if(StringUtils.isNotEmpty(exhibitor.getCompanye())) queryExhibitorInfoT.setCompanye(exhibitor.getCompanye());
-                    if(StringUtils.isNotEmpty(exhibitor.getCompanyt())) queryExhibitorInfoT.setCompanyt(exhibitor.getCompanyt());
+                    if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()))
+                        queryExhibitorInfoT.setCompany(exhibitorInfo.getCompany());
+                    if(StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn()))
+                        queryExhibitorInfoT.setCompanye(exhibitorInfo.getCompanyEn());
+                    if(StringUtils.isNotEmpty(exhibitorInfo.getCompanyT()))
+                        queryExhibitorInfoT.setCompanyt(exhibitorInfo.getCompanyT());
                     queryExhibitorInfos.add(queryExhibitorInfoT);
                 }
             }
@@ -188,11 +211,12 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportBoothNumAndMeipaiToExcel", method = RequestMethod.POST)
-	public ModelAndView exportBoothNumAndMeipaiToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+	public ModelAndView exportBoothNumAndMeipaiToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                                       @RequestParam(value = "type") Integer type) {
     	Map model = new HashMap();
         List<QueryBoothNumAndMeipai> boothNumAndMeipais = new ArrayList<QueryBoothNumAndMeipai>();
-        if(eids[0] == -1) boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(null);
-        else boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(eids);
+        if(eids[0] == -1) boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(null, type);
+        else boothNumAndMeipais = exhibitorManagerService.loadBoothNumAndMeipai(eids, type);
         model.put("list", boothNumAndMeipais);
         String[] titles = new String[] { "展位号", "企业楣牌(中文)", "企业楣牌(英文)" };
 		model.put("titles", titles);
@@ -211,11 +235,14 @@ public class ImportExportAction extends BaseAction {
      * @return
      */
     @RequestMapping(value = "exportExhibitorJoinersToExcel", method = RequestMethod.POST)
-    public ModelAndView exportExhibitorJoinersToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids) {
+    public ModelAndView exportExhibitorJoinersToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                                      @RequestParam(value = "type") Integer type) {
         Map model = new HashMap();
         List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
-        if(eids[0] == -1) exhibitors = exhibitorManagerService.loadAllExhibitors();
-        else exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
+        if(eids[0] == -1)
+            exhibitors = exhibitorManagerService.loadAllExhibitorsByLogType(type);
+        else
+            exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
 
         List<ExportExhibitorJoiner> exportExhibitorJoiners = importExportService.exportExhibitorJoiners(exhibitors);
         model.put("list", exportExhibitorJoiners);
@@ -257,28 +284,29 @@ public class ImportExportAction extends BaseAction {
      */
     @RequestMapping("/exportTransactionsToZip")
     public ModelAndView exportTransactionsToZip(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
-                                                        HttpServletRequest request,
-                                                        HttpServletResponse response) throws Exception {
+                                                @RequestParam(value = "type") Integer type,
+                                                HttpServletRequest request,
+                                                HttpServletResponse response) throws Exception {
 //    	String dirPath = "D:\\Users\\Foshi\\tmp\\" + UUID.randomUUID();
     	String appendix_directory = systemConfig.getVal(Constants.appendix_directory).replaceAll("\\\\\\\\", "\\\\");
         String randomFile = UUID.randomUUID().toString();
     	String destDir = appendix_directory + "\\tmp\\" + randomFile;
     	FileUtils.forceMkdir(new File(destDir)); // 创建临时文件夹
         if(eids[0] == -1){
-            exportTransactions(null, destDir);
+            exportTransactions(null, type, destDir);
             importExportService.copyLogo(null, destDir);
         }else{
-            exportTransactions(eids, destDir);
+            exportTransactions(eids, type, destDir);
             importExportService.copyLogo(eids, destDir);
         }
 	    CreateZip.zipToFile(destDir, randomFile);
     	return download(destDir, randomFile, request, response);
     }
 
-    private void exportTransactions(Integer[] eids, String dirPath) throws Exception {
+    private void exportTransactions(Integer[] eids, Integer type, String dirPath) throws Exception {
     	List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
     	if(eids == null){
-    		exhibitors = exhibitorManagerService.loadAllExhibitors();
+    		exhibitors = exhibitorManagerService.loadAllExhibitorsByLogType(type);
     	}else{
     		exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
     	}
@@ -288,11 +316,12 @@ public class ImportExportAction extends BaseAction {
         		String boothNumber = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
         		Transaction transaction = new Transaction();
         		if(exhibitorInfo != null){
-    	    			if((StringUtils.isNotEmpty(exhibitor.getCompany()) || StringUtils.isNotEmpty(exhibitor.getCompanye())) && StringUtils.isNotEmpty(boothNumber)){
+    	    			/*if((StringUtils.isNotEmpty(exhibitor.getCompany()) || StringUtils.isNotEmpty(exhibitor.getCompanye())) && StringUtils.isNotEmpty(boothNumber)){*/
+                        if((StringUtils.isNotEmpty(exhibitorInfo.getCompany()) || StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())) && StringUtils.isNotEmpty(boothNumber)){
     		        		transaction.setBoothNumber(boothNumber.trim());
-    		        		if(StringUtils.isNotEmpty(exhibitor.getCompany())) transaction.setCompany(exhibitor.getCompany().trim());
+    		        		if(StringUtils.isNotEmpty(exhibitorInfo.getCompany())) transaction.setCompany(exhibitorInfo.getCompany().trim());
     		        		else transaction.setCompany(null);
-    		        		if(StringUtils.isNotEmpty(exhibitor.getCompanye())) transaction.setCompanye(exhibitor.getCompanye().trim());
+    		        		if(StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())) transaction.setCompanye(exhibitorInfo.getCompanyEn().trim());
     		        		else transaction.setCompanye(null);
     		        		if(StringUtils.isNotEmpty(exhibitorInfo.getAddress())) transaction.setAddress(exhibitorInfo.getAddress().trim());
     		        		else transaction.setAddress(null);
@@ -311,17 +340,17 @@ public class ImportExportAction extends BaseAction {
     		        		if(StringUtils.isNotEmpty(exhibitorInfo.getMark())) transaction.setMark(exhibitorInfo.getMark().trim());
     		        		else transaction.setMark(null);
     	    			}
-        		}else if((StringUtils.isNotEmpty(exhibitor.getCompany()) || StringUtils.isNotEmpty(exhibitor.getCompanye())) && StringUtils.isNotEmpty(boothNumber)){
+        		}else if((StringUtils.isNotEmpty(exhibitorInfo.getCompany()) || StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())) && StringUtils.isNotEmpty(boothNumber)){
             		transaction.setBoothNumber(boothNumber.trim());
             		ModifyExhibitorInfoRequest modifyExhibitorInfoRequest = new ModifyExhibitorInfoRequest();
-            		if(StringUtils.isNotEmpty(exhibitor.getCompany())) {
-            			transaction.setCompany(exhibitor.getCompany().trim());
-            			modifyExhibitorInfoRequest.setCompany(exhibitor.getCompany().trim());
+            		if(StringUtils.isNotEmpty(exhibitorInfo.getCompany())) {
+            			transaction.setCompany(exhibitorInfo.getCompany().trim());
+            			modifyExhibitorInfoRequest.setCompany(exhibitorInfo.getCompany().trim());
             		}
 	        		else transaction.setCompany(null);
-	        		if(StringUtils.isNotEmpty(exhibitor.getCompanye())) {
-	        			transaction.setCompanye(exhibitor.getCompanye().trim());
-	        			modifyExhibitorInfoRequest.setCompanyEn(exhibitor.getCompanye().trim());
+	        		if(StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())) {
+	        			transaction.setCompanye(exhibitorInfo.getCompanyEn().trim());
+	        			modifyExhibitorInfoRequest.setCompanyEn(exhibitorInfo.getCompanyEn().trim());
 	        		}
 	        		else transaction.setCompanye(null);
             		transaction.setAddress(null);
@@ -336,12 +365,14 @@ public class ImportExportAction extends BaseAction {
     				continue;
     			}
                 /*茶博会需求开始*/
-//                if(StringUtils.isNotEmpty(exhibitor.getCompany())) exhibitor.setCompany("");
-//                if(StringUtils.isNotEmpty(exhibitor.getCompanye())) exhibitor.setCompanye("");
-        		String filePath = dirPath + "\\" + exhibitor.getCompany().replaceAll("/", "") + exhibitor.getCompanye().replaceAll("/", "") + boothNumber.replaceAll("/", "") + ".txt";
-        		/*茶博会需求结束*/
-                importExportService.WriteStringToFile(getTransactionText(transaction), filePath);
+//              if(StringUtils.isNotEmpty(exhibitor.getCompany())) exhibitor.setCompany("");
+//              if(StringUtils.isNotEmpty(exhibitor.getCompanye())) exhibitor.setCompanye("");
+                if(StringUtils.isNotEmpty(exhibitorInfo.getCompany()) && StringUtils.isNotEmpty(exhibitorInfo.getCompanyEn())){
+                    String filePath = dirPath + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + ".txt";
+        		    /*茶博会需求结束*/
+                    importExportService.WriteStringToFile(getTransactionText(transaction), filePath);
 //	        		System.out.println("导出" + exhibitor.getCompany() + "成功");
+                }
         	}
     	}
 //    	System.out.println("全部会刊信息导出完成");
@@ -376,7 +407,7 @@ public class ImportExportAction extends BaseAction {
             realName = new String(realName.getBytes(guessCharset), "ISO8859-1");   
         }  
     	String fileName = destDir + "\\" + zipName + ".zip";  //获取完整的文件名
-    	System.out.println(fileName);
+    	//System.out.println(fileName);
     	long fileLength = new File(fileName).length();
     	response.setContentType("application/octet-stream");
     	response.setHeader("Content-Disposition", "attachment; filename=" + realName);
@@ -410,5 +441,18 @@ public class ImportExportAction extends BaseAction {
             e.printStackTrace();
         }
         return targetFile;
+    }
+
+    /**
+     * 根据eid查询展商基本信息
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public TExhibitorInfo loadExhibitorInfoByEid(Integer eid) {
+        if(eid != null){
+            List<TExhibitorInfo> exhibitorInfo = exhibitorInfoDao.queryByHql("from TExhibitorInfo where eid=?", new Object[]{ eid });
+            return exhibitorInfo.size() > 0 ? exhibitorInfo.get(0) : null;
+        }else return null;
     }
 }

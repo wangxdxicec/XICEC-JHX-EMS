@@ -17,23 +17,20 @@ ${transaction.addressEn}
 <#elseif transaction.addressEn?exists>
 地址/Add: ${transaction.addressEn}
 </#if>
-<#if transaction.zipcode?exists>
-邮编/Post Code: ${transaction.zipcode}
-</#if>
-<#if transaction.phone?exists>
+<#if transaction.phone?exists && transaction.phone??>
 电话/Tel: ${transaction.phone}
 </#if>
-<#if transaction.fax?exists>
+<#if transaction.fax?exists && transaction.fax??>
 传真/Fax: ${transaction.fax}
 </#if>
 <#if transaction.website?exists>
 网址/Web: ${transaction.website}
 </#if>
-<#if transaction.email?exists>
+<#if transaction.email?exists && transaction.email??>
 电子邮箱/E-mail: ${transaction.email}
 </#if>
 
+<#if transaction.mark?exists && transaction.mark??>
 企业简介/Brief Introduction:
-<#if transaction.mark?exists>
 ${transaction.mark}
 </#if>

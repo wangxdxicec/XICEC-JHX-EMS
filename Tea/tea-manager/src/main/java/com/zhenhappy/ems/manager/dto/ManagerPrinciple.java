@@ -1,7 +1,7 @@
 package com.zhenhappy.ems.manager.dto;
 
 
-import com.zhenhappy.ems.manager.entity.TAdminUser;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 
 /**
  * Created by wujianbin on 2014-04-22.
@@ -13,13 +13,22 @@ public class ManagerPrinciple {
      */
     public static final String MANAGERPRINCIPLE = "MANAGERPRINCIPLE";
 
-    private TAdminUser admin;
+    private TUserInfo admin;
+    private String currentOperationIds;
 
-    public TAdminUser getAdmin() {
+    public TUserInfo getAdmin() {
         return admin;
     }
 
-    public void setAdmin(TAdminUser admin) {
+    public void setAdmin(TUserInfo admin) {
         this.admin = admin;
+    }
+
+    public String getCurrentOperationIds() {
+        return currentOperationIds;
+    }
+
+    public void setCurrentOperationIds(String currentOperationIds) {
+        this.currentOperationIds = currentOperationIds;
     }
 }

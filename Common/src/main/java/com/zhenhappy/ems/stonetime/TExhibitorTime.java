@@ -29,6 +29,7 @@ public class TExhibitorTime {
     private String visa_Info_Submit_Deadline_En;
     private String stone_Fair_Show_Date_Zh;
     private String stone_Fair_Show_Date_En;
+    private Integer menu_move_switch;
 
     @Id
     @Column(name = "id")
@@ -209,5 +210,15 @@ public class TExhibitorTime {
 
     public void setStone_Fair_Show_Date_En(String stone_Fair_Show_Date_En) {
         this.stone_Fair_Show_Date_En = stone_Fair_Show_Date_En;
+    }
+
+    @Basic
+    @Column(name = "menu_move_switch")
+    public Integer getMenu_move_switch() {
+        return menu_move_switch;
+    }
+
+    public void setMenu_move_switch(Integer menu_move_switch) {
+        this.menu_move_switch = menu_move_switch;
     }
 }

@@ -243,11 +243,6 @@
                         <#else>
                             <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="" id="previewLogo" name="previewLogo" class="img-rounded" />
                     </#if>
-                    <!--<div class="controls">
-                        <a href="#" class="img-thumbnail">
-                            <img style="width: 100px;height: 100px" data-src="holder.js/100x100" src="${base}/user/logoImg?eid=${updateInfo.eid}">
-                        </a>
-                    </div>-->
                 </div>
                 <hr>
                 <div style="color: #f1b426;font-size: 16px;border-bottom: 1px #dbdbdb solid;line-height: 32px;font-weight: bolder"><@spring.message "info.products"/><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span></div>
@@ -299,7 +294,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             (不能超过200字)</font></label>
                         <div class="controls">
-                            <textarea style="height:180px;width:350px;resize: none;" catValidate="required:true"
+                            <textarea style="height:180px;width:350px;resize: none;" catValidate="required:false"
                                       name="company_hignlight" class="form-control" id="company_hignlight">${updateInfo.company_hignlight!''}</textarea>
                         </div>
                     </div>
@@ -606,7 +601,6 @@
         });
         //save event
         $("[name='saveButton']").click(function () {
-
             nowSelected = new Array();
             request = {"selected": nowSelected}
             //find all selected
@@ -655,24 +649,6 @@
 						return;
 					}
 				}
-//				if(formData[i].name=='mark'){
-//					if(formData[i].value==''){
-//						alert("公司简介不能为空");
-//						return;
-//					}else if(formData[i].value.length > 200){
-//						alert("公司中文简介不能超过200个字");
-//						return;
-//					}
-//				}
-//				if(formData[i].name=='emark'){
-//					if(formData[i].value==''){
-//						alert("公司简介不能为空");
-//						return;
-//					}else if(testreg(formData[i].value) > 200){
-//						alert("公司英文简介不能超过200个字");
-//						return;
-//					}
-//				}
                 if(formData[i].value==''&&needValidate(formData[i])){
                     alert($("#infoform [name='"+formData[i].name+"']").attr("placeholder")+" 不能为空！");
                     return;
@@ -686,7 +662,12 @@
         });
 
         $("[name='previewCatagory']").click(function(){
-            var boothNum = '${booth.boothNumber}';
+            var boothNum  = "";
+            <#if booth?exists>
+            <#if booth.boothNumber?exists>
+                boothNum = '${booth.boothNumber}';
+            </#if>
+            </#if>
             var selectMap = {};
             $("[role='child']").each(function () {
                 if (!$($(this).children()[0]).hasClass("hide")) {

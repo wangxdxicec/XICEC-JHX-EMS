@@ -75,7 +75,11 @@
     }
 
     .companyInfo{
-        float: right;height: 39px;line-height: 39px;max-width: 280px;overflow: hidden
+        float: right;height: 39px;line-height: 39px;overflow: hidden
+    }
+
+    .companyInfoValue{
+        float: left;height: 39px;line-height: 39px;max-width: 200px;overflow: hidden; white-space:nowrap; text-overflow:ellipsis;
     }
 </style>
 
@@ -180,15 +184,15 @@
         </#if>
         <#if rc.locale=="zh_CN">
             <#if boothInfo?exists>
-                <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.company!""} (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
+                <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo?exists>&nbsp;&nbsp;${exhibitorInfo.company}</#if></div>(${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
             <#else>
-                <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.company!""}</div>
+                <div class="companyInfo"><#if exhibitorInfo?exists>${exhibitorInfo.company}</#if></div>
             </#if>
         <#else>
             <#if boothInfo?exists>
-                <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.companye!""} (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
+                <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo?exists>${exhibitorInfo.companyEn}&nbsp;</#if></div>(${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
             <#else>
-                <div class="companyInfo">${PRINCIPLE_SESSION_ATTRIBUTE.exhibitor.companye!""}</div>
+                <div class="companyInfo"><#if exhibitorInfo?exists>${exhibitorInfo.companyEn}</#if>/div>
             </#if>
         </#if>
         <div style="clear: both"></div>

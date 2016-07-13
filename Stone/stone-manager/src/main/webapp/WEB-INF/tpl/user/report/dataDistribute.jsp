@@ -22,7 +22,7 @@
 <body>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <div>
-    <div id="mapRegin" style="height: 680px;padding:20px;"></div>
+    <div id="mapRegin" style="height: 95%; width: 98%;border:1px solid #ccc;"></div>
     <div align="center">
         <button type="button" class="btn btn-sm btn-success" onclick="refresh(true)">刷 新</button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

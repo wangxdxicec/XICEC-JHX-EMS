@@ -1,7 +1,7 @@
 package com.zhenhappy.ems.manager.service;
 
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dao.AdminDao;
-import com.zhenhappy.ems.manager.entity.TAdminUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +23,10 @@ public class AdminServiceImp implements AdminService {
      * @return
      */
     @Override
-    public TAdminUser login(String username, String password) {
-        List<TAdminUser> adminUsers = adminDao.queryByHql("from TAdminUser where username = ? and password = ?", new Object[]{username, password});
+    public TUserInfo login(String username, String password) {
+        /*List<TAdminUser> adminUsers = adminDao.queryByHql("from TAdminUser where username = ? and password = ?", new Object[]{username, password});
+        return adminUsers.size()>0?adminUsers.get(0):null;*/
+        List<TUserInfo> adminUsers = adminDao.queryByHql("from TUserInfo where username = ? and password = ?", new Object[]{username, password});
         return adminUsers.size()>0?adminUsers.get(0):null;
     }
 

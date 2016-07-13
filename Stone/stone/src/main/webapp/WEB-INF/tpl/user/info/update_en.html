@@ -282,7 +282,7 @@
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 (Less than 200 words)</font></label>
                         <div class="controls">
-                            <textarea style="height:180px;width:350px;resize: none;" catValidate="required:true"
+                            <textarea style="height:180px;width:350px;resize: none;" catValidate="required:false"
                                       name="company_hignlight" class="form-control" id="company_hignlight">${updateInfo.company_hignlight!''}</textarea>
                         </div>
                     </div>
@@ -645,7 +645,12 @@
         });
 
         $("[name='previewCatagory']").click(function(){
-            var boothNum = '${booth.boothNumber}';
+            var boothNum  = "";
+            <#if booth?exists>
+            <#if booth.boothNumber?exists>
+            boothNum = '${booth.boothNumber}';
+            </#if>
+            </#if>
             var selectMap = {};
             $("[role='child']").each(function () {
                 if (!$($(this).children()[0]).hasClass("hide")) {

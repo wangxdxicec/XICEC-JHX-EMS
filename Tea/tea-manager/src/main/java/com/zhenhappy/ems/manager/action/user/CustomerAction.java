@@ -57,7 +57,7 @@ public class CustomerAction extends BaseAction {
     
     @RequestMapping(value = "customer")
     public ModelAndView directToCustomer() {
-        ModelAndView modelAndView = new ModelAndView("/user/customer");
+        ModelAndView modelAndView = new ModelAndView("/user/customer/customer");
         return modelAndView;
     }
     

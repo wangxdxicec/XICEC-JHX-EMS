@@ -143,4 +143,57 @@ public class ExhibitorImp extends BaseDaoHibernateImp<TExhibitor> implements Exh
 				+ "from TExhibitor e where " + typeCondition);
 		return q.list();
 	}
+
+	@Override
+	public List<TExhibitor> loadAllExhibitorsByLogType(Integer type) {
+		String typeCondition = "";
+		if(type == 1){
+			typeCondition = " isLogout = 0";
+			Query q = this.getSession().createQuery("select new TExhibitor(e.eid, "
+					+ "e.username, "
+					+ "e.password, "
+					+ "e.level, "
+					+ "e.area, "
+					+ "e.lastLoginTime, "
+					+ "e.lastLoginIp, "
+					+ "e.isLogout, "
+					+ "e.createUser, "
+					+ "e.createTime, "
+					+ "e.updateUser, "
+					+ "e.updateTime, "
+					+ "e.tag, "
+					+ "e.province, "
+					+ "e.country, "
+					+ "e.group, "
+					+ "e.contractId, "
+					+ "e.exhibitionArea, "
+					+ "e.exhibitor_type,"
+					+ "e.isLogin)"
+					+ "from TExhibitor e where " + typeCondition);
+			return q.list();
+		} else{
+			Query q = this.getSession().createQuery("select new TExhibitor(e.eid, "
+					+ "e.username, "
+					+ "e.password, "
+					+ "e.level, "
+					+ "e.area, "
+					+ "e.lastLoginTime, "
+					+ "e.lastLoginIp, "
+					+ "e.isLogout, "
+					+ "e.createUser, "
+					+ "e.createTime, "
+					+ "e.updateUser, "
+					+ "e.updateTime, "
+					+ "e.tag, "
+					+ "e.province, "
+					+ "e.country, "
+					+ "e.group, "
+					+ "e.contractId, "
+					+ "e.exhibitionArea, "
+					+ "e.exhibitor_type,"
+					+ "e.isLogin)"
+					+ "from TExhibitor e ");
+			return q.list();
+		}
+	}
 }
