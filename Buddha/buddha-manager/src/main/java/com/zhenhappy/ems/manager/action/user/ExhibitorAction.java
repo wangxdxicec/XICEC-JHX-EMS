@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.zhenhappy.ems.entity.TTag;
 import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.service.managerrole.TUserInfoService;
 import com.zhenhappy.util.Page;
 import org.apache.commons.io.FileUtils;
@@ -332,6 +333,35 @@ public class ExhibitorAction extends BaseAction {
         	}
         } catch (Exception e) {
             log.error("modify exhibitors group error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 批量修改展位号
+     * @param eids
+     * @param boothValue
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyExhibitorsBooth", method = RequestMethod.POST)
+    public BaseResponse modifyExhibitorsBooth(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                              @RequestParam("boothValue") String boothValue,
+                                              @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            if(eids != null && StringUtil.isNotEmpty(boothValue)){
+                if(exhibitorManagerService.queryBoothByBoothNum(boothValue) != null) {
+                    response.setResultCode(1);
+                    response.setDescription("展位号重复");
+                } else{
+                    exhibitorManagerService.modifyExhibitorsBooth(eids, boothValue, principle.getAdmin().getId());
+                }
+            }
+        } catch (Exception e) {
+            log.error("modify exhibitors booth error.", e);
             response.setResultCode(1);
         }
         return response;

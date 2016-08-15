@@ -21,41 +21,50 @@
     </style>
 </head>
 <body>
-<!-- 客商visa列表 -->
-<table id="tvisa" data-options="url:'${base}/user/queryTVisaByPage',
+<!-- 展商visa列表 -->
+<div id="tvisatabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+	<div title="展商visa列表" style="padding:5px">
+		<table id="tvisa" data-options="url:'${base}/user/queryTVisaByPage',
          						   loadMsg: '数据加载中......',
 						           singleSelect:false,	//只能当行选择：关闭
 						           fit:true,
 						           fitColumns:true,
+						           idField:'id',
 								   toolbar:'#tvisaBar',
 						           rownumbers: 'true',
 						           pagination:'true',
 						           pageSize:'20'">
-	<thead>
-		<tr>
-			<th data-options="field:'ck',checkbox:true"></th>
-			<th data-options="field: 'passportName', width: $(this).width() / 8">
-				<span id="sPassportName" class="sortable">姓名</span><br/>
-				<input id="tvisaPassportName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'nationality', width: $(this).width() / 8">
-				<span id="sNationality" class="sortable">国籍</span><br/>
-				<input id="tvisaNationality" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'companyName', width: $(this).width() / 8">
-				<span id="sCompanyName" class="sortable">公司</span><br/>
-				<input id="tvisaCompanyName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'createTime', formatter:formatDatebox, width: $(this).width() / 8">
-				<span id="screateTime" class="sortable">登记时间</span><br/>
-				<input id="createTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'id', formatter:formatImage, width: $(this).width() / 5">
-				查看护照图片<br/>
-			</th>
-		</tr>
-	</thead>
-</table>
+			<thead>
+			<tr>
+				<th data-options="field:'ck',checkbox:true"></th>
+				<th data-options="field: 'passportName', width: $(this).width() / 6">
+					<span id="sPassportName" class="sortable">姓名</span><br/>
+					<input id="tvisaPassportName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'nationality', width: $(this).width() / 6">
+					<span id="sNationality" class="sortable">国籍</span><br/>
+					<input id="tvisaNationality" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'companyName', width: $(this).width() / 6">
+					<span id="sCompanyName" class="sortable">公司</span><br/>
+					<input id="tvisaCompanyName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'updateTime', formatter:formatDatebox, width: $(this).width() / 6">
+					<span id="supdateTime" class="sortable">更新时间</span><br/>
+					<input id="updateTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'id', formatter:formatImage, width: $(this).width() / 6">
+					查看护照图片<br/>
+				</th>
+				<th data-options="field: 'createTime', formatter:formatDatebox, width: $(this).width() / 6">
+					<span id="screateTime" class="sortable">登记时间</span><br/>
+					<input id="createTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+			</tr>
+			</thead>
+		</table>
+	</div>
+</div>
 <!-- 导出所选展商到Excel -->
 <form id="exportTVisasToExcel" action="${base}/user/exportTVisasToExcel" method="post">
 	<div id="vidParm1"></div>
@@ -172,14 +181,32 @@
 	}
 
 	function filter(){
-		$('#tvisa').datagrid('reload', {
+		var filterParm = "?";
+		if(document.getElementById("tvisaPassportName").value != ""){
+			filterParm += '&passportName=' + document.getElementById("tvisaPassportName").value;
+		}
+		if(document.getElementById("tvisaNationality").value != ""){
+			filterParm += '&nationality=' + document.getElementById("tvisaNationality").value;
+		}
+		if(document.getElementById("tvisaCompanyName").value != ""){
+			filterParm += '&companyName=' + document.getElementById("tvisaCompanyName").value;
+		}
+		if(document.getElementById("updateTime").value != ""){
+			filterParm += '&updateTime=' + document.getElementById("updateTime").value;
+		}
+		if(document.getElementById("createTime").value != ""){
+			filterParm += '&createTime=' + document.getElementById("createTime").value;
+		}
+		$('#tvisa').datagrid('options').url = '${base}/user/queryTVisaByPage' + filterParm;
+		$('#tvisa').datagrid('reload');
+		/*$('#tvisa').datagrid('reload', {
 			passportName : document.getElementById("tvisaPassportName").value,
 			nationality : document.getElementById("tvisaNationality").value,
 			companyName : document.getElementById("tvisaCompanyName").value,
 			createTime : document.getElementById("createTime").value,
 			sort : sort,
 			order : order
-		});
+		});*/
 	}
 //----------------------------------------------------自定义函数结束--------------------------------------------------------//
     $(document).ready(function () {
@@ -219,7 +246,20 @@
 					}
 				}
 // 					alert(checkedItems);
-	        }
+	        },
+			onDblClickRow: function (index, field, value) {
+				if(field.passportName != ""){
+					if (!$("#tvisatabs").tabs("exists", field.passportName)) {
+						$('#tvisatabs').tabs('add', {
+							title: field.passportName,
+							content:'<iframe frameborder="0" src="'+ "${base}/user/tVisaDetailInfo?id=" + field.id+'" style="width:100%;height:99%;"></iframe>',
+							closable: true
+						});
+					} else {
+						$("#tvisatabs").tabs("select", field.passportName);
+					}
+				}
+			}
         }).datagrid('getPager').pagination({
             pageSize: 20,//每页显示的记录条数，默认为10
             pageList: [10,20,30,40,50],//可以设置每页记录条数的列表
@@ -234,7 +274,7 @@
 			return -1;
 		}
 		$("#tvisa").data().datagrid.dc.view.find("div.datagrid-header td .sortable").click(function(){
-			sort = $(this).prop("id").substr(1, $(this).prop("id").length);
+			//sort = $(this).prop("id").substr(1, $(this).prop("id").length);
 			if(order == "asc"){
 				$('#tvisa').datagrid('reload', {
 					passportName : document.getElementById("tvisaPassportName").value,
@@ -262,6 +302,7 @@
 					passportName : document.getElementById("tvisaPassportName").value,
 					nationality : document.getElementById("tvisaNationality").value,
 					companyName : document.getElementById("tvisaCompanyName").value,
+					updateTime : document.getElementById("updateTime").value,
 					createTime : document.getElementById("createTime").value,
 					sort : sort,
 					order : order

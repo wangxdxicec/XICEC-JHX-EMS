@@ -75,6 +75,7 @@ public class QueryVisitorInfo {
 	private String rabbi;
 	private Integer sendEmailFlag;
 	private Integer sendMsgFlag;
+	private Integer customerType;
 
 	/** default constructor */
 	public QueryVisitorInfo() {
@@ -133,7 +134,8 @@ public class QueryVisitorInfo {
 	}
 
 	public QueryVisitorInfo(Integer id, String firstName, String company, String city, String address,
-							String mobile, String tel, String email, Date createTime, Integer isGovement, String isRabbi, boolean isMobile) {
+							String mobile, String tel, String email, Date createTime, Integer isGovement, String isRabbi,
+							boolean isMobile, Integer customertype) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -146,10 +148,12 @@ public class QueryVisitorInfo {
 		this.govement = isGovement;
 		this.rabbi = isRabbi;
 		this.isMobile = isMobile;
+		this.customerType = customertype;
 	}
 
 	public QueryVisitorInfo(Integer id, String firstName, String company, Integer country, String address,
-							String mobile, String tel, String email, Date createTime, Integer isGovement, String isRabbi, boolean isMobile) {
+							String mobile, String tel, String email, Date createTime, Integer isGovement, String isRabbi,
+							boolean isMobile, Integer customertype) {
 		this.id = id;
 		this.firstName = firstName;
 		this.company = company;
@@ -162,6 +166,7 @@ public class QueryVisitorInfo {
 		this.govement = isGovement;
 		this.rabbi = isRabbi;
 		this.isMobile = isMobile;
+		this.customerType = customertype;
 	}
 
 	public QueryVisitorInfo(Integer id, String email, String checkingNo,
@@ -180,7 +185,7 @@ public class QueryVisitorInfo {
 						String tmp_Knowfrom,String tmp_KnowfromOthers,String tmp_V_name1,String tmp_V_title1,
 						String tmp_V_position1,String tmp_V_contact1,String tmp_V_name2,String tmp_V_title2,
 						String tmp_V_position2,String tmp_V_contact2,String tmp_V_name3,String tmp_V_title3,
-						String tmp_V_position3,String tmp_V_contact3,String guid, Integer isGovement, String isRabbi) {
+						String tmp_V_position3,String tmp_V_contact3,String guid, Integer isGovement, String isRabbi, Integer customertype) {
 		this.id = id;
 		this.email = email;
 		this.checkingNo = checkingNo;
@@ -248,6 +253,7 @@ public class QueryVisitorInfo {
 		this.guid = guid;
 		this.govement = isGovement;
 		this.rabbi = isRabbi;
+		this.customerType = customertype;
 	}
 
 	public Integer getId() {
@@ -800,5 +806,13 @@ public class QueryVisitorInfo {
 
 	public void setSendMsgFlag(Integer sendMsgFlag) {
 		this.sendMsgFlag = sendMsgFlag;
+	}
+
+	public Integer getCustomerType() {
+		return customerType;
+	}
+
+	public void setCustomerType(Integer customerType) {
+		this.customerType = customerType;
 	}
 }

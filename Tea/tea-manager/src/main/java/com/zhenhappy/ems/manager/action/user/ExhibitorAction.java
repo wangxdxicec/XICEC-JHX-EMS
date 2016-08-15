@@ -10,11 +10,23 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.JoinerDao;
-import com.zhenhappy.ems.entity.TExhibitorJoiner;
+import com.zhenhappy.ems.dao.TeaExhibitorDao;
+import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.manager.dao.ExhibitorBoothDao;
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.entity.THistoryExhibitorInfo;
+import com.zhenhappy.ems.manager.service.HistoryExhibitorInfoService;
+import com.zhenhappy.ems.manager.service.JoinerManagerService;
+import com.zhenhappy.util.Page;
+import net.sf.json.JSONArray;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,18 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.zhenhappy.ems.dto.BaseResponse;
-import com.zhenhappy.ems.entity.TExhibitor;
-import com.zhenhappy.ems.entity.WCountry;
-import com.zhenhappy.ems.entity.WProvince;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.ActiveExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.AddExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.BindBoothRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorInfoRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
@@ -57,6 +58,7 @@ import com.zhenhappy.system.SystemConfig;
 public class ExhibitorAction extends BaseAction {
 
 	private static Logger log = Logger.getLogger(ExhibitorAction.class);
+    private List<THistoryExhibitorInfo> existExhibitorInfo = new ArrayList<THistoryExhibitorInfo>();
 
     @Autowired
     private ExhibitorManagerService exhibitorManagerService;
@@ -75,8 +77,26 @@ public class ExhibitorAction extends BaseAction {
     @Autowired
     private JoinerDao joinerDao;
     @Autowired
-    private ExhibitorDao exhibitorDao;
-    
+    private TeaExhibitorDao exhibitorDao;
+    @Autowired
+    private JoinerManagerService joinerManagerService;
+    @Autowired
+    private HistoryExhibitorInfoService historyExhibitorInfoService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ExhibitorBoothDao exhibitorBoothDao;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
+
+    public HibernateTemplate getHibernateTemplate() {
+        return hibernateTemplate;
+    }
+
+    public void setHibernateTemplate(HibernateTemplate hibernateTemplate) {
+        this.hibernateTemplate = hibernateTemplate;
+    }
+
     /**
      * 分页查询展商列表
      * @param request
@@ -101,8 +121,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "queryExhibitors")
-    public List<TExhibitor> queryExhibitors() {
-    	List<TExhibitor> response = new ArrayList<TExhibitor>();
+    public List<TeaExhibitor> queryExhibitors() {
+    	List<TeaExhibitor> response = new ArrayList<TeaExhibitor>();
         try {
         	response = exhibitorManagerService.loadAllExhibitors();
         } catch (Exception e) {
@@ -118,10 +138,10 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "queryExhibitorByEid")
-    public TExhibitor queryExhibitorByEid(@RequestParam("eid") Integer eid) {
-    	TExhibitor response = new TExhibitor();
+    public TeaExhibitor queryExhibitorByEid(@RequestParam("eid") Integer eid) {
+        TeaExhibitor response = new TeaExhibitor();
         try {
-        	response = exhibitorManagerService.loadExhibitorByEid(eid);
+        	response = exhibitorManagerService.loadTeaExhibitorByEid(eid);
         } catch (Exception e) {
             log.error("query exhibitors error.", e);
         }
@@ -132,7 +152,7 @@ public class ExhibitorAction extends BaseAction {
     public ModelAndView directToCompany(@RequestParam("eid") Integer eid) {
         ModelAndView modelAndView = new ModelAndView("/user/exhibitor/company");
         modelAndView.addObject("eid", eid);
-        modelAndView.addObject("exhibitor", exhibitorManagerService.loadExhibitorByEid(eid));
+        modelAndView.addObject("exhibitor", exhibitorManagerService.loadTeaExhibitorByEid(eid));
         modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(eid));
         modelAndView.addObject("booth", exhibitorManagerService.queryBoothByEid(eid));
         modelAndView.addObject("currentTerm", exhibitorManagerService.queryCurrentTermNumber());
@@ -531,6 +551,147 @@ public class ExhibitorAction extends BaseAction {
     }
 
     /**
+     * 分页查询归档资料
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryHistoryExhibitorInfosByPage")
+    public QueryHistoryExhibitorResponse queryHistoryExhibitorInfosByPage(@ModelAttribute QueryHistoryInfoRequest request) {
+        QueryHistoryExhibitorResponse response = new QueryHistoryExhibitorResponse();
+        try {
+            response = exhibitorManagerService.queryHistoryExhibitorInfosByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 一键归档所有展商信息
+     * @param principle
+     */
+    @ResponseBody
+    @RequestMapping(value = "oneKeyBackupAllExhibitorInfo", method = RequestMethod.POST)
+    public BackupHistoryExhibitoryInfoResponse oneKeyBackupAllExhibitorInfo(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BackupHistoryExhibitoryInfoResponse backupHistoryExhibitoryInfoResponse = new BackupHistoryExhibitoryInfoResponse();
+        List<String> report = new ArrayList<String>();
+        existExhibitorInfo = new ArrayList<THistoryExhibitorInfo>();
+        try {
+            List<TeaExhibitor> tExhibitorList = exhibitorManagerService.loadAllExhibitorsByLogType(0);
+            String tea_Fair_Show_Begin_Date = jdbcTemplate.queryForObject("select tea_Fair_Show_Begin_Date from [t_exhibitor_teafair_time] ", new Object[]{}, String.class);
+            for(TeaExhibitor exhibitor:tExhibitorList){
+                TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(exhibitor.getEid());
+                //根据公司名，展位号和展会时间，判断是否有重复归档
+                if(exhibitorInfo != null){
+                    String boothNumber = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
+                    List<THistoryExhibitorInfo> tHistoryExhibitorInfoList = historyExhibitorInfoService.isExistTHistoryExhibitorInfo(exhibitorInfo.getCompany(),
+                            exhibitorInfo.getCompanyEn(), boothNumber, tea_Fair_Show_Begin_Date);
+                    if(tHistoryExhibitorInfoList != null && tHistoryExhibitorInfoList.size()>0){
+                        for(THistoryExhibitorInfo tHistoryExhibitorInfo:tHistoryExhibitorInfoList){
+                            existExhibitorInfo.add(tHistoryExhibitorInfo);
+                        }
+                    }
+                    THistoryExhibitorInfo tHistoryExhibitorInfo = new THistoryExhibitorInfo();
+                    tHistoryExhibitorInfo.setBooth_number(boothNumber);
+                    tHistoryExhibitorInfo.setCompany_zh(exhibitorInfo.getCompany());
+                    tHistoryExhibitorInfo.setCompany_en(exhibitorInfo.getCompanyEn());
+                    tHistoryExhibitorInfo.setTelphone(exhibitorInfo.getPhone());
+                    tHistoryExhibitorInfo.setFax(exhibitorInfo.getFax());
+                    tHistoryExhibitorInfo.setEmail(exhibitorInfo.getEmail());
+                    tHistoryExhibitorInfo.setWebsite(exhibitorInfo.getWebsite());
+                    tHistoryExhibitorInfo.setAddress_zh(exhibitorInfo.getAddress());
+                    tHistoryExhibitorInfo.setAddress_en(exhibitorInfo.getAddressEn());
+                    tHistoryExhibitorInfo.setZipcode(exhibitorInfo.getZipcode());
+                    tHistoryExhibitorInfo.setProduct_type(exhibitorManagerService.queryExhibitorClassByEinfoid(exhibitorInfo.getEinfoid()));
+                    tHistoryExhibitorInfo.setMain_product_zh(exhibitorInfo.getMainProduct());
+                    tHistoryExhibitorInfo.setMain_product_en(exhibitorInfo.getMainProductEn());
+                    tHistoryExhibitorInfo.setCompany_profile(exhibitorInfo.getMark());
+                    TInvoiceApply invoice = invoiceService.getByEid(exhibitorInfo.getEid());
+                    if(invoice != null){
+                        if(StringUtils.isNotEmpty(invoice.getInvoiceNo())) {
+                            tHistoryExhibitorInfo.setLocal_tax(invoice.getInvoiceNo());
+                        }else{
+                            tHistoryExhibitorInfo.setLocal_tax("");
+                        }
+                        if(StringUtils.isNotEmpty(invoice.getTitle())){
+                            tHistoryExhibitorInfo.setInvoice_head(invoice.getTitle());
+                        }else{
+                            tHistoryExhibitorInfo.setInvoice_head("");
+                        }
+                    }else{
+                        tHistoryExhibitorInfo.setLocal_tax("");
+                        tHistoryExhibitorInfo.setInvoice_head("");
+                    }
+                    List<TExhibitorJoiner> exhibitorJoinerList = joinerManagerService.loadExhibitorAllJoinerByEid(exhibitorInfo.getEid());
+                    StringBuffer joinerNameBuf = new StringBuffer();
+                    StringBuffer joinerTelphoneBuf = new StringBuffer();
+                    StringBuffer joinerEmailBuf = new StringBuffer();
+                    for(TExhibitorJoiner tExhibitorJoiner:exhibitorJoinerList){
+                        if (StringUtils.isNotEmpty(tExhibitorJoiner.getName())) {
+                            joinerNameBuf.append(tExhibitorJoiner.getName() + "&");
+                        }
+                        if (StringUtils.isNotEmpty(tExhibitorJoiner.getTelphone())) {
+                            joinerTelphoneBuf.append(tExhibitorJoiner.getTelphone() + "&");
+                        }
+                        if (StringUtils.isNotEmpty(tExhibitorJoiner.getEmail())) {
+                            joinerEmailBuf.append(tExhibitorJoiner.getEmail() + "&");
+                        }
+                    }
+                    if(StringUtils.isNotEmpty(joinerNameBuf.toString())){
+                        int lastNameIndex = joinerNameBuf.lastIndexOf("&");
+                        String joinerNameValue = joinerNameBuf.substring(0,lastNameIndex);
+                        tHistoryExhibitorInfo.setJoiner_name(joinerNameValue);
+                    }
+                    if(StringUtils.isNotEmpty(joinerTelphoneBuf.toString())){
+                        int lastTelphoneIndex = joinerTelphoneBuf.lastIndexOf("&");
+                        String joinerTelphoneValue = joinerTelphoneBuf.substring(0,lastTelphoneIndex);
+                        tHistoryExhibitorInfo.setJoiner_telphone(joinerTelphoneValue);
+                    }
+                    if(StringUtils.isNotEmpty(joinerEmailBuf.toString())){
+                        int lastEmailIndex = joinerEmailBuf.lastIndexOf("&");
+                        String joinerEmailValue = joinerEmailBuf.substring(0,lastEmailIndex);
+                        tHistoryExhibitorInfo.setJoiner_email(joinerEmailValue);
+                    }
+
+                    tHistoryExhibitorInfo.setFair_year(tea_Fair_Show_Begin_Date);
+                    tHistoryExhibitorInfo.setField_back1("");
+                    tHistoryExhibitorInfo.setField_back2("");
+                    tHistoryExhibitorInfo.setField_back3("");
+                    tHistoryExhibitorInfo.setField_back4("");
+                    historyExhibitorInfoService.saveTHistoryExhibitorInfo(tHistoryExhibitorInfo);
+                    if(tHistoryExhibitorInfo.getId() != null && tHistoryExhibitorInfo.getId() >0){
+                        List<TExhibitorBooth> booths = getHibernateTemplate().find("from TExhibitorBooth where eid = ?", new Object[]{exhibitor.getEid()});
+                        for(TExhibitorBooth tExhibitorBooth:booths){
+                            tExhibitorBooth.setBoothNumber("");
+                            exhibitorBoothDao.update(tExhibitorBooth);
+                        }
+                    }
+                }
+            }
+            if(existExhibitorInfo != null && existExhibitorInfo.size()>0){
+                StringBuffer resultBuffer = new StringBuffer();
+                resultBuffer.append("有" + existExhibitorInfo.size() + "条记录，数据库中已经归档！");
+                List resultArray = new ArrayList();
+                resultArray.add(resultBuffer.toString());
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
+                JSONArray resultJson = JSONArray.fromObject(resultArray);
+                backupHistoryExhibitoryInfoResponse.setResult(resultJson.toString());
+                JSONArray isExistDataJsonArray = JSONArray.fromObject(existExhibitorInfo);
+                backupHistoryExhibitoryInfoResponse.setIsExistData(isExistDataJsonArray.toString());
+                backupHistoryExhibitoryInfoResponse.setResultCode(1);
+            }
+        } catch (Exception e) {
+            backupHistoryExhibitoryInfoResponse.setResultCode(1);
+            log.error("reset exhibitor list to backup error.", e);
+        }
+        return backupHistoryExhibitoryInfoResponse;
+    }
+
+    /**
      * 重置展商列表为初始状态
      * @param principle
      */
@@ -539,8 +700,8 @@ public class ExhibitorAction extends BaseAction {
     public BaseResponse resetExhibitorToDefault(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
-            List<TExhibitor> tExhibitorList = exhibitorManagerService.loadAllExhibitors();
-            for(TExhibitor tExhibitor:tExhibitorList){
+            List<TeaExhibitor> tExhibitorList = exhibitorManagerService.loadAllExhibitors();
+            for(TeaExhibitor tExhibitor:tExhibitorList){
                 tExhibitor.setIsLogout(1);
                 exhibitorDao.update(tExhibitor);
             }
@@ -591,5 +752,27 @@ public class ExhibitorAction extends BaseAction {
             e.printStackTrace();
         }
         return response;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "showExistExhibitorInfo")
+    public QueryHistoryExhibitorResponse showExistExhibitorInfo(@ModelAttribute QueryHistoryInfoRequest request) {
+        QueryHistoryExhibitorResponse response = new QueryHistoryExhibitorResponse();
+        Page page = new Page();
+        page.setPageSize(request.getRows());
+        page.setPageIndex(request.getPage());
+        response.setResultCode(0);
+        response.setRows(existExhibitorInfo);
+        response.setTotal(existExhibitorInfo.size());
+        //response.setTotal(page.getTotalCount());
+        return response;
+    }
+
+    @RequestMapping(value = "historyExhibitorDetailInfo")
+    public ModelAndView directToHistoryExhibitorDetailInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/managerreset/historyExhibitoryDetailInfo");
+        modelAndView.addObject("id", id);
+        modelAndView.addObject("historyExhibitorDetailInfo", historyExhibitorInfoService.loadHistoryExhibitorInfoById(id));
+        return modelAndView;
     }
 }

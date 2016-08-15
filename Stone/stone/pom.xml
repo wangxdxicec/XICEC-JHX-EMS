@@ -102,6 +102,7 @@
 			<version>1.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<resources>
 			<resource>

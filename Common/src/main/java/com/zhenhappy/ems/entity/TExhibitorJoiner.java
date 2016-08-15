@@ -22,6 +22,7 @@ public class TExhibitorJoiner {
 	private Date createTime;
 	private Integer admin;
 	private Date adminUpdateTime;
+	private Integer isNew;//表示是否为本届新增加的参展人员。注：归档后，要重置为往届，即值为0或NULL
 
 	public TExhibitorJoiner() {
 		super();
@@ -60,7 +61,7 @@ public class TExhibitorJoiner {
 	
 	public TExhibitorJoiner(Integer id, Integer eid, String name, String position,
 			String telphone, String email, Integer isDelete, Date createTime,
-			Integer admin, Date adminUpdateTime) {
+			Integer admin, Date adminUpdateTime, Integer isNew) {
 		super();
 		this.id = id;
 		this.eid = eid;
@@ -72,6 +73,7 @@ public class TExhibitorJoiner {
 		this.createTime = createTime;
 		this.admin = admin;
 		this.adminUpdateTime = adminUpdateTime;
+		this.isNew = isNew;
 	}
 
 	@Id
@@ -164,5 +166,14 @@ public class TExhibitorJoiner {
 
 	public void setAdminUpdateTime(Date adminUpdateTime) {
 		this.adminUpdateTime = adminUpdateTime;
+	}
+
+	@Column(name = "is_new")
+	public Integer getIsNew() {
+		return isNew;
+	}
+
+	public void setIsNew(Integer isNew) {
+		this.isNew = isNew;
 	}
 }

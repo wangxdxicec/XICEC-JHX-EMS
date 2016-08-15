@@ -53,32 +53,69 @@
                 </div>
                 <div class="panel-body" style="min-height: 400px">
 					<div class="alert alert-block">
-						<p><a href="#" onclick="javascript:$('#readBefore').toggle();"><b>Read Before Apply</b></a></p>
-						<ul id="readBefore">
-							<li>
-								Exhibitors are strongly advised to obtain VISA to China <b>before February 1, ${tExhibitorTime.stone_fair_begin_year}</b>.
-							</li>
-							<li>
-								Date of expiry on the <b>passport</b> should be after September, ${tExhibitorTime.stone_fair_end_year}.
-							</li>
-							<li>
-								The Official Invitation Letter is released by Xiamen Municipal Bureau of Commerce. It is <b>NOT a Visa</b>.
-							</li>
-							<li>
-								<p><b>Official Invitation Letter Application Procedure:</b></p>
-								<p>Consult the Chinese Embassy or Consulate nearest you for applying VISA to China.</p>
-								<p>If Official Invitation Letter is required in the application materials, do the follows:</p>
-								<p>1.	Click “Add” to choose a participant.</p>
-								<p>2.	Fill in the form and submit.</p>
-								<p>3.	Wait for the Invitation for 1 week. The scan of invitation will be sent by email.</p>
-							</li>
-							<li>
-								If the <b>original invitation</b> is required, express deliveries by DHL, TNT, FEDEX, UPS etc. are available if paid by consignee. Please send your express address to <a href="mailto:info@cxisf.com">info@cxisf.com</a>. The delivery time should be counted in your Visa application.
-							</li>
-							<li>
-								Any further question, please contact <a href="mailto:info@cxisf.com">info@cxisf.com</a>.
-							</li>
-						</ul>
+                        <#if rc.locale=="zh_CN">
+                            <p><a href="#" onclick="javascript:$('#readBefore').toggle();"><b>小贴士</b></a></p>
+                            <li>
+                                强烈建议参展商在<b>${tExhibitorTime.stone_fair_begin_year}年2月1日</b>之前取得入境签证。
+                            </li>
+                            <li>
+                                <b>护照</b>到期日期应在${tExhibitorTime.stone_fair_begin_year}年9月份以后。
+                            </li>
+                            <li>
+                                厦门石材展的官方邀请函由厦门市商务局签发。请注意：<b>它不是签证</b>。
+                            </li>
+                            <li>
+                                <p><b>正式邀请函申请程序：</b></p>
+                                <p>请咨询您附近的中国大使馆或领事如何申请入境签证。</p>
+                                <p>如果申请材料需要正式邀请函：</p>
+                                <p>1．点击“添加”来选择一个参展人员。</p>
+                                <p>2．填写护照信息并提交。</p>
+                                <p>3．做好邀请函需要7天。邀请函扫描将通过电子邮件发送，请注意查收。</p>
+                            </li>
+                            <li>
+                                如果需要<b>邀请函原件</b>，请提供DHL/TNT/UPS/联邦快递的到付账号、您的详细地址、联系方式到：<a href="mailto:info@cxisf.com">info@cxisf.com</a>。快递费将由收件人支付。请至少预留7天时间来邮寄。
+                            </li>
+                            <li>
+                                如有其它疑问，请联系<a href="mailto:info@cxisf.com">info@cxisf.com</a>。
+                            </li>
+                         <#else>
+                             <p><a href="#" onclick="javascript:$('#readBefore').toggle();"><b>Read Before Apply</b></a>
+                             </p>
+                             <ul id="readBefore">
+                                 <li>
+                                     Exhibitors are strongly advised to obtain VISA to China <b>before February 1,
+                                     ${tExhibitorTime.stone_fair_begin_year}</b>.
+                                 </li>
+                                 <li>
+                                     Date of expiry on the <b>passport</b> should be after October,
+                                     ${tExhibitorTime.stone_fair_begin_year}.
+                                 </li>
+                                 <li>
+                                     The Official Invitation Letter is released by Xiamen Municipal Bureau of Commerce.
+                                     It is <b>NOT a Visa</b>.
+                                 </li>
+                                 <li>
+                                     <p><b>Official Invitation Letter Application Procedure:</b></p>
+                                     <p>Consult the Chinese Embassy or Consulate nearest you for applying VISA to
+                                         China.</p>
+                                     <p>If Official Invitation Letter is required in the application materials, do the
+                                         follows:</p>
+                                     <p>1. Click “Add” to choose a participant.</p>
+                                     <p>2. Fill in the form and submit.</p>
+                                     <p>3. Wait for the Invitation for 1 week. The scan of invitation will be sent by
+                                         email.</p>
+                                 </li>
+                                 <li>
+                                     If the <b>original invitation</b> is required, express deliveries by DHL, TNT,
+                                     FEDEX, UPS etc. are available if paid by consignee. Please send your express
+                                     address to <a href="mailto:info@cxisf.com">info@cxisf.com</a>. The delivery time
+                                     should be counted in your Visa application.
+                                 </li>
+                                 <li>
+                                     Any further question, please contact <a href="mailto:info@cxisf.com">info@cxisf.com</a>.
+                                 </li>
+                             </ul>
+                        </#if>
 
 					</div>
                     <div style="float: right">
@@ -115,7 +152,7 @@
 		<h4 class="modal-title"><@spring.message "visa.select.joiner"/></h4>
 	</div>
 	<div class="modal-body">
-		<table class="table table-striped" style="margin-top: 10px">
+		<table class="table table-striped" id="addJoinerTable" style="margin-top: 10px">
 			<thead>
 			<tr style="text-align: center">
 				<th style="width: 100px"><@spring.message "info.joiner.participants.table.select"/></th>
@@ -130,32 +167,32 @@
 		<button id="NextBtn" type="button" class="btn btn-success"><@spring.message "visa.addFromJoiner.next"/></button>
 	</div>
 </div>
-<div class="modal hide fade" id="joiner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal hide fade" style="height: 492px" id="joiner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
-    <div class="modal-header">
+    <div class="modal-header" style="height: 31px; padding: 0px;">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><@spring.message "visa.addDialog.title"/></h4>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="max-height:430px; height: 430px; padding: 0px">
         <form class="form-horizontal" id="addJoinerForm" method="post" enctype="multipart/form-data" action="${base}/user/visa/saveVisa" target="postIframe">
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.passportName"/></label>
-                <div class="controls">
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.passportName"/></label>
+                <div class="controls" style="margin-left: 240px">
                     <input type="text" name="passportName" placeholder='<@spring.message "visa.label.passportName"/>'>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.gender"/></label>
-                <div class="controls">
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.gender"/></label>
+                <div class="controls" style="margin-left: 240px">
                     <select name="gender">
                         <option value="1"><@spring.message "gender.male"/></option>
                         <option value="2"><@spring.message "gender.female"/></option>
                     </select>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.nationality"/></label>
-                <div class="controls">
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.nationality"/></label>
+                <div class="controls" style="margin-left: 240px">
                     <select name="nationality">
                         <option value="">-- select one --</option>
                         <option value="afghan">Afghan</option>
@@ -353,68 +390,68 @@
                     </select>
                 </div>
             </div>
-			<div class="control-group">
-				<label class="control-label"><@spring.message "visa.label.passportNo"/></label>
-				<div class="controls">
+			<div class="control-group" style="margin-bottom: 3px">
+				<label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.passportNo"/></label>
+				<div class="controls" style="margin-left: 240px">
 					<input type="text" name="passportNo" placeholder='<@spring.message "visa.label.passportNo"/>'>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label"><@spring.message "visa.label.expDate"/></label>
-				<div class="controls">
+			<div class="control-group" style="margin-bottom: 3px">
+				<label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.expDate"/></label>
+				<div class="controls" style="margin-left: 240px">
 					<!--<input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" name="expireDate" placeholder='<@spring.message "visa.label.expDate"/>'>-->
                     <input type="text" class="Wdate" onClick="WdatePicker()" name="expireDate" placeholder='<@spring.message "visa.label.expDate"/>'>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label"><@spring.message "visa.label.birth"/></label>
-				<div class="controls">
+			<div class="control-group" style="margin-bottom: 3px">
+				<label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.birth"/></label>
+				<div class="controls" style="margin-left: 240px">
 					<!--<input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" name="birthDay" placeholder='<@spring.message "visa.label.birth"/>'>-->
                     <input type="text" class="Wdate" onClick="WdatePicker()" name="birthDay" placeholder='<@spring.message "visa.label.birth"/>'>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label"><@spring.message "visa.label.whereApplyVisa"/></label>
+			<div class="control-group" style="margin-bottom: 3px">
+				<label class="control-label" style="width: 240px"><@spring.message "visa.label.whereApplyVisa"/></label>
 			</div>
-			<div class="control-group">
-				<label class="control-label"><@spring.message "visa.label.address"/></label>
-				<div class="controls">
-					<input type="text" name="address" placeholder='<@spring.message "visa.label.address"/>'>
-				</div>
-			</div>
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.applyFor"/></label>
-                <div class="controls">
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.applyFor"/></label>
+                <div class="controls" style="margin-left: 240px">
                     <input type="text" name="applyFor" placeholder='<@spring.message "visa.label.applyFor"/>'>
                 </div>
             </div>
-			<div class="control-group">
-				<label class="control-label"><@spring.message "visa.label.DurationStay"/></label>
+			<div class="control-group" style="margin-bottom: 3px">
+				<label class="control-label" style="width: 240px"><@spring.message "visa.label.DurationStay"/></label>
 			</div>
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.from"/></label>
-                <div class="controls">
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.from"/></label>
+                <div class="controls" style="margin-left: 240px">
                     <!--<input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" name="fromDate" placeholder='<@spring.message "visa.label.from"/>'>-->
                     <input type="text" class="Wdate" onClick="WdatePicker()" name="fromDate" placeholder='<@spring.message "visa.label.from"/>'>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.to"/></label>
-                <div class="controls">
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.to"/></label>
+                <div class="controls" style="margin-left: 240px">
                     <!--<input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" name="toDate" placeholder='<@spring.message "visa.label.to"/>'>-->
                     <input type="text" class="Wdate" onClick="WdatePicker()" name="toDate" placeholder='<@spring.message "visa.label.to"/>'>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label"><@spring.message "visa.label.passportPage"/></label>
-                <div class="controls">
-                    <input type="file" name="passportPageFile" placeholder='<@spring.message "visa.label.passportPage"/>'>
+            <div class="control-group" style="margin-bottom: 3px">
+                <label class="control-label" style="width: 240px; margin-right: 25px"><@spring.message "visa.label.passportPage"/><font color="#dc143c">
+                    <#if rc.locale=="zh_CN">
+                        点击选择文件，提交新的护照首页(1M以下, 只支持jpg或者jpeg格式)
+                    <#else>
+                        Click "Choose file" to upload a new passport copy
+                    </#if>
+                </font></label>
+                <div class="controls" style="margin-left: 240px">
+                    <input type="file" name="passportPageFile" id="passportPageFile" placeholder='<@spring.message "visa.label.passportPage"/>' onchange="change()">
                 </div>
             </div>
        		<input type="hidden" name="joinerId" id="addJoinerId">
         </form>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer" style="height: 31px; padding: 0px">
         <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "info.joiner.participants.add.close"/></button>
         <button type="button" class="btn btn-primary" id="saveJoiner"><@spring.message "info.joiner.participants.add.save"/></button>
     </div>
@@ -663,12 +700,12 @@
 			<div class="control-group">
 				<label class="control-label"><@spring.message "visa.label.whereApplyVisa"/></label>
 			</div>
-			<div class="control-group">
+			<!--<div class="control-group">
 				<label class="control-label"><@spring.message "visa.label.address"/></label>
 				<div class="controls">
 					<input type="text" name="address" placeholder='<@spring.message "visa.label.address"/>'>
 				</div>
-			</div>
+			</div>-->
             <div class="control-group">
                 <label class="control-label"><@spring.message "visa.label.applyFor"/></label>
                 <div class="controls">
@@ -693,8 +730,14 @@
             <div class="control-group">
                 <label class="control-label"><@spring.message "visa.label.passportPage"/></label>
                 <div class="controls">
-                    <a id="viewPassportPage" target="_blank" href="">Click to view has been uploaded picture</a>
-                    <input type="file" name="passportPageFile" placeholder='<@spring.message "visa.label.passportPage"/>'>
+                    <a id="viewPassportPage" target="_blank" href="">
+                        <#if rc.locale=="zh_CN">
+                            点击这里查看以前提交的护照首页
+                        <#else>
+                            Click here to view the old passport copy <font color="#dc143c">(less than 1M, only support jpg or jpeg file)</font>
+                        </#if>
+                    </a>
+                    <input type="file" name="passportPageFile" id="passportPageFile" placeholder='<@spring.message "visa.label.passportPage"/>' onchange="change()">
                 </div>
             </div>
             <!--<div class="control-group">-->
@@ -745,7 +788,7 @@
 		$.ajax({
 			url: "${base}/user/queryJoiners",
 			type: "POST",
-			data: {},
+			data: {"flag": "1"},
 			dataType: "json",
 			success: function (data) {
 				if (data.resultCode == 0) {
@@ -761,7 +804,7 @@
 						var joiner = joiners[i];
 						//console.log(joiner);
 						$("#addFromJoiners").append( '<tr joiner="' + i + '">'
-														+'<td><input type="radio" name="selectJoinerId" value="' + joiner.id + '" /></td>'
+														+'<td><input type="checkbox" id="selectJoinerId" name="selectJoinerId" value="' + joiner.id + '" /></td>'
 														+'<td>' + joiner.name + '</td>'
 													+'</tr>');
 					}
@@ -806,7 +849,7 @@
         };
     })(jQuery);
     function loadData() {
-        $("#datas").html("")
+        $("#datas").html("");
         $.ajax({
             url: "${base}/user/visa/queryVisas",
             type: "POST",
@@ -814,16 +857,23 @@
             dataType: "json",
             success: function (data) {
                 if (data.resultCode == 0) {
-					joinerVisas = data.rows;
+                    joiners = data.rows;
 					console.log(data);
-					for (var i in joinerVisas) {
-						var visa = joinerVisas[i];
+					for (var i in joiners) {
+						var visa = joiners[i];
 						if (visa.status == 1) var status = "Submitted";
-						else if (visa.status == 0) var status = "Cancelled";
+						else if (visa.status == 0 || visa.status == 2) var status = "Unsubmitted";
 						else var status = "null";
                         var html = '<tr joiner="' + visa.id + '"><td>' + visa.passportName + '</td>'
                                 +'<td>' + visa.passportNo + '</td>'
 								+'<td>' + status + '</td>';
+                        if(visa.status == 0){
+                            html +='<td><button name="updateJoiner" type="button" value="' + visa.joinerId + '" class="btn btn-success" style="margin-right: 10px"><@spring.message "info.joiner.participants.table.active"/></button>';
+                        }else if(visa.status == 2){
+                            html +='<td><button name="activeJoiner" type="button" value="' + visa.joinerId + '" class="btn btn-success" style="margin-right: 10px"><@spring.message "info.joiner.participants.table.apply"/></button>';
+                        }else{
+                            html +='<td><button name="activeJoiner" type="button" class="btn btn-success" disabled="true" style="margin-right: 10px"><@spring.message "info.joiner.participants.table.active"/></button>';
+                        }
 							html +='<td><button name="deleteJoiner" type="button" class="btn btn-success" style="margin-right: 10px"><@spring.message "info.joiner.participants.table.cancel"/></button>';
 							html+='</td>'+'</tr>';
                         $("#datas").append(html);
@@ -875,6 +925,48 @@
 //                        $("#modifyJoinerDialog").modal();
 //                    });
 
+                    $("[name='activeJoiner']").click(function () {
+                        //alert("--value: " + this.value);
+                        $("#addJoinerId").val(this.value);
+                        $("#joiner").modal();
+                        $('#addFromJoiner').modal('hide');
+                    });
+
+                    $("[name='updateJoiner']").click(function () {
+                        $("#addJoinerId").val(this.value);
+                        $.ajax({
+                            url: "${base}/user/visa/queryVisaByJoinerID",
+                            type: "post",
+                            dataType: "json",
+                            data: {"joinerid":this.value},
+                            success: function (visa) {
+                                if (visa) {
+                                    //$($("#addJoinerForm [name='passportName']")[0]).value = visa.passportName;
+                                    $("[name='passportName']").val(visa.passportName);
+                                    $("[name='gender']").val(visa.gender);
+                                    $("[name='nationality']").val(visa.nationality);
+                                    $("[name='passportNo']").val(visa.passportNo);
+                                    $("[name='expireDate']").val(visa.expDate);
+                                    $("[name='expireDate']").val(visa.expDate);
+                                    $("[name='birthDay']").val(visa.birth);
+                                    $("[name='applyFor']").val(visa.applyFor);
+                                    $("[name='fromDate']").val(visa.from);
+                                    $("[name='toDate']").val(visa.to);
+                                    if(visa.passportPage!=''){
+                                        $("#viewPassportPage").attr("href","${base}/user/visa/visaZhengjian?type=1&vid="+visa.id);
+                                    }else{
+                                        $("#viewPassportPage").attr("href","javascript:void(0)");
+                                    }
+                                    //$("#joiner").modal();
+                                    $("#modifyJoinerDialog").modal();
+                                    //$('#addFromJoiner').modal('hide');
+                                } else {
+                                    alert(words.operateFailure);
+                                }
+                            }
+                        });
+                    });
+
                     $("[name='deleteJoiner']").click(function () {
 //						alert(parseInt($(this).parent().parent().attr("joiner")));
                         vid = parseInt($(this).parent().parent().attr("joiner"));
@@ -890,6 +982,7 @@
                                         $("#confirm").modal('hide');
                                         alert(words.operateSuccess);
                                         loadData();
+                                        window.location.href = window.location.href;
                                     } else {
                                         alert(words.operateFailure);
                                     }
@@ -920,13 +1013,41 @@
 //			alert($('input[name="selectJoinerId"]:checked').val());
 			$("#addJoinerForm input").val("");
 			if(typeof $('input[name="selectJoinerId"]:checked').val() === 'undefined') {
-				alert("请先选择参展人员,再添加VISA,IE9以下的用户可能无法显示出参赞人员列表");
+                <#if rc.locale=="zh_CN">
+				    alert("请先选择参展人员,再添加VISA.");
+                <#else>
+                    alert("Please fill in the participant list first. Exhibitor's Visa invitation is only provided to the participant.");
+                </#if>
 				return;
 			}else{
-				console.log($('input[name="selectJoinerId"]:checked').val());
+                    //alert("--joinerid: " + $('input[name="selectJoinerId"]:checked').val());
+                var obj = document.getElementsByName('selectJoinerId');  //选择所有name="aihao"的对象，返回数组
+                //取到对象数组后，我们来循环检测它是不是被选中
+                var chk = new Array();
+                for(var i=0; i<obj.length; i++){
+                    if(obj[i].checked){
+                        chk.push(obj[i].value);
+                    }
+                }
+				/*console.log($('input[name="selectJoinerId"]:checked').val());
 				$("#addJoinerId").val($('input[name="selectJoinerId"]:checked').val());
 				$("#joiner").modal();
-				$('#addFromJoiner').modal('hide');
+				$('#addFromJoiner').modal('hide');*/
+                $.ajax({
+                    url: "${base}/user/visa/addJoinerToVisa",
+                    type: "post",
+                    dataType: "json",
+                    data: {"joinerid": chk},
+                    traditional: true,
+                    success: function (data) {
+                        if (data.resultCode == 0) {
+                            $('#addFromJoiner').modal('hide');
+                            loadData();
+                        } else {
+                            $.messager.alert('错误', '系统错误');
+                        }
+                    }
+                });
 			}
 		});
 
@@ -934,47 +1055,87 @@
             var data = $("#addJoinerForm").serializeJson();
 			console.log(data);
             if(data.passportName==''){
-                alert("Passport Name can not be empty！");
+                <#if rc.locale=="zh_CN">
+                    alert("户照姓名不能为空！");
+                <#else>
+                    alert("Passport Name can not be empty！");
+                </#if>
                 return;
             }
             if(data.nationality==''){
+                <#if rc.locale=="zh_CN">
+                alert("国籍不能为空！");
+                <#else>
                 alert("Nationality can not be empty！");
+                </#if>
                 return;
             }
             if(data.passportNo==''){
+                <#if rc.locale=="zh_CN">
+                alert("户照ID不能为空！");
+                <#else>
                 alert("Password No. can not be empty！");
+                </#if>
                 return;
             }
             if(data.expireDate==''){
+                <#if rc.locale=="zh_CN">
+                alert("户照到期时间不能为空！");
+                <#else>
                 alert("Expire date can not be empty！");
+                </#if>
                 return;
             }
             if(data.birthDay==''){
+                <#if rc.locale=="zh_CN">
+                alert("出生时间不能为空！");
+                <#else>
                 alert("Birth day can not be empty！");
+                </#if>
                 return;
             }
-			if(data.address==''){
+			/*if(data.address==''){
 				alert("Address can not be empty！");
 				return;
-			}
+			}*/
             if(data.applyFor==''){
+                <#if rc.locale=="zh_CN">
+                alert("大使馆地址不能为空！");
+                <#else>
                 alert("Chinese Embassy/Consulate of (City) can not be empty！");
+                </#if>
                 return;
             }
             if(data.fromDate==''){
+                <#if rc.locale=="zh_CN">
+                alert("在华停留开始时间不能为空！");
+                <#else>
                 alert("Start date can not be empty！");
+                </#if>
                 return;
             }
             if((new Date(data.expireDate) - new Date(data.fromDate))<86400000*60){
-                alert("Expire date must be greater than start date for 60 days ")
+                <#if rc.locale=="zh_CN">
+                alert("户照过期时间必须比在华停留开始时间大60天");
+                <#else>
+                alert("Expire date must be greater than start date for 60 days ");
+                </#if>
                 return;
             }
             if(data.toDate==''){
+                <#if rc.locale=="zh_CN">
+                alert("在华停留结束时间不能为空！");
+                <#else>
                 alert("End date can not be empty！");
+                </#if>
                 return;
             }
             if($($("#addJoinerForm [name='passportPageFile']")[0]).val()==''){
+                <#if rc.locale=="zh_CN">
+                alert("请上传您的户照！");
+                <#else>
                 alert("Please upload your Passport Page (JPEG)");
+                </#if>
                 return;
             }
             $("#addJoinerForm").submit();
@@ -984,52 +1145,114 @@
             var data = $("#modifyJoinerForm").serializeJson();
 			console.log(data);
             if(data.passportName==''){
+                <#if rc.locale=="zh_CN">
+                alert("户照姓名不能为空！");
+                <#else>
                 alert("Passport Name can not be empty！");
+                </#if>
                 return;
             }
             if(data.nationality==''){
+                <#if rc.locale=="zh_CN">
+                alert("国籍不能为空！");
+                <#else>
                 alert("Nationality can not be empty！");
+                </#if>
                 return;
             }
             if(data.passportNo==''){
+                <#if rc.locale=="zh_CN">
+                alert("户照ID不能为空！");
+                <#else>
                 alert("Password No. can not be empty！");
+                </#if>
                 return;
             }
             if(data.expireDate==''){
+                <#if rc.locale=="zh_CN">
+                alert("户照到期时间不能为空！");
+                <#else>
                 alert("Expire date can not be empty！");
+                </#if>
                 return;
             }
             if(data.birthDay==''){
+                <#if rc.locale=="zh_CN">
+                alert("出生时间不能为空！");
+                <#else>
                 alert("Birth day can not be empty！");
+                </#if>
                 return;
             }
-			if(data.address==''){
+			/*if(data.address==''){
 				alert("Address can not be empty！");
 				return;
-			}
+			}*/
             if(data.applyFor==''){
+                <#if rc.locale=="zh_CN">
+                alert("大使馆地址不能为空！");
+                <#else>
                 alert("Chinese Embassy/Consulate of (City) can not be empty！");
+                </#if>
                 return;
             }
             if(data.fromDate==''){
+                <#if rc.locale=="zh_CN">
+                alert("在华停留开始时间不能为空！");
+                <#else>
                 alert("Start date can not be empty！");
+                </#if>
                 return;
             }
             if((new Date(data.expireDate) - new Date(data.fromDate))<86400000*60){
-                alert("Expire date must be greater than start date for 60 days ")
+                <#if rc.locale=="zh_CN">
+                alert("户照过期时间必须比在华停留开始时间大60天");
+                <#else>
+                alert("Expire date must be greater than start date for 60 days ");
+                </#if>
                 return;
             }
             if(data.toDate==''){
+                <#if rc.locale=="zh_CN">
+                alert("在华停留结束时间不能为空！");
+                <#else>
                 alert("End date can not be empty！");
+                </#if>
                 return;
             }
             if($($("#modifyJoinerForm [name='passportPageFile']")[0]).val()==''){
+                <#if rc.locale=="zh_CN">
+                alert("请上传您的户照！");
+                <#else>
                 alert("Please upload your Passport Page (JPEG)");
+                </#if>
                 return;
             }
             $("#modifyJoinerForm").submit();
         });
     });
+
+    function change() {
+        var file = document.getElementById("passportPageFile");
+        var ext = file.value.substring(file.value.lastIndexOf(".")+1).toLowerCase();
+        // gif在IE浏览器暂时无法显示
+        if(ext!='jpg' && ext!='jpeg'){
+            <#if rc.locale=="zh_CN">
+                alert("文件必须为jpg或jpeg格式图片！");
+            <#else>
+                alert("It only support jpeg or jpg file,thang you！");
+            </#if>
+            return;
+        }
+        if((file.offsetWidth * file.offsetHeight)/100 > 1024*1024){
+            <#if rc.locale=="zh_CN">
+            alert("文件大小超过1M，请重新选择图片！");
+            <#else>
+            alert("The file must less than 1M,thang you！");
+            </#if>
+            return;
+        }
+    }
 </script>
 <!--/.container-->
 <script src="${resource}/bootstrap/b2/js/bootstrap.js"></script>

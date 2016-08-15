@@ -55,9 +55,9 @@
                     2、如您需要开具增值税专用发票，请<a href="${base}/resource/invoice_template.xlsx" style="color:#FF0000; font-weight:bolder">点击此处下载表格</a>，详细填写内容并盖章，确认后回传我司；如有不实，责任由贵司承担。</br>
                     3、请于2017年1月31日前提交。如有不详敬请咨询：0592-5959616
                 </#if>-->
-                1、如您仅需开具增值税普通发票，只需提供汇款公司名或个人姓名和税号即可。若以现金或个人名义汇款，需填写发票抬头；若以公司账户汇款，则组委会以汇款名称为准开具发票。</br>
+                1、如您仅需开具增值税普通发票，只需提供汇款公司名或个人姓名和税号即可。若以现金或个人名义汇款，需填写发票抬头；若以公司账户汇款，则组委会以汇款名称为准开具发票。<font style="color:red;font-weight:bold">注：个人汇款的企业只能开增值税普通发票，不能开具增值税专用发票。</font></br>
                 2、如您需要开具增值税专用发票，请<a href="${base}/resource/invoice_template.xlsx" style="color:#FF0000; font-weight:bolder">点击此处下载表格</a>，详细填写内容并盖章，确认后回传我司；如有不实，责任由贵司承担。</br>
-                3、请于2017年1月31日前提交。如有不详敬请咨询：0592-5959616
+                3、请于${tExhibitorTime.exhibitor_Info_Submit_Deadline_Zh}前提交。如有不详敬请咨询：0592-5959616
             </div>
             <form class="form-horizontal" id="invoiceForm">
                 <div class="control-group">
@@ -75,10 +75,10 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="invoiceNo">地税税号</label>
+                    <label class="control-label" for="invoiceNo">税号</label>
 
                     <div class="controls">
-                        <input type="text" value="${invoice.invoiceNo!""}" name="invoiceNo" id="invoiceNo" placeholder="地税税号">
+                        <input type="text" value="${invoice.invoiceNo!""}" name="invoiceNo" id="invoiceNo" placeholder="税号">
                     </div>
                 </div>
                 <div class="control-group">

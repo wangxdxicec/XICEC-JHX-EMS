@@ -67,7 +67,11 @@
 	<tr>
 		<td style="width: 240px">重置展商列表为初始状态：</td>
 		<td>
-			<a href="#" d="resetExhibitorDefault" class="btn blue" style="width: 240px">重置展商列表为初始状态</a>
+			<a href="#" id="resetExhibitorDefault" class="btn blue" style="width: 240px">重置展商列表为初始状态</a>
+		</td>
+		<td style="width: 240px">重置展商Visa列表为初始状态：</td>
+		<td>
+			<a href="#" id="resetExhibitorVisaDefault" class="btn blue" style="width: 240px">重置展商Visa列表为初始状态</a>
 		</td>
 	</tr>
 </table>
@@ -105,6 +109,32 @@
 
 	$('#resetJoinersList').click(function(){
 		$.messager.confirm('确认重置','你确定要重置所有展商对应的参展人员？',function(r){
+			if (r){
+				$("#bg,.loading").show();
+				$.ajax({
+					url: "${base}/user/resetJoinerListToDefault",
+					type: "post",
+					dataType: "json",
+					traditional: true,
+					success: function (data) {
+						$("#bg,.loading").hide();
+						if (data.resultCode == 0) {
+							$.messager.show({
+								title: '成功',
+								msg: '重置成功',
+								timeout: 5000,
+								showType: 'slide'
+							});
+						} else {
+							$.messager.alert('错误', '系统错误');
+						}
+					}
+				});
+			}
+		});
+	});
+	$('#resetExhibitorVisaDefault').click(function(){
+		$.messager.confirm('确认重置','你确定要重置展商Visa列表为初始状态？',function(r){
 			if (r){
 				$("#bg,.loading").show();
 				$.ajax({

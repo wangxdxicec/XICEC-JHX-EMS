@@ -105,14 +105,14 @@
                     <label for="inputCompanyZh" class="control-label" required><@spring.message "info.update.exhibition.company_zh"/></label>
 
                     <div class="controls">
-                        <textarea disabled="disabled" catValidate="required:true" name="company" class="form-control" id="inputCompanyZh">${updateInfo.company!''}</textarea>
+                        <textarea readonly="readonly" catValidate="required:true" name="company" class="form-control" id="inputCompanyZh">${updateInfo.company!''}</textarea>
                     </div>
                 </div>
                 <div class="control-group">
                     <label for="inputCompanyEn" class="control-label"><@spring.message "info.update.exhibition.company_en"/></label>
 
                     <div class="controls">
-                        <textarea disabled="disabled" catValidate="required:true" name="companyEn" class="form-control" id="inputCompanyEn">${updateInfo.companyEn!''}</textarea><span style="font-weight: bolder;color: red;padding-left: 5px;">* In case of errors, please contact us.</span>
+                        <textarea readonly="readonly" catValidate="required:true" name="companyEn" class="form-control" id="inputCompanyEn">${updateInfo.companyEn!''}</textarea><span style="font-weight: bolder;color: red;padding-left: 5px;">* In case of errors, please contact us.</span>
                     </div>
                 </div>
 				<div class="control-group">

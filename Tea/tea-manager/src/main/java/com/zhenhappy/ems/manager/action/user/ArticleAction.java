@@ -92,7 +92,8 @@ public class ArticleAction extends BaseAction {
     
     @ResponseBody
     @RequestMapping(value = "modifyArticle", method = RequestMethod.POST)
-    public BaseResponse modifyArticle(@ModelAttribute ModifyArticleRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse modifyArticle(@ModelAttribute ModifyArticleRequest request,
+                                      @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
             TArticle article = articleService.query(request.getId());

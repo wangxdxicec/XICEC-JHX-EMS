@@ -5,6 +5,7 @@ import java.util.List;
 import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.entity.TExhibitor;
 
+import com.zhenhappy.ems.entity.TeaExhibitor;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
@@ -84,7 +85,7 @@ public class ExhibitorImp extends BaseDaoHibernateImp<TExhibitor> implements Exh
 		}else if(type == 2){
 			typeCondition = " and exhibitor_type = 2";
 		} else if(type == 0){
-			typeCondition = " (and exhibitor_type = '' or exhibitor_type is null)";
+			typeCondition = " and (e.exhibitor_type = '' or e.exhibitor_type is null)";
 		}
 		Query q = this.getSession().createQuery("select new TExhibitor(e.eid, "
 				+ "e.username, "

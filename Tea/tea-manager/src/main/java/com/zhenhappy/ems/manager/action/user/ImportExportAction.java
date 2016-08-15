@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
+import com.zhenhappy.ems.entity.TeaExhibitor;
 import com.zhenhappy.ems.manager.dto.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -36,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;
@@ -78,7 +78,7 @@ public class ImportExportAction extends BaseAction {
     public ModelAndView exportExhibitorsToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
                                                 @RequestParam(value = "type") Integer type) {
         Map model = new HashMap();
-        List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
+        List<TeaExhibitor> exhibitors = new ArrayList<TeaExhibitor>();
         if(eids[0] == -1)
             exhibitors = exhibitorManagerService.loadAllExhibitorsByLogType(type);
         else
@@ -103,10 +103,10 @@ public class ImportExportAction extends BaseAction {
     @RequestMapping("/exportBoothInfoToExcel_2")
     public ModelAndView exportBoothInfoToExcel_2() {
         Map model = new HashMap();
-        List<TExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitors();
+        List<TeaExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitors();
         List<QueryExhibitorInfoT> queryExhibitorInfos = new ArrayList<QueryExhibitorInfoT>();
         if(exhibitors != null){
-            for(TExhibitor exhibitor:exhibitors){
+            for(TeaExhibitor exhibitor:exhibitors){
                 String boothNum = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
                 TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
                 String boothNums[] = boothNum.split(",");
@@ -161,10 +161,10 @@ public class ImportExportAction extends BaseAction {
     public ModelAndView exportBoothInfoToExcel_1() {
         Map model = new HashMap();
         // 构造数据
-        List<TExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitors();
+        List<TeaExhibitor> exhibitors = exhibitorManagerService.loadAllExhibitors();
         List<QueryExhibitorInfoT> queryExhibitorInfos = new ArrayList<QueryExhibitorInfoT>();
         if(exhibitors != null){
-            for(TExhibitor exhibitor:exhibitors){
+            for(TeaExhibitor exhibitor:exhibitors){
                 String boothNum = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
                 TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
                 String boothNums[] = boothNum.split(",");
@@ -238,7 +238,7 @@ public class ImportExportAction extends BaseAction {
     public ModelAndView exportExhibitorJoinersToExcel(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
                                                       @RequestParam(value = "type") Integer type) {
         Map model = new HashMap();
-        List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
+        List<TeaExhibitor> exhibitors = new ArrayList<TeaExhibitor>();
         if(eids[0] == -1)
             exhibitors = exhibitorManagerService.loadAllExhibitorsByLogType(type);
         else
@@ -260,6 +260,7 @@ public class ImportExportAction extends BaseAction {
     /**
      * 导入展商账号
      * @param file
+     * @param isCurrent 表示是否为今年参展的展商
      * @param request
      * @return
      * @throws IOException
@@ -267,9 +268,16 @@ public class ImportExportAction extends BaseAction {
     @ResponseBody
     @RequestMapping(value="upload/exhibitors", method={RequestMethod.POST,RequestMethod.GET})
     public List<String> importExhibitors(@RequestParam MultipartFile file,
+                                         @RequestParam Integer isCurrent,
+                                         @RequestParam String country,
+                                         @RequestParam String province,
+                                         @RequestParam String area,
+                                         @RequestParam String group,
+                                         @RequestParam String tag,
+                                         @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle,
 										 @ModelAttribute ImportExhibitorsRequest request) throws IOException {
     	File importFile = upload(file, "\\import", FilenameUtils.getBaseName(file.getOriginalFilename()) + new Date().getTime() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
-        List<String> report = importExportService.importExhibitor(importFile, request);
+        List<String> report = importExportService.importExhibitor(importFile, request, isCurrent, country, province, area, group, tag, principle);
 //        FileUtils.deleteQuietly(importFile); // 删除临时文件
         return report;
     }
@@ -304,14 +312,14 @@ public class ImportExportAction extends BaseAction {
     }
 
     private void exportTransactions(Integer[] eids, Integer type, String dirPath) throws Exception {
-    	List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
+    	List<TeaExhibitor> exhibitors = new ArrayList<TeaExhibitor>();
     	if(eids == null){
     		exhibitors = exhibitorManagerService.loadAllExhibitorsByLogType(type);
     	}else{
     		exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
     	}
     	if(exhibitors.size() > 0){
-    		for(TExhibitor exhibitor:exhibitors){
+    		for(TeaExhibitor exhibitor:exhibitors){
         		TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(exhibitor.getEid());
         		String boothNumber = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
         		Transaction transaction = new Transaction();

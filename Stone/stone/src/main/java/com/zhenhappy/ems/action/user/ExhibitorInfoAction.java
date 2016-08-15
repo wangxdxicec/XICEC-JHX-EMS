@@ -158,7 +158,7 @@ public class ExhibitorInfoAction extends BaseAction {
                     }
                 }*/
                 modelAndView.setViewName("/user/info/update_en");
-                modelAndView.addObject("alert", "Add Success");
+                modelAndView.addObject("alert", "Add Successfully!");
             } else {
                 modelAndView.addObject("alert", "添加成功");
                 modelAndView.setViewName("/user/info/update");

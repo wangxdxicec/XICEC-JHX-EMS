@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.zhenhappy.ems.entity.TContact;
-import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
+import com.zhenhappy.ems.entity.TeaExhibitor;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 
 import jxl.*;   
@@ -39,7 +39,7 @@ public class ReadXLS {
 //                System.out.println();
 //            }
             for (int j = 1; j < sheet.getRows(); j++) {
-            	TExhibitor exhibitor = new TExhibitor();
+				TeaExhibitor exhibitor = new TeaExhibitor();
             	TExhibitorBooth booth = new TExhibitorBooth();
             	TExhibitorInfo exhibitorInfo = new TExhibitorInfo();
             	List<TContact> contacts = new ArrayList<TContact>();

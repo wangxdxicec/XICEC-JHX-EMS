@@ -2,8 +2,9 @@ package com.zhenhappy.ems.action.user;
 
 import com.zhenhappy.ems.action.BaseAction;
 import com.zhenhappy.ems.dto.*;
-import com.zhenhappy.ems.entity.TProductImage;
-import com.zhenhappy.ems.entity.TVisa;
+import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.service.ExhibitorService;
+import com.zhenhappy.ems.service.JoinerService;
 import com.zhenhappy.ems.service.VisaService;
 import com.zhenhappy.ems.sys.Constants;
 import com.zhenhappy.system.SystemConfig;
@@ -43,6 +44,12 @@ public class VisaAction extends BaseAction {
 
     @Autowired
     private SystemConfig systemConfig;
+
+    @Autowired
+    private JoinerService joinerService;
+
+    @Autowired
+    private ExhibitorService exhibitorService;
 
     @RequestMapping(value = "/visa/list")
     public String visaList() {
@@ -85,7 +92,7 @@ public class VisaAction extends BaseAction {
         for(int j=0 ; j<field.length ; j++){ //遍历所有属性
             String name = field[j].getName(); //获取属性的名字
 
-            System.out.println("attribute name:"+name);
+            //System.out.println("attribute name:"+name);
             name = name.substring(0,1).toUpperCase()+name.substring(1); //将属性的首字符大写，方便构造get，set方法
             String type = field[j].getGenericType().toString(); //获取属性的类型
             if(type.equals("class java.lang.String")){ //如果type是类类型，则前面包含"class "，后面跟类名
@@ -108,42 +115,69 @@ public class VisaAction extends BaseAction {
     }
 
     @RequestMapping(value = "/visa/saveVisa", method = RequestMethod.POST)
-    public ModelAndView saveVisa(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle, @ModelAttribute SaveVisaInfoRequest visa, @RequestParam(value = "license", required = false) MultipartFile license, @RequestParam(value = "passportPageFile", required = false) MultipartFile passportPage) {
+    public ModelAndView saveVisa(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle,
+                                 @ModelAttribute SaveVisaInfoRequest visa,
+                                 @RequestParam(value = "license", required = false) MultipartFile license,
+                                 @RequestParam(value = "passportPageFile", required = false) MultipartFile passportPage) {
         ModelAndView modelAndView = new ModelAndView("/user/callback");
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            if(StringUtils.isNotEmpty(visa.getBirthDay())){
-                visa.setBirth(sdf.parse(visa.getBirthDay()));
-            }
-            if(StringUtils.isNotEmpty(visa.getFromDate())) {
-                visa.setFrom(sdf.parse(visa.getFromDate()));
-            }
-            if(StringUtils.isNotEmpty(visa.getToDate())) {
-                visa.setTo(sdf.parse(visa.getToDate()));
-            }
-            if(StringUtils.isNotEmpty(visa.getExpireDate())) {
-                visa.setExpDate(sdf.parse(visa.getExpireDate()));
-            }
-//            if (license != null) {
-//                String fileName = systemConfig.getVal(Constants.appendix_directory)+"/" + new Date().getTime() + "." + FilenameUtils.getExtension(license.getOriginalFilename());
-//                if (license != null && license.getSize() != 0) {
-//                    FileUtils.copyInputStreamToFile(license.getInputStream(), new File(fileName));
-//                    visa.setBusinessLicense(fileName);
-//                }
-//            }
-            if (passportPage != null) {
-                String fileName = systemConfig.getVal(Constants.appendix_directory)+"/" + new Date().getTime() + "." + FilenameUtils.getExtension(passportPage.getOriginalFilename());
-                if (passportPage != null && passportPage.getSize() != 0) {
-                    FileUtils.copyInputStreamToFile(passportPage.getInputStream(), new File(fileName));
-                    visa.setPassportPage(fileName);
+            if(visa.getJoinerId() != null){
+                TVisa temp = visaService.queryVisasByJoinerId(visa.getJoinerId());
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                if(StringUtils.isNotEmpty(visa.getBirthDay())){
+                    temp.setBirth(sdf.parse(visa.getBirthDay()));
                 }
+                if(StringUtils.isNotEmpty(visa.getExpireDate())){
+                    temp.setExpDate(sdf.parse(visa.getExpireDate()));
+                }
+                if(StringUtils.isNotEmpty(visa.getFromDate())) {
+                    temp.setFrom(sdf.parse(visa.getFromDate()));
+                }
+                if(StringUtils.isNotEmpty(visa.getToDate())) {
+                    temp.setTo(sdf.parse(visa.getToDate()));
+                }
+                if(StringUtils.isNotEmpty(visa.getPassportName())) {
+                    temp.setPassportName(visa.getPassportName());
+                }
+                if(visa.getGender() != null) {
+                    temp.setGender(visa.getGender());
+                }
+                if(StringUtils.isNotEmpty(visa.getNationality())) {
+                    temp.setNationality(visa.getNationality());
+                }
+                if(StringUtils.isNotEmpty(visa.getPassportNo())) {
+                    temp.setPassportNo(visa.getPassportNo());
+                }
+                if(StringUtils.isNotEmpty(visa.getApplyFor())) {
+                    temp.setApplyFor(visa.getApplyFor());
+                }
+                if (passportPage != null) {
+                    String fileName = systemConfig.getVal(Constants.appendix_directory)+"/" + new Date().getTime() + "." + FilenameUtils.getExtension(passportPage.getOriginalFilename());
+                    if (passportPage != null && passportPage.getSize() != 0) {
+                        FileUtils.copyInputStreamToFile(passportPage.getInputStream(), new File(fileName));
+                        temp.setPassportPage(fileName);
+                    }
+                }
+                temp.setUpdateTime(new Date());
+                if(principle.getExhibitor() != null){
+                    temp.setEid(principle.getExhibitor().getEid());
+                    TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(principle.getExhibitor().getEid());
+                    if(principle.getExhibitor().getCountry() != 44){
+                        temp.setCompanyName(exhibitorInfo.getCompanyEn());
+                    }else{
+                        temp.setCompanyName(exhibitorInfo.getCompany());
+                    }
+                    temp.setCompanyWebsite(exhibitorInfo.getWebsite());
+                    temp.setAddress(exhibitorInfo.getAddress());
+                    temp.setEmail(exhibitorInfo.getEmail());
+                    temp.setTel(exhibitorInfo.getPhone());
+                }
+                temp.setStatus(1);
+                visaService.saveOrUpdate(temp);
+                //visaService.deleteByEidAndJoinerId(principle.getExhibitor().getEid(), visa.getJoinerId());
+                modelAndView.addObject("method", "addSuccess");
             }
-            visa.setEid(principle.getExhibitor().getEid());
-			visa.setStatus(1);
-            TVisa temp = new TVisa();
-            BeanUtils.copyProperties(visa,temp);
-            visaService.saveOrUpdate(temp);
-            modelAndView.addObject("method", "addSuccess");
         } catch (Exception e) {
             log.error("add visa error",e);
             modelAndView.addObject("method", "addFailure");
@@ -152,11 +186,61 @@ public class VisaAction extends BaseAction {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/visa/addJoinerToVisa", method = RequestMethod.POST)
+    public BaseResponse addJoinerToVisa(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle,
+                                        @RequestParam(value = "joinerid", defaultValue = "") Integer[] joinerids) {
+        BaseResponse baseResponse = new BaseResponse();
+        try {
+            List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByIds(joinerids);
+            for(TExhibitorJoiner joiner:joiners){
+                joiner.setIsDelete(0);
+                joinerService.saveOrUpdate(joiner);
+
+                TVisa visa = visaService.queryVisasByJoinerId(joiner.getId());
+                if(visa != null){
+                    visa.setPassportName(joiner.getName());
+                    visa.setEid(principle.getExhibitor().getEid());
+                    visa.setJoinerId(joiner.getId());
+                    if(joiner.getIsNew() != null && joiner.getIsNew() == 1) {
+                        visa.setStatus(2);
+                    }else{
+                        visa.setStatus(0);
+                    }
+                    visaService.saveOrUpdate(visa);
+                }else{
+                    visa = new TVisa();
+                    visa.setPassportName(joiner.getName());
+                    visa.setEid(principle.getExhibitor().getEid());
+                    visa.setJoinerId(joiner.getId());
+                    visa.setStatus(2);
+                    visaService.saveOrUpdate(visa);
+                }
+            }
+            baseResponse.setResultCode(0);
+        } catch (Exception e) {
+            log.error("add joiner to visa error",e);
+            baseResponse.setResultCode(1);
+        }
+        return baseResponse;
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/visa/delete",method = RequestMethod.POST)
-    public BaseResponse deleteVisa(@RequestParam(value = "vid") Integer vid,@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle){
+    public BaseResponse deleteVisa(@RequestParam(value = "vid") Integer vid,
+                                   @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle){
         BaseResponse response = new BaseResponse();
         try{
+            TVisa tVisa = visaService.queryByVid(vid);
             visaService.delete(principle.getExhibitor().getEid(),vid);
+            if(tVisa != null){
+                Integer[] ids = new Integer[1];
+                ids[0] = tVisa.getJoinerId();
+                List<TExhibitorJoiner> tExhibitorJoinerList = joinerService.queryAllJoinersByIds(ids);
+                for(TExhibitorJoiner tExhibitorJoiner:tExhibitorJoinerList){
+                    tExhibitorJoiner.setIsDelete(1);
+                    joinerService.saveOrUpdate(tExhibitorJoiner);
+                }
+            }
             response.setResultCode(0);
         }catch (Exception e){
             log.error("delete visa error.",e);
@@ -187,5 +271,18 @@ public class VisaAction extends BaseAction {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @RequestMapping(value = "/visa/queryVisaByJoinerID")
+    @ResponseBody
+    public TVisa queryVisaByJoinerID(@RequestParam("joinerid") Integer joinerid,
+                                     @ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+        TVisa visa = new TVisa();
+        try {
+            visa = visaService.queryVisasByJoinerId(joinerid);
+        } catch (Exception e) {
+            log.error("query visas error.", e);
+        }
+        return visa;
     }
 }

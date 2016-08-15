@@ -17,15 +17,22 @@ public class JoinerDaoImp extends BaseDaoHibernateImp<TExhibitorJoiner> implemen
 
 	@Override
 	public List<TExhibitorJoiner> loadJoinersByJIds(Integer[] jids) {
-		Query q = this.getSession().createQuery("select new TExhibitorJoiner(j.id, j.eid, j.name, j.position, j.telphone, j.email, j.isDelete, j.createTime, j.admin, j.adminUpdateTime) from TExhibitorJoiner j where j.id in (:jids)");
+		Query q = this.getSession().createQuery("select new TExhibitorJoiner(j.id, j.eid, j.name, j.position, j.telphone, j.email, j.isDelete, j.createTime, j.admin, j.adminUpdateTime, j.isNew) from TExhibitorJoiner j where j.id in (:jids)");
 		q.setParameterList("jids", jids);
 		return q.list();
 	}
 	
 	@Override
 	public List<TExhibitorJoiner> loadJoinersByEids(Integer[] eids) {
-		Query q = this.getSession().createQuery("select new TExhibitorJoiner(j.id, j.eid, j.name, j.position, j.telphone, j.email, j.isDelete, j.createTime, j.admin, j.adminUpdateTime) from TExhibitorJoiner j where j.eid in (:eids)");
+		Query q = this.getSession().createQuery("select new TExhibitorJoiner(j.id, j.eid, j.name, j.position, j.telphone, j.email, j.isDelete, j.createTime, j.admin, j.adminUpdateTime, j.isNew) from TExhibitorJoiner j where j.eid in (:eids)");
 		q.setParameterList("eids", eids);
+		return q.list();
+	}
+
+	@Override
+	public List<TExhibitorJoiner> loadJoinersByIds(Integer[] ids) {
+		Query q = this.getSession().createQuery("select new TExhibitorJoiner(j.id, j.eid, j.name, j.position, j.telphone, j.email, j.isDelete, j.createTime, j.admin, j.adminUpdateTime, j.isNew) from TExhibitorJoiner j where j.id in (:ids)");
+		q.setParameterList("ids", ids);
 		return q.list();
 	}
 }

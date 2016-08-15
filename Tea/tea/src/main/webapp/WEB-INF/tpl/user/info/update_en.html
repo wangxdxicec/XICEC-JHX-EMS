@@ -94,7 +94,7 @@
                         <label for="inputEmail3" class="control-label" required><@spring.message "info.update.exhibition.company_zh"/></label>
 
                         <div class="controls">
-                            <input type="text" catValidate="required:false" name="company" value="${newinfo.company!""}"
+                            <input type="text" readonly="readonly" catValidate="required:false" name="company" value="${newinfo.company!""}"
                             class="form-control" placeholder='<@spring.message "info.update.exhibition.company_zh"/>'>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                         <label for="inputPassword3" class="control-label"><@spring.message "info.update.exhibition.company_en"/></label>
 
                         <div class="controls">
-                            <input type="text" catValidate="required:true" name="companyEn" value="${newinfo.companyEn!""}" class="form-control"
+                            <input type="text" readonly="readonly" catValidate="required:true" name="companyEn" value="${newinfo.companyEn!""}" class="form-control"
                             id="inputPassword3" placeholder='<@spring.message "info.update.exhibition.company_en"/>'><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>
                         </div>
                     </div>
@@ -182,7 +182,7 @@
 
                         <div class="controls">
                             <textarea name="mark" cols="40" rows="10" class="form-control" id="inputMark" style="margin: 0px; width: 350px; height: 150px;" placeholder='<@spring.message "info.update.exhibition.remark"/>' onkeydown="countCharEn('inputMark','counterZh');" onkeyup="countCharZh('inputMark','counterZh');">${newinfo.mark!""}</textarea>
-                            <span style="font-weight: bolder;color: red;padding-left: 5px;">*</span><span id="counterZh">You can input 200 words</span>
+                            <span style="font-weight: bolder;color: red;padding-left: 5px;">*</span><span id="counterZh">You can input 300 words</span>
                             <!--<div><@spring.message "info.description.max"/></div>-->
                         </div>
                     </div>
@@ -514,19 +514,22 @@
         });
     }
     function countCharEn(textareaName,spanName){
-        if(document.getElementById(textareaName).value.length > 200){
-            document.getElementById(spanName).innerHTML = "You input more than 200 words";
-            document.getElementById(textareaName).value = document.getElementById(textareaName).value.substring(0, 200);
+        if(document.getElementById(textareaName).value.length >= 300){
+            document.getElementById(spanName).innerHTML = "You input more than 300 words";
+            document.getElementById(textareaName).value = document.getElementById(textareaName).value.substring(0, 300);
             $("#counterZh").css("color","#e9322d");
             $("#inputMark").css("border-color","#e9322d");
         }else{
-            document.getElementById(spanName).innerHTML = "You can input " + (200 - document.getElementById(textareaName).value.length) + "words";
+            document.getElementById(spanName).innerHTML = "You can input " + (300 - document.getElementById(textareaName).value.length) + "words";
             $("#counterZh").css("color","#000");
             $("#inputMark").css("border-color","rgba(82, 168, 236, 0.8)");
         }
     }
     $(document).ready(function () {
-        //init
+        document.getElementById('counterZh').innerHTML = "You can input " + (300 - document.getElementById('inputMark').value.length) + "words";
+        $("#counterZh").css("color","#000");
+        $("#inputMark").css("border-color","rgba(82, 168, 236, 0.8)");
+
         $("a[sort='parent_0']").parent().addClass("active");
         $("div[sort='child_0']").removeClass("hide");
         //load exhibitor class info

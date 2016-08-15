@@ -110,13 +110,8 @@
             <map>
                 <entry key="base" value=""/>
                 <entry key="resource" value="/resource"/>
-                <!--&lt;!&ndash; 设置展商提交信息截止时间 &ndash;&gt;
-                <entry key="exhibitor_data_end_html" value="2016-12-20"></entry>
-                <entry key="exhibitor_data_end_html2016" value="2016"></entry>
-                <entry key="exhibitor_data_end_html2017" value="2017"></entry>-->
             </map>
         </property>
-
     </bean>
 
     <bean id="emailSenderPool" name="emailSenderPool"

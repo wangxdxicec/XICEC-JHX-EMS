@@ -1,9 +1,11 @@
 package com.zhenhappy.ems.manager.action.user;
 
+import com.zhenhappy.ems.dto.BaseResponse;
+import com.zhenhappy.ems.entity.TVisa;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.service.JoinerManagerService;
 import com.zhenhappy.ems.manager.service.TVisaManagerService;
-import com.zhenhappy.ems.manager.service.WVisaManagerService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -28,6 +30,8 @@ public class TVisaAction extends BaseAction {
 
     @Autowired
     private TVisaManagerService tVisaManagerService;
+	@Autowired
+	private JoinerManagerService joinerManagerService;
 
 	@RequestMapping(value = "tVisa")
 	public ModelAndView directToExhbitorVisa() {
@@ -75,5 +79,63 @@ public class TVisaAction extends BaseAction {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 根据ID获取具体的VISA信息
+	 *
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "tVisaDetailInfo")
+	public ModelAndView directToTVisaDetailInfo(@RequestParam("id") Integer id) {
+		ModelAndView modelAndView = new ModelAndView("user/visa/tvisaInfo");
+		modelAndView.addObject("id", id);
+		TVisa tVisa = tVisaManagerService.queryByVid(id);
+		modelAndView.addObject("visaInfo", tVisa);
+		if(tVisa != null && tVisa.getJoinerId() != null){
+			modelAndView.addObject("joinerInfo", joinerManagerService.loadExhibitorJoinerById(tVisa.getJoinerId()));
+		}
+		return modelAndView;
+	}
+
+	/**
+	 * 显示Logo
+	 * @param response
+	 * @param path
+	 */
+	@RequestMapping(value = "showTPassportPicture", method = RequestMethod.GET)
+	public void showTPassportPicture(HttpServletResponse response, @RequestParam("path") String path) {
+		try {
+			if (StringUtils.isNotEmpty(path)) {
+				File logo = new File("http://www.stonefair.org.cn/" + path);
+				if (!logo.exists())
+					return;
+				OutputStream outputStream = response.getOutputStream();
+				FileUtils.copyFile(logo, outputStream);
+				outputStream.close();
+				outputStream.flush();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 重置展商Visa列表为初始状态，即设置status=0
+	 * @param principle
+	 */
+	@ResponseBody
+	@RequestMapping(value = "resetExhibitorVisaToDefault", method = RequestMethod.POST)
+	public BaseResponse resetExhibitorVisaToDefault(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+		BaseResponse response = new BaseResponse();
+		try {
+			tVisaManagerService.resetExhibitorVisaToDefault();
+			response.setResultCode(0);
+		} catch (Exception e) {
+			response.setResultCode(1);
+			e.printStackTrace();
+		}
+		return response;
 	}
 }

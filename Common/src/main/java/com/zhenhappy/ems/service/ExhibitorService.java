@@ -2,6 +2,7 @@ package com.zhenhappy.ems.service;
 
 import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
+import com.zhenhappy.ems.dao.TeaExhibitorDao;
 import com.zhenhappy.ems.dto.ExhibitorBooth;
 import com.zhenhappy.ems.dto.ProductType;
 import com.zhenhappy.ems.dto.ProductTypeCheck;
@@ -26,6 +27,8 @@ public class ExhibitorService {
 
     @Autowired
     private ExhibitorDao exhibitorDao;
+    @Autowired
+    private TeaExhibitorDao teaExhibitorDao;
 
     @Autowired
     private HibernateTemplate hibernateTemplate;
@@ -152,6 +155,10 @@ public class ExhibitorService {
 
     public TExhibitor loadExhibitorByEid(Integer exhibitorId) {
         List<TExhibitor> exhibitors = exhibitorDao.queryByHql("from TExhibitor where eid = ?", new Object[]{exhibitorId});
+        return exhibitors.size() > 0 ? exhibitors.get(0) : null;
+    }
+    public TeaExhibitor loadTeaExhibitorByEid(Integer exhibitorId) {
+        List<TeaExhibitor> exhibitors = teaExhibitorDao.queryByHql("from TeaExhibitor where eid = ?", new Object[]{exhibitorId});
         return exhibitors.size() > 0 ? exhibitors.get(0) : null;
     }
 

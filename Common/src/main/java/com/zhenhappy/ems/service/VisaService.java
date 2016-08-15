@@ -29,7 +29,9 @@ public class VisaService {
 	private static Logger log = Logger.getLogger(VisaService.class);
 
     public List<TVisa> queryVisasByEid(Integer eid) {
-        List<TVisa> visas = hibernateTemplate.find("from TVisa where eid = ?", new Object[]{eid});
+        //select * from t_visa where joiner_id in(select id from t_exhibitor_joiner where eid in(1428) and is_delete=0);
+        List<TVisa> visas = hibernateTemplate.find("from TVisa where joinerId in ( select id from TExhibitorJoiner where eid in (?) and isDelete = 0 )", new Object[]{eid});
+        //List<TVisa> visas = hibernateTemplate.find("from TVisa where eid = ?", new Object[]{eid});
         return visas;
     }
 
@@ -104,8 +106,27 @@ public class VisaService {
         jdbcTemplate.update("delete from t_visa where eid = ? and id=?",new Object[]{eid,vid});
     }
 
+    @Transactional
+    public void deleteByEidAndJoinerId(Integer eid,Integer joinerid){
+        jdbcTemplate.update("delete from t_visa where eid = ? and joiner_id=?",new Object[]{eid,joinerid});
+    }
+
     public TVisa queryByVid(Integer vid){
         TVisa visa = hibernateTemplate.get(TVisa.class,vid);
         return visa;
+    }
+
+    public TVisa queryVisasByJoinerId(Integer joinerid) {
+        List<TVisa> visas = hibernateTemplate.find("from TVisa where joinerId in (?)", new Object[]{joinerid});
+        if(visas != null && visas.size()>0){
+            return visas.get(0);
+        }else{
+            return null;
+        }
+    }
+
+    @Transactional
+    public void resetExhibitorVisaToDefault(){
+        jdbcTemplate.update("update t_visa set status=0",new Object[]{});
     }
 }

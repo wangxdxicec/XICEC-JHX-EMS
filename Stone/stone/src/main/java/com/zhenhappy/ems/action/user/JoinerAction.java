@@ -5,7 +5,9 @@ import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.dto.Principle;
 import com.zhenhappy.ems.dto.QueryJoinersResponse;
 import com.zhenhappy.ems.entity.TExhibitorJoiner;
+import com.zhenhappy.ems.entity.TVisa;
 import com.zhenhappy.ems.service.JoinerService;
+import com.zhenhappy.ems.service.VisaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,9 @@ public class JoinerAction extends BaseAction {
     private JoinerService joinerService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private VisaService visaService;
 
     @RequestMapping(value = "queryJoiners", method = RequestMethod.GET)
     public String queryJoiners() {
@@ -62,8 +67,10 @@ public class JoinerAction extends BaseAction {
             });
             response.setJoiners(joiners);
             Integer area = jdbcTemplate.queryForInt("select exhibition_area from [t_exhibitor] where eid = ?",new Object[] { principle.getExhibitor().getEid() });
-            if(area != null) response.setArea(area);
-            else response.setArea(0);
+            if(area != null)
+                response.setArea(area);
+            else
+                response.setArea(0);
         } catch (Exception e) {
             response.setResultCode(1);
         }
@@ -82,13 +89,49 @@ public class JoinerAction extends BaseAction {
 
     @ResponseBody
     @RequestMapping(value = "saveJoiner", method = RequestMethod.POST)
-    public BaseResponse saveOrUpdate(@RequestBody TExhibitorJoiner joiner,@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+    public BaseResponse saveJoiner(@RequestBody TExhibitorJoiner joiner,@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         BaseResponse response = new BaseResponse();
         try {
             joiner.setEid(principle.getExhibitor().getEid());
             joiner.setCreateTime(new Date());
             joiner.setAdminUpdateTime(new Date());
+            joiner.setIsNew(1);
             joinerService.saveOrUpdate(joiner);
+
+            TVisa visa = new TVisa();
+            visa.setPassportName(joiner.getName());
+            visa.setEid(principle.getExhibitor().getEid());
+            visa.setJoinerId(joiner.getId());
+            //visa.setStatus(0);
+            visa.setStatus(2);
+            visa.setCreateTime(new Date());
+            visaService.saveOrUpdate(visa);
+
+            response.setResultCode(0);
+        } catch (Exception e) {
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "updateJoiner", method = RequestMethod.POST)
+    public BaseResponse updateJoiner(@RequestBody TExhibitorJoiner joiner,@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            joiner.setEid(principle.getExhibitor().getEid());
+            joiner.setAdminUpdateTime(new Date());
+            joinerService.saveOrUpdate(joiner);
+
+            TVisa visa = visaService.queryVisasByJoinerId(joiner.getId());
+            if(visa == null){
+                visa = new TVisa();
+                visa.setPassportName(joiner.getName());
+                visa.setEid(principle.getExhibitor().getEid());
+                visa.setJoinerId(joiner.getId());
+                visa.setStatus(2);
+                visaService.saveOrUpdate(visa);
+            }
             response.setResultCode(0);
         } catch (Exception e) {
             response.setResultCode(1);

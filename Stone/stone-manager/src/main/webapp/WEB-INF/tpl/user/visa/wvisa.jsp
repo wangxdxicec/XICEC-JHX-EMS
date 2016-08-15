@@ -22,43 +22,52 @@
 </head>
 <body>
 <!-- 客商visa列表 -->
-<table id="wvisa" data-options="url:'${base}/user/queryWVisaByPage',
+<div id="wvisatabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+	<div title="客商visa列表" style="padding:5px">
+		<table id="wvisa" class="easyui-tabs" data-options="url:'${base}/user/queryWVisaByPage',
          						   loadMsg: '数据加载中......',
 						           singleSelect:false,	//只能当行选择：关闭
 						           fit:true,
 						           fitColumns:true,
+						           idField:'id',
 								   toolbar:'#wvisaBar',
 						           rownumbers: 'true',
 						           pagination:'true',
 						           pageSize:'20'">
-	<thead>
-		<tr>
-			<th data-options="field:'ck',checkbox:true"></th>
-			<th data-options="field: 'fullPassportName', width: $(this).width() / 6">
-				<span id="sfullPassportName" class="sortable">姓名</span><br/>
-				<input id="wvisaFullPassportName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'nationality', width: $(this).width() / 6">
-				<span id="snationality" class="sortable">国籍</span><br/>
-				<input id="wvisaNationality" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'needPost', width: $(this).width() / 6">
-				<span id="sneedPost" class="sortable">是否邮寄</span><br/>
-				<input id="wvisaNeedPost" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'createTime', formatter:formatDatebox, width: $(this).width() / 6">
-				<span id="screateTime" class="sortable">登记时间</span><br/>
-				<input id="createTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-			</th>
-			<th data-options="field: 'passportPage', formatter:formatImage, width: $(this).width() / 6">
-				查看护照图片<br/>
-			</th>
-			<th data-options="field: 'businessLicense', formatter:formatImage, width: $(this).width() / 6">
-				查看营业执照<br/>
-			</th>
-		</tr>
-	</thead>
-</table>
+			<thead>
+			<tr>
+				<th data-options="field:'ck',checkbox:true"></th>
+				<th data-options="field: 'fullPassportName', width: $(this).width() / 6">
+					<span id="sfullPassportName" class="sortable">姓名</span><br/>
+					<input id="wvisaFullPassportName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'nationality', width: $(this).width() / 6">
+					<span id="snationality" class="sortable">国籍</span><br/>
+					<input id="wvisaNationality" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'needPost', width: $(this).width() / 6">
+					<span id="sneedPost" class="sortable">是否邮寄</span><br/>
+					<input id="wvisaNeedPost" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'updateTime', formatter:formatDatebox, width: $(this).width() / 6">
+					<span id="supdateTime" class="sortable">更新时间</span><br/>
+					<input id="updateTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'passportPage', formatter:formatImage, width: $(this).width() / 6">
+					查看护照图片<br/>
+				</th>
+				<th data-options="field: 'businessLicense', formatter:formatImage, width: $(this).width() / 6">
+					查看营业执照<br/>
+				</th>
+				<th data-options="field: 'createTime', formatter:formatDatebox, width: $(this).width() / 6">
+					<span id="screateTime" class="sortable">登记时间</span><br/>
+					<input id="createTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+			</tr>
+			</thead>
+		</table>
+	</div>
+</div>
 <!-- 导出所选客商到Excel -->
 <form id="exportWVisasToExcel" action="${base}/user/exportWVisasToExcel" method="post">
 	<div id="vidParm1"></div>
@@ -171,18 +180,32 @@
 	}
 
 	function filter(){
-		$('#wvisa').datagrid('reload', {
+		var filterParm = "?";
+		if(document.getElementById("wvisaFullPassportName").value != ""){
+			filterParm += '&fullPassportName=' + document.getElementById("wvisaFullPassportName").value;
+		}
+		if(document.getElementById("wvisaNationality").value != ""){
+			filterParm += '&nationality=' + document.getElementById("wvisaNationality").value;
+		}
+		if(document.getElementById("updateTime").value != ""){
+			filterParm += '&updateTime=' + document.getElementById("updateTime").value;
+		}
+		if(document.getElementById("createTime").value != ""){
+			filterParm += '&createTime=' + document.getElementById("createTime").value;
+		}
+		$('#wvisa').datagrid('options').url = '${base}/user/queryWVisaByPage' + filterParm;
+		$('#wvisa').datagrid('reload');
+		/*$('#wvisa').datagrid('reload', {
 			fullPassportName : document.getElementById("wvisaFullPassportName").value,
 			nationality : document.getElementById("wvisaNationality").value,
 			needPost : document.getElementById("wvisaNeedPost").value,
 			createTime : document.getElementById("createTime").value,
 			sort : sort,
 			order : order
-		});
+		});*/
 	}
 //----------------------------------------------------自定义函数结束--------------------------------------------------------//
     $(document).ready(function () {
-
     	// 国外客商VISA信息列表渲染
         $('#wvisa').datagrid({
        		onSelect:function (rowIndex, rowData){
@@ -225,6 +248,19 @@
 				}else if(row.isDisabled == 0){
 					return 'color:black;font-weight:bold;';
 				}
+			},
+			onDblClickRow: function (index, field, value) {
+				if(field.fullPassportName != ""){
+					if (!$("#wvisatabs").tabs("exists", field.fullPassportName)) {
+						$('#wvisatabs').tabs('add', {
+							title: field.fullPassportName,
+							content:'<iframe frameborder="0" src="'+ "${base}/user/wVisaDetailInfo?id=" + field.id+'" style="width:100%;height:99%;"></iframe>',
+							closable: true
+						});
+					} else {
+						$("#wvisatabs").tabs("select", field.fullPassportName);
+					}
+				}
 			}
         }).datagrid('getPager').pagination({
             pageSize: 20,//每页显示的记录条数，默认为10
@@ -240,7 +276,7 @@
 			return -1;
 		}
 		$("#wvisa").data().datagrid.dc.view.find("div.datagrid-header td .sortable").click(function(){
-			sort = $(this).prop("id").substr(1, $(this).prop("id").length);
+			//sort = $(this).prop("id").substr(1, $(this).prop("id").length);
 			if(order == "asc"){
 				$('#wvisa').datagrid('reload', {
 					fullPassportName : document.getElementById("wvisaFullPassportName").value,

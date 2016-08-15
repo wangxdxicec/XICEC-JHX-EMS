@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>金泓信展商管理后台</title>
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
+    <script type="text/javascript" src="${base}/resource/jquery.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/ajaxfileupload.js"></script>
+    <script type="text/javascript" src="${base}/resource/common.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/easyui-validate.js"></script>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        input {
+            width: 200px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 归档资料信息 -->
+<div class="easyui-panel" title="归档资料信息" style="width: auto;height: auto;">
+    <#if historyExhibitorDetailInfo?exists>
+        <table id="historyExhibitorDetailInfoTable" name="historyExhibitorDetailInfoTable" style="width: 90%;height:90%; margin-top: 5px;table-layout:fixed;">
+            <tr style="height: 30px">
+                <td style="width: 10%;text-align: right">展位号：</td>
+                <td style="width: 10%;"><#if historyExhibitorDetailInfo.booth_number?exists>${historyExhibitorDetailInfo.booth_number}</#if></td>
+                <td style="width: 10%;text-align: right">公司中文名：</td>
+                <td style="width: 25%;"><#if historyExhibitorDetailInfo.company_zh?exists>${historyExhibitorDetailInfo.company_zh}</#if></td>
+                <td style="width: 10%;text-align: right">公司英文名：</td>
+                <td style="width: 25%;"><#if historyExhibitorDetailInfo.company_en?exists>${historyExhibitorDetailInfo.company_en}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 10%;text-align: right">电话：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.telphone?exists>${historyExhibitorDetailInfo.telphone}</#if></td>
+                <td style="width: 10%;text-align: right">传真：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.fax?exists>${historyExhibitorDetailInfo.fax}</#if></td>
+                <td style="width: 10%;text-align: right">邮箱：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.email?exists>${historyExhibitorDetailInfo.email}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 5%;text-align: right">网址：</td>
+                <td style="width: 10%;"><#if historyExhibitorDetailInfo.website?exists>${historyExhibitorDetailInfo.website}</#if></td>
+                <td style="width: 10%;text-align: right">中文地址：</td>
+                <td style="width: 25%;"><#if historyExhibitorDetailInfo.address_zh?exists>${historyExhibitorDetailInfo.address_zh}</#if></td>
+                <td style="width: 10%;text-align: right">英文地址：</td>
+                <td style="width: 30%;"><#if historyExhibitorDetailInfo.address_en?exists>${historyExhibitorDetailInfo.address_en}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 10%;text-align: right">邮编：</td>
+                <td style="width: 10%;"><#if historyExhibitorDetailInfo.zipcode?exists>${historyExhibitorDetailInfo.zipcode}</#if></td>
+                <td style="width: 15%;text-align: right">发票抬头：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.invoice_head?exists>${historyExhibitorDetailInfo.invoice_head}</#if></td>
+                <td style="width: 15%;text-align: right">地税编号：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.local_tax?exists>${historyExhibitorDetailInfo.local_tax}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 15%;text-align: right">主营产品_中文：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.main_product_zh?exists>${historyExhibitorDetailInfo.main_product_zh}</#if></td>
+                <td style="width: 15%;text-align: right">主营产品_英文：</td>
+                <td style="width: 20%;"><#if historyExhibitorDetailInfo.main_product_en?exists>${historyExhibitorDetailInfo.main_product_en}</#if></td>
+                <td style="width: 10%;text-align: right">展会时间：</td>
+                <td style="width: 10%;"><#if historyExhibitorDetailInfo.fair_year?exists>${historyExhibitorDetailInfo.fair_year}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 15%;text-align: right">参展人员名单：</td>
+                <td style="width: 75%;"><#if historyExhibitorDetailInfo.joiner_name?exists>${historyExhibitorDetailInfo.joiner_name}</#if></td>
+            </tr>
+            <tr>
+                <td style="width: 15%;text-align: right">参展人员电话：</td>
+                <td style="width: 75%;"><#if historyExhibitorDetailInfo.joiner_telphone?exists>${historyExhibitorDetailInfo.joiner_telphone}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 15%;text-align: right">参展人员邮箱：</td>
+                <td style="width: 75%;"><#if historyExhibitorDetailInfo.joiner_email?exists>${historyExhibitorDetailInfo.joiner_email}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+            	<td style="width: 15%;text-align: right">公司简介：</td>
+                <td colspan="9" style="width: 75%;text-align: left;word-break:break-all">
+                    <#if historyExhibitorDetailInfo.company_profile?exists>${historyExhibitorDetailInfo.company_profile}</#if>
+                </td>
+            </tr>
+        </table>
+	<#else>
+		<div style="margin:10px 10px">归档资料缺少。</div>
+    </#if>
+</div>
+</body>
+</html>

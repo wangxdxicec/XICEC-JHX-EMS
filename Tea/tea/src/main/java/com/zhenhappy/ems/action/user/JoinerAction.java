@@ -11,7 +11,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by wujianbin on 2014-04-20.
@@ -45,14 +49,37 @@ public class JoinerAction extends BaseAction {
         try {
             //List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid());
             List<TExhibitorJoiner> joiners = joinerService.queryAllJoinersByEid(principle.getExhibitor().getEid(), flag);
+            for(TExhibitorJoiner j:joiners) {
+                j.setName(replaceBlank(j.getName()));
+                j.setPosition(replaceBlank(j.getPosition()));
+                j.setTelphone(replaceBlank(j.getTelphone()));
+                j.setEmail(replaceBlank(j.getEmail()));
+            }
+            Collections.sort(joiners,new Comparator<TExhibitorJoiner>(){
+                public int compare(TExhibitorJoiner arg0, TExhibitorJoiner arg1) {
+                    return arg0.getIsDelete().compareTo(arg1.getIsDelete());
+                }
+            });
             response.setJoiners(joiners);
             Integer area = jdbcTemplate.queryForInt("select exhibition_area from [t_exhibitor] where eid = ?",new Object[] { principle.getExhibitor().getEid() });
-            if(area != null) response.setArea(area);
-            else response.setArea(0);
+            if(area != null)
+                response.setArea(area);
+            else
+                response.setArea(0);
         } catch (Exception e) {
             response.setResultCode(1);
         }
         return response;
+    }
+
+    private String replaceBlank(String str) {
+        String dest = "";
+        if (str!=null) {
+            Pattern p = Pattern.compile("\t|\r|\n");
+            Matcher m = p.matcher(str);
+            dest = m.replaceAll("");
+        }
+        return dest;
     }
 
     @ResponseBody

@@ -3,9 +3,9 @@
  */
 var words = {
     findPassword:"Please contact our manager to find back your password：86-592-5959616",
-    addSuccess:"Add success",
+    addSuccess:"Add Successfully!",
     addFailure:"Add Failure",
-    operateSuccess:"Operate Success",
+    operateSuccess:"Operate Successfully!",
     operateFailure:"Operate Failure",
     loadDataFailure:"Load data failure",
     companyNotEmpty:"Company name can not be empty",

@@ -4,9 +4,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.zhenhappy.ems.dao.VisitorInfoDao;
 import com.zhenhappy.ems.entity.TVisitorInfo;
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.entity.TVisitorType;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.ems.manager.service.TVisitorTypeService;
+import com.zhenhappy.ems.manager.tag.StringUtil;
+import com.zhenhappy.util.Page;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,11 +27,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.TArticle;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.AddArticleRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyArticleRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerResponse;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 
 /**
@@ -39,6 +41,10 @@ public class CustomerAction extends BaseAction {
 
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
+    @Autowired
+    private VisitorInfoDao visitorInfoDao;
+    @Autowired
+    private TVisitorTypeService tVisitorTypeService;
 
     /**
      * 分页查询客商
@@ -143,6 +149,75 @@ public class CustomerAction extends BaseAction {
         } catch (Exception e) {
             response.setResultCode(1);
             log.error("query queryInland CustomersByPage error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 查询所有国家
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryCustomerType", method = RequestMethod.POST)
+    public List<TVisitorType> queryCustomerType(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        List<TVisitorType> tVisitorTypeList = new ArrayList<TVisitorType>();
+        try {
+            tVisitorTypeList = tVisitorTypeService.loadVisitorType();
+        } catch (Exception e) {
+            log.error("query inland customer type error.", e);
+        }
+        return tVisitorTypeList;
+    }
+
+    /**
+     * 一键归类国内客商
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "classVisitorByOneKey")
+    public BaseResponse classVisitorByOneKey(@ModelAttribute QueryExhibitorTimeRequest request) {
+        BaseResponse response = new BaseResponse();
+        try {
+            List<TVisitorType> tVisitorTypeList = tVisitorTypeService.loadVisitorType();
+            List<TVisitorInfo> customers = visitorInfoDao.queryByHql("from TVisitorInfo e where country = 44 and (rabbi = 0  or rabbi is null) ", new Object[]{});
+
+            for(TVisitorInfo visitorInfo:customers){
+                if(StringUtil.isNotEmpty(visitorInfo.getCompany())){
+                    for(TVisitorType tVisitorType:tVisitorTypeList){
+                        if(StringUtil.isNotEmpty(tVisitorType.getTypevalue()) && tVisitorType.getTypevalue() != null){
+                            String[] visitorTypeArray = tVisitorType.getTypevalue().trim().split(",");
+                            for(int i=0;i<visitorTypeArray.length;i++){
+                                if(visitorInfo.getCompany().indexOf(visitorTypeArray[i])>=0){
+                                    visitorInfo.setCustomer_type(tVisitorType.getId());
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    //如果对应的公司名为空，则属于“未分类”，未分类对应的类别值是空
+                    for(TVisitorType tVisitorType:tVisitorTypeList){
+                        if(StringUtil.isEmpty(tVisitorType.getTypevalue())){
+                            visitorInfo.setCustomer_type(tVisitorType.getId());
+                            break;
+                        }
+                    }
+                }
+                if(visitorInfo.getCustomer_type() == null){
+                    for(TVisitorType tVisitorType:tVisitorTypeList){
+                        if(StringUtil.isEmpty(tVisitorType.getTypevalue())){
+                            visitorInfo.setCustomer_type(tVisitorType.getId());
+                            break;
+                        }
+                    }
+                }
+                visitorInfoDao.update(visitorInfo);
+            }
+            response.setResultCode(0);
+        } catch (Exception e) {
+            log.error("modify buddha exhibitor time error.", e);
+            response.setResultCode(1);
         }
         return response;
     }

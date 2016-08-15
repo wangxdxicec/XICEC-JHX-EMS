@@ -470,7 +470,7 @@
 	//删除展商账号
 	$('#deleteExhibitor').click(function(){
 		if(checkedItems.length > 0){
-			$.messager.confirm('删除展商','你确定要删除展商吗?',function(r){
+			$.messager.confirm('删除展商','删除掉数据将不可恢复！你确定要删除展商吗?',function(r){
 			    if (r){
 			    	$.ajax({
 		                url: "${base}/user/deleteExhibitors",
@@ -1243,7 +1243,8 @@
 		                    		$.ajaxFileUpload({
 										url:'upload/exhibitors',
 										dataType: 'text/html',
-										data:$("#importExhibitorsForm").serializeJson(),
+										data:{"file":$("#importExhibitorsForm").serializeJson(), "isCurrent": 0,
+											"country":country, "province": province, "area": area, "group": group, "tag": tag},
 										fileElementId:'file',
 										success: function (data){
 											$("#importExhibitorsDlg").dialog("close");

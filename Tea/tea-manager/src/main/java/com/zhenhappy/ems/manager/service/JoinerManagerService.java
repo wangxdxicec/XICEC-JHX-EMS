@@ -57,7 +57,7 @@ public class JoinerManagerService extends JoinerService {
 	
 	/**
 	 * 通过姓名获取参展人员
-	 * @param id
+	 * @param eid
 	 * @return
 	 */
 	@Transactional
@@ -66,7 +66,7 @@ public class JoinerManagerService extends JoinerService {
     }
 
     /**
-     * 通过id获取参展人员
+     * 通过eid获取参展人员
      * @param eid
      * @return
      */
@@ -77,8 +77,19 @@ public class JoinerManagerService extends JoinerService {
     }
 
     /**
+     * 通过eid获取参展人员
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public List<TExhibitorJoiner> loadExhibitorAllJoinerByEid(Integer eid) {
+        List<TExhibitorJoiner> joiners = getJoinerDao().queryByHql("from TExhibitorJoiner where eid=?", new Object[]{eid});
+        return joiners;
+    }
+
+    /**
      * 添加参展人员
-     * @param joiner
+     * @param exhibitorJoiner
      */
     @Transactional
     public void addExhibitorJoiner(TExhibitorJoiner exhibitorJoiner) {
@@ -87,7 +98,7 @@ public class JoinerManagerService extends JoinerService {
     
     /**
      * 修改参展人员
-     * @param joiner
+     * @param exhibitorJoiner
      */
     @Transactional
     public void modifyExhibitorJoiner(TExhibitorJoiner exhibitorJoiner) {

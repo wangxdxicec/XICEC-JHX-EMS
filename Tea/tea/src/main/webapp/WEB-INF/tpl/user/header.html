@@ -52,12 +52,12 @@
 <div style="width:100%;margin-top: 0px;background-color: #ffffff">
     <div style="width:962px;height:178px; margin:0px auto; background-image:url(${resource}/images/header.jpg);position: relative">
         <div class="language">
-            <#if rc.locale=="zh_CN">
+            <!--<#if rc.locale=="zh_CN">
                 <a name="db" href="javascript:void(0)">下载APP</a>
             <#else>
                 <a name="db" href="javascript:void(0)">Download APP</a>
             </#if>
-                | <a href="${base}/changeLanguage?locale=cn">中文</a>
+                | --><a href="${base}/changeLanguage?locale=cn">中文</a>
                 | <a href="${base}/changeLanguage?locale=us">English</a>
         </div>
         <div style="margin-left: 223px;position: absolute">
@@ -69,7 +69,7 @@
             <#else>
                 <div style="font-size: 24px;line-height: 50px;margin-top: 40px;color: #4a7716;font-weight: bold"><@spring.message "banner.one"/>&nbsp;${tExhibitorTime.tea_Fair_Show_Year}</div>
                 <div style="font-size: 20px;line-height: 35px;color: #bf8108;;font-weight: bold"><@spring.message "banner.two"/>&nbsp;${tExhibitorTime.tea_Fair_Show_Year}</div>
-                <div style="font-size: 14px;line-height: 30px;color: #666666;margin-top: 0px;margin-left: 40px;"><@spring.message "banner.three"/></div>
+                <div style="font-size: 14px;line-height: 30px;color: #666666;margin-top: 0px;margin-left: 40px;">${tExhibitorTime.tea_Fair_Show_Date_En}&nbsp;<@spring.message "banner.three"/></div>
             </#if>
         </div>
         <#if rc.locale=="zh_CN">
@@ -110,15 +110,15 @@
                 <td style="position: absolute;right: 150px;color: #000000;">
                     <#if rc.locale=="zh_CN">
                         <#if boothInfo?exists>
-                            <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo?exists>&nbsp;&nbsp;${exhibitorInfo.company}</#if></div> (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
+                            <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo.company?exists>&nbsp;&nbsp;${exhibitorInfo.company}</#if></div> (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
                         <#else>
-                            <div class="companyInfo"><#if exhibitorInfo?exists>${exhibitorInfo.company}</#if></div>
+                            <div class="companyInfo"><#if exhibitorInfo.company?exists>${exhibitorInfo.company}</#if></div>
                         </#if>
                     <#else>
                         <#if boothInfo?exists>
-                            <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo?exists>${exhibitorInfo.companyEn}&nbsp;</#if></div> (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
+                            <div class="companyInfo"><div class="companyInfoValue"><#if exhibitorInfo.companyEn?exists>${exhibitorInfo.companyEn}&nbsp;</#if></div> (${boothInfo.boothNumber!""} ${boothInfo.exhibitorArea!""})</div>
                         <#else>
-                            <div class="companyInfo"><#if exhibitorInfo?exists>${exhibitorInfo.companyEn}</#if></div>
+                            <div class="companyInfo"><#if exhibitorInfo.companyEn?exists>${exhibitorInfo.companyEn}</#if></div>
                         </#if>
                     </#if>
                 </td>

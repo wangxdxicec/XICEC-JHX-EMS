@@ -14,8 +14,10 @@ import com.zhenhappy.ems.manager.util.WriterUtil;
 import com.zhenhappy.ems.service.managerrole.TUserInfoService;
 import com.zhenhappy.ems.service.managerrole.TUserMenuService;
 import com.zhenhappy.ems.service.managerrole.TUserRoleService;
+import com.zhenhappy.ems.teatime.TExhibitorTeaTime;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +47,8 @@ public class LoginAction extends BaseAction {
     private TUserRoleService roleService;
     @Autowired
     private TUserMenuService userMenuService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * process login.
@@ -66,10 +70,16 @@ public class LoginAction extends BaseAction {
                 ManagerPrinciple principle = new ManagerPrinciple();
                 /*principle.setAdmin(admin);
                 request.getSession().setAttribute(ManagerPrinciple.MANAGERPRINCIPLE, principle);*/
+
+                //加载前台界面相关时间对象
+                String tea_Fair_Show_Begin_Date = jdbcTemplate.queryForObject("select tea_Fair_Show_Begin_Date from [t_exhibitor_teafair_time] ", new Object[]{}, String.class);
+                request.getSession().setAttribute("tea_Fair_Show_Begin_Date", tea_Fair_Show_Begin_Date);
+
                 TUserRole tUserRole = roleService.findOneRole(admin.getRoleId());
                 admin.setRoleName(tUserRole.getRoleName());
                 principle.setAdmin(admin);
                 principle.setCurrentOperationIds(tUserRole.getOperationIds());
+                request.getSession().setAttribute("roleId", admin.getRoleId());
                 request.setAttribute("userName", username);
                 request.setAttribute("password", password);
                 request.getSession().setAttribute("currentUser", admin);  // 当前用户信息

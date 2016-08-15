@@ -76,6 +76,9 @@ public class CustomerInfoManagerService {
 			if (request.getEmail() != null) {
 				conditions.add(" e.email like '%" + new String(request.getEmail().replace(",","").getBytes("ISO-8859-1"),"utf-8") + "%'");
 			}
+			if (request.getCustomerType() != null) {
+				conditions.add(" e.customer_type = " + request.getCustomerType().intValue() + " ");
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -129,7 +132,7 @@ public class CustomerInfoManagerService {
 		List<QueryVisitorInfo> visitorInfos = visitorInfoDao.queryPageByHQL("select count(*) from TVisitorInfo e" + conditionsSqlNoOrder,
 				"select new com.zhenhappy.ems.manager.dto.QueryVisitorInfo(e.id, e.firstName, e.company,"
 						+  (request.getInlandOrForeign() == 1 ? "e.city" : "e.country")
-						+ ", e.address, e.mobilePhone, e.tel, e.email, e.createTime, e.govement, e.rabbi, e.isMobile) "
+						+ ", e.address, e.mobilePhone, e.tel, e.email, e.createTime, e.govement, e.rabbi, e.isMobile, e.customer_type) "
 						+ "from TVisitorInfo e"  + conditionsSqlOrder, new Object[]{}, page);
 		for(QueryVisitorInfo queryVisitorInfo:visitorInfos){
 			boolean sendEmailFlag = isBetweenBeginDateAndEndDate(queryVisitorInfo.getSendEmailTime(), "2016-4-25", "2016-10-24");
@@ -190,7 +193,7 @@ public class CustomerInfoManagerService {
 						"e.langFlag,e.visitDate,e.beenToFair,e.beenToRole,e.isRecieveEmail,e.isRecieveDoc,e.isMobile,e.isjudged,e.isProfessional,e.isAccommodation," +
 						"e.isDisabled, e.isReaded,e.tmp_Country,e.tmp_Postcode,e.tmp_Interest,e.tmp_InterestOthers," +
 						"e.tmp_Knowfrom,e.tmp_KnowfromOthers,e.tmp_V_name1,e.tmp_V_title1, e.tmp_V_position1,e.tmp_V_contact1,e.tmp_V_name2,e.tmp_V_title2," +
-						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi) "
+						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi, e.customer_type) "
 						+ "from TVisitorInfo e where country = 44 and (rabbi = 0  or rabbi is null) " +
 						(1==request.getPre()?" and convert(varchar, e.createTime,120) >= '2016-04-25 00:00:00' and convert(varchar, e.createTime,120) <= '2016-10-18 23:59:59' ":" ")
 						+ " order by e.updateTime desc ", new Object[]{}, page);
@@ -253,7 +256,7 @@ public class CustomerInfoManagerService {
 						"e.langFlag,e.visitDate,e.beenToFair,e.beenToRole,e.isRecieveEmail,e.isRecieveDoc,e.isMobile,e.isjudged,e.isProfessional,e.isAccommodation," +
 						"e.isDisabled, e.isReaded,e.tmp_Country,e.tmp_Postcode,e.tmp_Interest,e.tmp_InterestOthers," +
 						"e.tmp_Knowfrom,e.tmp_KnowfromOthers,e.tmp_V_name1,e.tmp_V_title1, e.tmp_V_position1,e.tmp_V_contact1,e.tmp_V_name2,e.tmp_V_title2," +
-						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi) "
+						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi, e.customer_type) "
 						+ "from TVisitorInfo e where country = 44 and rabbi = 1 order by e.updateTime desc ", new Object[]{}, page);
 		for(QueryVisitorInfo queryVisitorInfo:customers){
 			boolean sendEmailFlag = isBetweenBeginDateAndEndDate(queryVisitorInfo.getSendEmailTime(), "2016-4-25", "2016-10-24");
@@ -293,7 +296,7 @@ public class CustomerInfoManagerService {
 						"e.langFlag,e.visitDate,e.beenToFair,e.beenToRole,e.isRecieveEmail,e.isRecieveDoc,e.isMobile,e.isjudged,e.isProfessional,e.isAccommodation," +
 						"e.isDisabled, e.isReaded,e.tmp_Country,e.tmp_Postcode,e.tmp_Interest,e.tmp_InterestOthers," +
 						"e.tmp_Knowfrom,e.tmp_KnowfromOthers,e.tmp_V_name1,e.tmp_V_title1, e.tmp_V_position1,e.tmp_V_contact1,e.tmp_V_name2,e.tmp_V_title2," +
-						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi) "
+						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi, e.customer_type) "
 						+ "from TVisitorInfo e where country <> 44 and (rabbi = 0  or rabbi is null)" +
 						(1==request.getPre()?" and convert(varchar, e.createTime,120) >= '2016-04-25 00:00:00' and convert(varchar, e.createTime,120) <= '2016-10-18 23:59:59' ":" ")
 						+ " order by e.updateTime desc ", new Object[]{}, page);
@@ -335,7 +338,7 @@ public class CustomerInfoManagerService {
 						"e.langFlag,e.visitDate,e.beenToFair,e.beenToRole,e.isRecieveEmail,e.isRecieveDoc,e.isMobile,e.isjudged,e.isProfessional,e.isAccommodation," +
 						"e.isDisabled, e.isReaded,e.tmp_Country,e.tmp_Postcode,e.tmp_Interest,e.tmp_InterestOthers," +
 						"e.tmp_Knowfrom,e.tmp_KnowfromOthers,e.tmp_V_name1,e.tmp_V_title1, e.tmp_V_position1,e.tmp_V_contact1,e.tmp_V_name2,e.tmp_V_title2," +
-						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi) "
+						"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi, e.customer_type) "
 						+ "from TVisitorInfo e where country <> 44 and rabbi = 1 order by e.updateTime desc ", new Object[]{}, page);
 		for(QueryVisitorInfo queryVisitorInfo:customers){
 			boolean sendEmailFlag = isBetweenBeginDateAndEndDate(queryVisitorInfo.getSendEmailTime(), "2016-4-25", "2016-10-24");
@@ -383,7 +386,7 @@ public class CustomerInfoManagerService {
 				"e.langFlag,e.visitDate,e.beenToFair,e.beenToRole,e.isRecieveEmail,e.isRecieveDoc,e.isMobile,e.isjudged,e.isProfessional,e.isAccommodation," +
 				"e.isDisabled, e.isReaded,e.tmp_Country,e.tmp_Postcode,e.tmp_Interest,e.tmp_InterestOthers," +
 				"e.tmp_Knowfrom,e.tmp_KnowfromOthers,e.tmp_V_name1,e.tmp_V_title1, e.tmp_V_position1,e.tmp_V_contact1,e.tmp_V_name2,e.tmp_V_title2," +
-				"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi) "
+				"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi, e.customer_type) "
 				+ "from TVisitorInfo e where country " + (inlandOrForeignflag == 1? "=":"<>") + " 44 and rabbi " + (rabbiFlag == 1?"= 1":"= 0 or rabbi is null");
 		List<TVisitorInfo> customers = visitorInfoDao.queryByHql(hql, new Object[]{});
 		return customers.size() > 0 ? customers : null;
@@ -423,7 +426,7 @@ public class CustomerInfoManagerService {
 				"e.langFlag,e.visitDate,e.beenToFair,e.beenToRole,e.isRecieveEmail,e.isRecieveDoc,e.isMobile,e.isjudged,e.isProfessional,e.isAccommodation," +
 				"e.isDisabled, e.isReaded,e.tmp_Country,e.tmp_Postcode,e.tmp_Interest,e.tmp_InterestOthers," +
 				"e.tmp_Knowfrom,e.tmp_KnowfromOthers,e.tmp_V_name1,e.tmp_V_title1, e.tmp_V_position1,e.tmp_V_contact1,e.tmp_V_name2,e.tmp_V_title2," +
-				"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi) "
+				"e.tmp_V_position2,e.tmp_V_contact2,e.tmp_V_name3,e.tmp_V_title3,e.tmp_V_position3,e.tmp_V_contact3,e.guid, e.govement, e.rabbi, e.customer_type) "
 				+ "from TVisitorInfo e where id=" + id;
 		List<TVisitorInfo> customers = visitorInfoDao.queryByHql(hql, new Object[]{});
 		return customers.size() > 0 ? customers.get(0) : null;

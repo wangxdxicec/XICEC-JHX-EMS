@@ -76,6 +76,11 @@
 					登记时间<br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
+				<th data-options="field: 'customerType', formatter: formatCustomerType, width: $(this).width()/8">
+					类别<br/>
+					<select id="customer_type" style="width:100%;height:15px;" onchange="filter(this.options[this.options.selectedIndex].value);">
+					</select>
+				</th>
 			</tr>
 			</thead>
 		</table>
@@ -119,7 +124,7 @@
 </div>
 <script>
 	var checkedItems = [];
-
+	var customerType = [];
 	//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
 	//群发所有客商邮件
 	$('#emailAllCustomers').click(function(){
@@ -324,6 +329,14 @@
 		}
 	}
 
+	function formatCustomerType(val, row) {
+		if (val != null) {
+			return customerType[val - 1].typename;
+		} else {
+			return null;
+		}
+	}
+
 	Date.prototype.format = function (format)
 	{
 		var o = {
@@ -342,6 +355,49 @@
 							RegExp.$1.length == 1 ? o[k] :
 							("00" + o[k]).substr(("" + o[k]).length));
 		return format;
+	}
+
+	function filter(customerType){
+		var filterParm = "?";
+		if(document.getElementById("customerFirstName").value != ""){
+			filterParm += '&firstName=' + encodeURI(document.getElementById("customerFirstName").value);
+		}
+		if(document.getElementById("customerCompany").value != ""){
+			filterParm += '&company=' + encodeURI(document.getElementById("customerCompany").value);
+		}
+		if(document.getElementById("customerCity").value != ""){
+			filterParm += '&city=' + encodeURI(document.getElementById("customerCity").value);
+		}
+		if(document.getElementById("customerAddress").value != ""){
+			filterParm += '&address=' + encodeURI(document.getElementById("customerAddress").value);
+		}
+		if(document.getElementById("customerMobilePhone").value != ""){
+			filterParm += '&mobile=' + encodeURI(document.getElementById("customerMobilePhone").value);
+		}
+		if(document.getElementById("customerTelephone").value != ""){
+			filterParm += '&tel=' + encodeURI(document.getElementById("customerTelephone").value);
+		}
+		if(document.getElementById("customerEmail").value != ""){
+			filterParm += '&email=' + encodeURI(document.getElementById("customerEmail").value);
+		}
+		if(document.getElementById("customerSource").value != ""){
+			if(document.getElementById("customerSource").value == '0'){
+				filterParm += '&sourceValue=0';
+			}else if(document.getElementById("customerSource").value == '1'){
+				filterParm += '&sourceValue=1';
+			}
+			filterParm += '&isMobile=' + encodeURI(document.getElementById("customerSource").value);
+		}
+		if(document.getElementById("createdTime").value != ""){
+			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
+		}
+		if(document.getElementById("customer_type").value != ""){
+			filterParm += '&customerType=' + encodeURI(document.getElementById("customer_type").value);
+		}
+		filterParm += '&inlandOrForeign=1';
+		filterParm += '&isRabbicFlag=0';
+		$('#customers').datagrid('options').url = '${base}/user/queryCustomersByPage' + filterParm;
+		$('#customers').datagrid('reload');
 	}
 
 	function filter(){
@@ -378,6 +434,9 @@
 		if(document.getElementById("createdTime").value != ""){
 			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
 		}
+		if(document.getElementById("customer_type").value != ""){
+			filterParm += '&customerType=' + encodeURI(document.getElementById("customer_type").value);
+		}
 		filterParm += '&inlandOrForeign=1';
 		filterParm += '&isRabbicFlag=0';
 		$('#customers').datagrid('options').url = '${base}/user/queryCustomersByPage' + filterParm;
@@ -386,6 +445,23 @@
 	//----------------------------------------------------自定义函数结束--------------------------------------------------------//
 
 	$(document).ready(function () {
+		//加载国内客商类别
+		$.ajax({
+			type:"POST",
+			dataType:"json",
+			url:"${base}/user/queryCustomerType",
+			success : function(result) {
+				if(result){
+					customerType = result;
+					$("#customer_type").html('');
+					$("#customer_type").append('<option value="">全部</option>');
+					for(var i=0,a;a=customerType[i++];){
+						$("#customer_type").append('<option value="'+a.id+'">'+a.typename+'</option>');
+					}
+				}
+			}
+		});
+
 		// 国内客商列表渲染
 		$('#customers').datagrid({
 			onSelect:function (rowIndex, rowData){

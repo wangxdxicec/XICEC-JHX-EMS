@@ -398,6 +398,7 @@
 //	        				    console.log(a);
 	       					$("#modifyGroup").append('<option value="'+a.id+'">'+a.groupName+'</option>');
 	       				}
+						$("#modifyGroup").append('<option value="0">无</option>');
 	       			}
 	       		}
 	       	});
@@ -1176,8 +1177,8 @@
      	// 批量修改展团弹出框
         $('#modifyExhibitorsGroupDlg').dialog({
             title: '批量修改所属人',
-            width: 350,
-            height: 140,
+            width: 360,
+            height: 150,
             closed: true,
             cache: false,
             modal: true,

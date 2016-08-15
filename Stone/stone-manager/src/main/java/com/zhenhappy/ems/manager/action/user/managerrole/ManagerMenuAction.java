@@ -36,6 +36,12 @@ public class ManagerMenuAction extends BaseAction {
         return "/user/group/group";
     }
 
+    //展位预向列表
+    @RequestMapping(value = "intetionXicecMap")
+    public String intetionXicecMap(){
+        return "user/xicecmap/xicecmapintetionpage";
+    }
+
     //国内客商菜单
     @RequestMapping(value = "inlandCustomerIndex")
     public String inlandCustomerIndex(){

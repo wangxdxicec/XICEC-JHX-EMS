@@ -61,7 +61,7 @@
             </p>
 
             <div>
-                <button id="addJoiner" type="button" class="btn btn-warning pull-right"><@spring.message "info.joiner.participants.add"/></button>
+                <button id="addJoiner" type="button" class="btn btn-warning pull-left"><@spring.message "info.joiner.participants.add"/></button>
             </div>
 
             <table width="100%" class="table table-striped" style="margin-top: 5px" align="center">
@@ -265,7 +265,7 @@
         };
     })(jQuery);
     function loadData() {
-        $("#olddatas").html("")
+        $("#olddatas").html("");
         $.ajax({
             url: "${base}/user/queryJoiners",
             type: "POST",
@@ -278,7 +278,7 @@
                     for (var i in data.joiners) {
                         var joiner = oldjoiners[i];
                         $("#olddatas").append('<tr joiner="' + i + '">&nbsp;&nbsp;<td width="40%;">' + '<a href="#" name="activateJoiner"><img src=\"${base}/resource/plus.png\"/></a></td>'
-                                + "    " + '&nbsp;&nbsp;<td width="60%;"><button name="oldviewJoiner" type="button" class="btn btn-warning">' + joiner.name + '</button></td></tr>');
+                                + "    " + '&nbsp;&nbsp;<td width="60%;"><button name="oldviewJoiner" type="button" class="btn btn-warning" style="background: #6B6B6B;color: white;">' + joiner.name + '</button></td></tr>');
                     }
 
                     $("[name='oldviewJoiner']").click(function () {
@@ -345,7 +345,7 @@
             }
         });
 
-        $("#newdatas").html("")
+        $("#newdatas").html("");
         $.ajax({
             url: "${base}/user/queryJoiners",
             type: "POST",

@@ -187,7 +187,7 @@ public class HistoryCustomerService extends ExhibitorService {
 	public ImportHistoryCustomerResponse importInlandHistoryCustomer(File importFile, TUserInfo userInfo) {
 		Integer count = 0;
 		Integer willImportId = 1;
-		ImportHistoryCustomerResponse report = new ImportHistoryCustomerResponse();
+		ImportHistoryCustomerResponse importHistoryCustomerResponse = new ImportHistoryCustomerResponse();
 		isExistCustomerList = new ArrayList<THistoryCustomer>();
 		willImportCustomerList = new ArrayList<THistoryCustomer>();
 		List resultArray = new ArrayList();
@@ -349,29 +349,29 @@ public class HistoryCustomerService extends ExhibitorService {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, Boolean.TRUE);
 				JSONArray resultJson = JSONArray.fromObject(resultArray);
-				report.setResult(resultJson.toString());
+				importHistoryCustomerResponse.setResult(resultJson.toString());
 				JSONArray isExistDataJsonArray = JSONArray.fromObject(isExistCustomerList);
 				JSONArray willImportDataJsonArray = JSONArray.fromObject(willImportCustomerList);
-				report.setIsExistData(isExistDataJsonArray.toString());
-				report.setWillImportData(willImportDataJsonArray.toString());
-				report.setResultCode(1);
+				importHistoryCustomerResponse.setIsExistData(isExistDataJsonArray.toString());
+				importHistoryCustomerResponse.setWillImportData(willImportDataJsonArray.toString());
+				importHistoryCustomerResponse.setResultCode(1);
 			}else{
 				StringBuffer resultBuffer = new StringBuffer();
 				resultBuffer.append("共导入：" + count + "条数据");
 				resultArray.add(resultBuffer.toString());
 				JSONArray resultJson = JSONArray.fromObject(resultArray);
-				report.setResult(resultJson.toString());
-				report.setIsExistData("");
-				report.setWillImportData("");
-				report.setResultCode(0);
+				importHistoryCustomerResponse.setResult(resultJson.toString());
+				importHistoryCustomerResponse.setIsExistData("");
+				importHistoryCustomerResponse.setWillImportData("");
+				importHistoryCustomerResponse.setResultCode(0);
 			}
 			xssfWorkbook.close();
 		} catch (Exception e) {
 			System.out.println(e);
-			report.setResultCode(-1);
+			importHistoryCustomerResponse.setResultCode(-1);
 			e.printStackTrace();
 		}
-		return report;
+		return importHistoryCustomerResponse;
 	}
 
 	public ImportHistoryCustomerResponse importForeignHistoryCustomer(File importFile, TUserInfo userInfo) {

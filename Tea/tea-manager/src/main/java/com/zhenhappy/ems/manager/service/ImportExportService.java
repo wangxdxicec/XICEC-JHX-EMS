@@ -4,6 +4,7 @@ import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.ExportExhibitorJoiner;
 import com.zhenhappy.ems.manager.dto.ImportExhibitorsRequest;
+import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorInfo;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.util.JChineseConvertor;
@@ -16,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -47,11 +49,13 @@ public class ImportExportService extends ExhibitorService {
 	private InvoiceService invoiceService;
     @Autowired
     private JoinerManagerService joinerManagerService;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
-	public List<QueryExhibitorInfo> exportExhibitor(List<TExhibitor> exhibitors) {
+	public List<QueryExhibitorInfo> exportExhibitor(List<TeaExhibitor> exhibitors) {
 		List<QueryExhibitorInfo> queryExhibitorInfos = new ArrayList<QueryExhibitorInfo>();
 		if(exhibitors != null){
-			for(TExhibitor exhibitor:exhibitors){
+			for(TeaExhibitor exhibitor:exhibitors){
 				TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(exhibitor.getEid());
 				if(exhibitorInfo != null){
 					QueryExhibitorInfo queryExhibitorInfo = new QueryExhibitorInfo();
@@ -103,10 +107,10 @@ public class ImportExportService extends ExhibitorService {
 	 * @param exhibitors
 	 * @return
 	 */
-	public List<ExportExhibitorJoiner> exportExhibitorJoiners(List<TExhibitor> exhibitors) {
+	public List<ExportExhibitorJoiner> exportExhibitorJoiners(List<TeaExhibitor> exhibitors) {
 		List<ExportExhibitorJoiner> exportExhibitorJoiners = new ArrayList<ExportExhibitorJoiner>();
 		if(exhibitors != null){
-			for(TExhibitor exhibitor:exhibitors){
+			for(TeaExhibitor exhibitor:exhibitors){
 				TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
 				List<TExhibitorJoiner> joiners = joinerManagerService.loadExhibitorJoinerByEid(exhibitor.getEid());
 				String booth_number = exhibitorManagerService.loadBoothNum(exhibitor.getEid());
@@ -125,9 +129,18 @@ public class ImportExportService extends ExhibitorService {
 		return exportExhibitorJoiners;
 	}
 
-	public List<String> importExhibitor(File importFile, ImportExhibitorsRequest request) {
+	public List<String> importExhibitor(File importFile,
+										ImportExhibitorsRequest request,
+										Integer isCurrent,
+										String country,
+										String province,
+										String area,
+										String group,
+										String tag,
+										ManagerPrinciple principle) {
 		Integer count = 0;
 		List<String> report = new ArrayList<String>();
+		String tea_Fair_Show_Begin_Date = jdbcTemplate.queryForObject("select tea_Fair_Show_Begin_Date from [t_exhibitor_teafair_time] ", new Object[]{}, String.class);
 		try {
 			Workbook book = Workbook.getWorkbook(importFile);
 			// 获得第一个工作表对象
@@ -151,16 +164,18 @@ public class ImportExportService extends ExhibitorService {
 				booth.setBoothNumber(boothNo);
 				booth.setExhibitionArea(boothNo.substring(0,1) + "厅");
 
-				TExhibitor exhibitor = new TExhibitor();
+				TeaExhibitor exhibitor = new TeaExhibitor();
 				TExhibitorInfo exhibitorInfo = new TExhibitorInfo();
 				List<TContact> contacts = new ArrayList<TContact>();
 				String company = null;
 				String companye = null;
+				String userName = null;
 				for (int i = 1; i < 15; i++) {
 					Cell cell = sheet.getCell(i, j);
 					switch (i) {
 						case 1:	//用户名
-							exhibitor.setUsername(cell.getContents().trim().replaceAll(" ", ""));
+							userName = cell.getContents().trim().replaceAll(" ", "");
+							exhibitor.setUsername(userName);
 							break;
 						case 2:	//密码
 							exhibitor.setPassword(cell.getContents().trim().replaceAll(" ", ""));
@@ -252,26 +267,44 @@ public class ImportExportService extends ExhibitorService {
 //					System.out.println("第" + (j+1) + "行有问题,原因:公司中文名和英文名都为空");
 					report.add("第" + (j+1) + "行有问题,原因:公司中文名和英文名都为空");
 					continue;//公司中文名和英文名都为空
+				}
+				if(isCurrent == 1){
+					if(exhibitorManagerService.loadAllExhibitorByUserName(userName) != null){
+						report.add("第" + (j+1) + "行有问题,原因:用户名"+ userName + "存在重复");
+						continue;
+					}
 				}else if((exhibitorManagerService.loadAllExhibitorByCompany(company) != null) || (exhibitorManagerService.loadAllExhibitorByCompanye(companye) != null)){
 //					System.out.println("第" + (j+1) + "行有问题,原因:公司中文名"+ company +"或英文名"+ companye +"存在重复");
 					report.add("第" + (j+1) + "行有问题,原因:公司中文名"+ company +"或英文名"+ companye +"存在重复");
-					continue;//公司中文名或英文名存在重复
+					continue;
 				}
 				//exhibitor.setCompany(company);
 				exhibitorInfo.setCompany(company);
 				exhibitorInfo.setCompany(company);
+				exhibitor.setFair_year(tea_Fair_Show_Begin_Date);
+				if(isCurrent == 1){
+					//若是在本届展商列表界面导入账商信息，默认为启用状态
+					exhibitor.setIsLogout(0);
+				}else{
+					exhibitor.setIsLogout(1);
+				}
 				//exhibitor.setCompanye(companye);
 				exhibitorInfo.setCompanyEn(companye);
 				//exhibitor.setCompanyt(JChineseConvertor.getInstance().s2t(company.trim()));
 				exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(company.trim()));
-				if(request.getCountry() != null) exhibitor.setCountry(request.getCountry());
-				if(request.getProvince() != null) exhibitor.setProvince(request.getProvince());
-				if(request.getArea() != null) exhibitor.setArea(request.getArea());
-				if(request.getGroup() != null) exhibitor.setGroup(request.getGroup());
-				if(request.getTag() != null) exhibitor.setTag(request.getTag());
+				if(StringUtils.isNotEmpty(country)) exhibitor.setCountry(request.getCountry());
+				if(StringUtils.isNotEmpty(province)) exhibitor.setProvince(request.getProvince());
+				if(StringUtils.isNotEmpty(area)) exhibitor.setArea(request.getArea());
+				if(StringUtils.isNotEmpty(group)) exhibitor.setGroup(request.getGroup());
+				if(StringUtils.isNotEmpty(tag)) exhibitor.setTag(request.getTag());
 				exhibitor.setCreateTime(new Date());
-				exhibitor.setCreateUser(1);
-				exhibitor.setIsLogout(0);
+				if(principle != null && principle.getAdmin() != null){
+					exhibitor.setCreateUser(principle.getAdmin().getId());
+					exhibitor.setUpdateUser(principle.getAdmin().getId());
+				}
+				exhibitor.setExhibitionArea("0");
+				exhibitor.setCreateTime(new Date());
+				exhibitor.setUpdateTime(new Date());
 				Integer eid = (Integer) getHibernateTemplate().save(exhibitor);
 
 				if(eid != null){
@@ -307,13 +340,13 @@ public class ImportExportService extends ExhibitorService {
 	}
 
 	public void copyLogo(Integer[] eids, String destDir) throws IOException {
-		List<TExhibitor> exhibitors = new ArrayList<TExhibitor>();
+		List<TeaExhibitor> exhibitors = new ArrayList<TeaExhibitor>();
 		if(eids == null){
 			exhibitors = exhibitorManagerService.loadAllExhibitors();
 		}else{
 			exhibitors = exhibitorManagerService.loadSelectedExhibitors(eids);
 		}
-		for(TExhibitor exhibitor:exhibitors){
+		for(TeaExhibitor exhibitor:exhibitors){
 			TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(exhibitor.getEid());
 			if(exhibitorInfo != null){
 				if(StringUtils.isNotEmpty(exhibitorInfo.getLogo())){

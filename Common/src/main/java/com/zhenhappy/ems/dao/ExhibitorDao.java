@@ -3,6 +3,7 @@ package com.zhenhappy.ems.dao;
 import java.util.List;
 
 import com.zhenhappy.ems.entity.TExhibitor;
+import com.zhenhappy.ems.entity.TeaExhibitor;
 
 /**
  * Created by wujianbin on 2014-04-03.

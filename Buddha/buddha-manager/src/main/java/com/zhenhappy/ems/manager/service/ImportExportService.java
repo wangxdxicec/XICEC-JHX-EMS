@@ -73,6 +73,8 @@ public class ImportExportService extends ExhibitorService {
 				TExhibitorInfo exhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(exhibitor.getEid());
 				if(exhibitorInfo != null){
 					QueryExhibitorInfo queryExhibitorInfo = new QueryExhibitorInfo();
+					queryExhibitorInfo.setUsername(exhibitor.getUsername());
+					queryExhibitorInfo.setPassword(exhibitor.getPassword());
 					queryExhibitorInfo.setBoothNumber(exhibitorManagerService.loadBoothNum(exhibitor.getEid()));
 					queryExhibitorInfo.setCompany(exhibitorInfo.getCompany());
 					queryExhibitorInfo.setCompanyEn(exhibitorInfo.getCompanyEn());

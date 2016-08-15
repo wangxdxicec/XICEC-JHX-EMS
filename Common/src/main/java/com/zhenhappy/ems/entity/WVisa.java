@@ -12,9 +12,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "WVisa", schema = "dbo")
 public class WVisa implements java.io.Serializable {
-
 	// Fields
-
 	private Integer id;
 	private Integer WCustomerInfo;
 	private String fullPassportName;
@@ -91,7 +89,7 @@ public class WVisa implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "WCustomerInfo")
+	@Column(name = "CustomerID")
 	public Integer getWCustomerInfo() {
 		return this.WCustomerInfo;
 	}

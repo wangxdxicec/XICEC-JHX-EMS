@@ -28,14 +28,14 @@ public class InvoiceAction extends BaseAction {
     @RequestMapping(value = "index")
     public ModelAndView index(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         TInvoiceApply invoiceApply = invoiceService.getByEid(principle.getExhibitor().getEid());
-        try {
-            invoiceApply.setExhibitorNo(jdbcTemplate.queryForObject("select booth_number from [t_exhibitor_booth] where eid = ?", new Object[]{principle.getExhibitor().getEid()}, java.lang.String.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if (invoiceApply == null) {
             return new ModelAndView("/user/invoice/index");
         } else {
+            try {
+                invoiceApply.setExhibitorNo(jdbcTemplate.queryForObject("select booth_number from [t_exhibitor_booth] where eid = ?", new Object[]{principle.getExhibitor().getEid()}, java.lang.String.class));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             ModelAndView modelAndView = new ModelAndView("/user/invoice/update");
             modelAndView.addObject("invoice", invoiceApply);
             return modelAndView;

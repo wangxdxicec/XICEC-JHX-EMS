@@ -22,7 +22,7 @@ public class VisitorInfoDaoImp extends BaseDaoHibernateImp<TVisitorInfo> impleme
                 "a.updateTime, a.sendEmailNum,a.sendEmailTime, a.sendMsgNum,a.sendMsgTime, a.langFlag,a.visitDate,a.beenToFair,a.beenToRole,a.isRecieveEmail," +
                 "a.isRecieveDoc,a.isMobile,a.isjudged,a.isProfessional,a.isAccommodation, a.isDisabled, a.isReaded, a.tmp_Country,a.tmp_Postcode,a.tmp_Interest,a.tmp_InterestOthers," +
                 "a.tmp_Knowfrom,a.tmp_KnowfromOthers,a.tmp_V_name1,a.tmp_V_title1, a.tmp_V_position1,a.tmp_V_contact1,a.tmp_V_name2,a.tmp_V_title2," +
-                "a.tmp_V_position2,a.tmp_V_contact2,a.tmp_V_name3,a.tmp_V_title3, a.tmp_V_position3,a.tmp_V_contact3,a.guid,a.govement,a.rabbi) from TVisitorInfo a " +
+                "a.tmp_V_position2,a.tmp_V_contact2,a.tmp_V_name3,a.tmp_V_title3, a.tmp_V_position3,a.tmp_V_contact3,a.guid,a.govement,a.rabbi,a.customer_type) from TVisitorInfo a " +
                 "where a.id in (:ids) and (a.rabbi " + (rabbiFlag==1?"= 1" :"=0 or a.rabbi is null") + ")");
         q.setParameterList("ids", ids);
         return q.list();
@@ -36,7 +36,7 @@ public class VisitorInfoDaoImp extends BaseDaoHibernateImp<TVisitorInfo> impleme
                 "a.updateTime, a.sendEmailNum,a.sendEmailTime, a.sendMsgNum,a.sendMsgTime, a.langFlag,a.visitDate,a.beenToFair,a.beenToRole,a.isRecieveEmail," +
                 "a.isRecieveDoc,a.isMobile,a.isjudged,a.isProfessional,a.isAccommodation, a.isDisabled, a.isReaded, a.tmp_Country,a.tmp_Postcode,a.tmp_Interest,a.tmp_InterestOthers," +
                 "a.tmp_Knowfrom,a.tmp_KnowfromOthers,a.tmp_V_name1,a.tmp_V_title1, a.tmp_V_position1,a.tmp_V_contact1,a.tmp_V_name2,a.tmp_V_title2," +
-                "a.tmp_V_position2,a.tmp_V_contact2,a.tmp_V_name3,a.tmp_V_title3, a.tmp_V_position3,a.tmp_V_contact3,a.guid,a.govement,a.rabbi) from TVisitorInfo a where a.country=44 and a.rabbi=1");
+                "a.tmp_V_position2,a.tmp_V_contact2,a.tmp_V_name3,a.tmp_V_title3, a.tmp_V_position3,a.tmp_V_contact3,a.guid,a.govement,a.rabbi,a.customer_type) from TVisitorInfo a where a.country=44 and a.rabbi=1");
         return q.list();
     }
 
@@ -48,7 +48,7 @@ public class VisitorInfoDaoImp extends BaseDaoHibernateImp<TVisitorInfo> impleme
                 "a.updateTime, a.sendEmailNum,a.sendEmailTime, a.sendMsgNum,a.sendMsgTime, a.langFlag,a.visitDate,a.beenToFair,a.beenToRole,a.isRecieveEmail," +
                 "a.isRecieveDoc,a.isMobile,a.isjudged,a.isProfessional,a.isAccommodation, a.isDisabled, a.isReaded, a.tmp_Country,a.tmp_Postcode,a.tmp_Interest,a.tmp_InterestOthers," +
                 "a.tmp_Knowfrom,a.tmp_KnowfromOthers,a.tmp_V_name1,a.tmp_V_title1, a.tmp_V_position1,a.tmp_V_contact1,a.tmp_V_name2,a.tmp_V_title2," +
-                "a.tmp_V_position2,a.tmp_V_contact2,a.tmp_V_name3,a.tmp_V_title3, a.tmp_V_position3,a.tmp_V_contact3,a.guid,a.govement,a.rabbi) from TVisitorInfo a where a.country<>44 and a.rabbi=1");
+                "a.tmp_V_position2,a.tmp_V_contact2,a.tmp_V_name3,a.tmp_V_title3, a.tmp_V_position3,a.tmp_V_contact3,a.guid,a.govement,a.rabbi,a.customer_type) from TVisitorInfo a where a.country<>44 and a.rabbi=1");
         return q.list();
     }
 }

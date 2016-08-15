@@ -9,6 +9,8 @@ public class QueryExhibitorInfo {
 	private Integer einfoid;
 	private Integer eid;
 	private String organizationCode;
+	private String username;
+	private String password;
 	private String company;
 	private String companyEn;
 	private String phone;
@@ -241,4 +243,19 @@ public class QueryExhibitorInfo {
 		this.boothNumber = boothNumber;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 }

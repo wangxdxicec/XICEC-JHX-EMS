@@ -3,14 +3,25 @@ package com.zhenhappy.ems.manager.action.user;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
 import com.zhenhappy.ems.dao.JoinerDao;
-import com.zhenhappy.ems.entity.TExhibitorJoiner;
+import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
+import com.zhenhappy.ems.manager.dao.xicecmap.XicecMapDao;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionRequest;
+import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionResponse;
+import com.zhenhappy.ems.manager.entity.xicecmap.ReserverExhibitorInfoAndBooth;
+import com.zhenhappy.ems.manager.entity.xicecmap.SelloutExhibitorInfoAndBooth;
+import com.zhenhappy.ems.manager.entity.xicecmap.TXicecMapIntetion;
+import com.zhenhappy.ems.manager.exception.DuplicateTagException;
 import com.zhenhappy.ems.manager.service.ImportExportService;
+import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.manager.util.JXLExcelView;
+import com.zhenhappy.ems.service.managerrole.TUserInfoService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -26,9 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.zhenhappy.ems.dto.BaseResponse;
-import com.zhenhappy.ems.entity.TExhibitor;
-import com.zhenhappy.ems.entity.WCountry;
-import com.zhenhappy.ems.entity.WProvince;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
@@ -68,6 +76,10 @@ public class ExhibitorAction extends BaseAction {
     private JoinerDao joinerDao;
     @Autowired
     private ImportExportService importExportService;
+    @Autowired
+    private XicecMapDao xicecMapDao;
+    @Autowired
+    private TUserInfoService userInfoService;
 
     /**
      * 分页查询展商列表
@@ -300,7 +312,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "modifyExhibitorsArea", method = RequestMethod.POST)
-    public BaseResponse modifyExhibitorsArea(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @RequestParam("area") Integer area, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse modifyExhibitorsArea(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                             @RequestParam("area") Integer area, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	if(eids != null && area != null){
@@ -574,5 +587,229 @@ public class ExhibitorAction extends BaseAction {
             e.printStackTrace();
         }
         return response;
+    }
+
+    /**
+     * 分页查询展位预向列表
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryXicecMapIntetionByPage")
+    public QueryXicecMapIntetionResponse queryXicecMapIntetionByPage(@ModelAttribute QueryXicecMapIntetionRequest request) {
+        QueryXicecMapIntetionResponse response = new QueryXicecMapIntetionResponse();
+        try {
+            response = exhibitorManagerService.queryXicecMapIntetionByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "addBoothIntetion", method = RequestMethod.POST)
+    public BaseResponse addBoothIntetion(@ModelAttribute QueryXicecMapIntetionRequest request,
+                                         @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            boolean result = exhibitorManagerService.isSellOutByBoothNum(request.getBooth_num());
+            if(result){
+                throw new DuplicateTagException("展位号已经卖出去，请重新填写");
+            }else{
+                TXicecMapIntetion tXicecMapIntetion = new TXicecMapIntetion();
+                tXicecMapIntetion.setBooth_num(request.getBooth_num());
+                tXicecMapIntetion.setTag(request.getTag());
+                xicecMapDao.create(tXicecMapIntetion);
+            }
+        } catch (DuplicateTagException e) {
+            response.setResultCode(2);
+            response.setDescription("展位号已经卖出去，请重新填写");
+        } catch (Exception e) {
+            log.error("add booth intetion error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "modifyBoothIntetion", method = RequestMethod.POST)
+    public BaseResponse modifyBoothIntetion(@ModelAttribute QueryXicecMapIntetionRequest request,
+                                            @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            boolean result = exhibitorManagerService.isSellOutByBoothNum(request.getBooth_num());
+            if(result){
+                throw new DuplicateTagException("展位号已经卖出去，请重新填写");
+            }else{
+                TXicecMapIntetion tXicecMapIntetion = xicecMapDao.query(request.getId());
+                if(tXicecMapIntetion != null){
+                    tXicecMapIntetion.setBooth_num(request.getBooth_num());
+                    tXicecMapIntetion.setTag(request.getTag());
+                    xicecMapDao.update(tXicecMapIntetion);
+                }
+            }
+        } catch (Exception e) {
+            log.error("modify booth intetion error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 查询预定的展位信息
+     * @param principle
+     */
+    @ResponseBody
+    @RequestMapping(value = "getReserveExhibitorInfoAndBoothNum", method = RequestMethod.POST)
+    public List<ReserverExhibitorInfoAndBooth> getReserveExhibitorInfoAndBoothNum(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        List<ReserverExhibitorInfoAndBooth> reserverExhibitorInfoAndBoothList = new ArrayList<ReserverExhibitorInfoAndBooth>();
+        try {
+            List<TXicecMapIntetion> tXicecMapIntetionList = xicecMapDao.queryByHql("from TXicecMapIntetion ", new Object[]{});
+            for(TXicecMapIntetion tXicecMapIntetion:tXicecMapIntetionList){
+                String tagName = "";
+                if(tXicecMapIntetion.getTag() != null){
+                    TUserInfo userInfo = userInfoService.findOneUserInfo(tXicecMapIntetion.getTag());
+                    if(userInfo != null){
+                        tagName = userInfo.getName();
+                    }
+                }
+                ReserverExhibitorInfoAndBooth reserverExhibitorInfoAndBooth = new ReserverExhibitorInfoAndBooth(tXicecMapIntetion.getBooth_num(), tagName);
+                reserverExhibitorInfoAndBoothList.add(reserverExhibitorInfoAndBooth);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return reserverExhibitorInfoAndBoothList;
+    }
+
+    /**
+     * 根据本届展位查询对应的展商信息
+     * @param principle
+     */
+    @ResponseBody
+    @RequestMapping(value = "getSelloutExhibitorInfoAndBoothNum", method = RequestMethod.POST)
+    public List<SelloutExhibitorInfoAndBooth> getSelloutExhibitorInfoAndBoothNum(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        List<SelloutExhibitorInfoAndBooth> selloutExhibitorInfoAndBoothList = new ArrayList<SelloutExhibitorInfoAndBooth>();
+        try {
+            List<TExhibitor> tExhibitorList = exhibitorManagerService.loadAllExhibitors();
+            for(TExhibitor tExhibitor:tExhibitorList){
+                TExhibitorBooth tExhibitorBooth = exhibitorManagerService.queryBoothByEid(tExhibitor.getEid());
+                if(tExhibitorBooth.getBoothNumber() != null){
+                    String boothNumberValue = tExhibitorBooth.getBoothNumber().replace(", ",",");
+                    if(boothNumberValue.indexOf("-") > 0 && boothNumberValue.split("-")[1].length() > 2){
+                        List<SelloutExhibitorInfoAndBooth> selloutExhibitorInfoAndBoothListTemp = new ArrayList<SelloutExhibitorInfoAndBooth>();
+                        selloutExhibitorInfoAndBoothListTemp = converExhibitorInfoAndBoothList(tExhibitor, boothNumberValue);
+                        selloutExhibitorInfoAndBoothList.addAll(selloutExhibitorInfoAndBoothListTemp);
+                    }else if(boothNumberValue.indexOf(",") > 0){
+                        String[] boothArray = boothNumberValue.split(",");
+                        for(String booth: boothArray){
+                            TExhibitorInfo tExhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(tExhibitor.getEid());
+                            SelloutExhibitorInfoAndBooth selloutExhibitorInfoAndBooth = new SelloutExhibitorInfoAndBooth(booth.trim(),
+                                    ((tExhibitor.getCountry() == null || (tExhibitor.getCountry() != null && tExhibitor.getCountry() == 44))?tExhibitorInfo.getCompany():tExhibitorInfo.getCompanyEn()));
+                            selloutExhibitorInfoAndBoothList.add(selloutExhibitorInfoAndBooth);
+                        }
+                    }else{
+                        TExhibitorInfo tExhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(tExhibitor.getEid());
+                        SelloutExhibitorInfoAndBooth selloutExhibitorInfoAndBooth = new SelloutExhibitorInfoAndBooth(boothNumberValue,
+                                ((tExhibitor.getCountry() == null || (tExhibitor.getCountry() != null && tExhibitor.getCountry() == 44))?tExhibitorInfo.getCompany():tExhibitorInfo.getCompanyEn()));
+                        selloutExhibitorInfoAndBoothList.add(selloutExhibitorInfoAndBooth);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return selloutExhibitorInfoAndBoothList;
+    }
+
+    private List<SelloutExhibitorInfoAndBooth> converExhibitorInfoAndBoothList(TExhibitor tExhibitor, String boothNum) {
+        List<SelloutExhibitorInfoAndBooth> converExhibitorInfoAndBoothList = new ArrayList<SelloutExhibitorInfoAndBooth>();
+        String[] boothArray = boothNum.split("-");
+        if(boothArray.length>1){
+            String firstStr = boothArray[0];
+            String lastStr = boothArray[1];
+            String commomStr = "";
+            String firstNum = "";
+            String lastNum = "";
+            char[] firstArray = firstStr.toCharArray();
+            for (int i = firstArray.length-1; i>=0; i--) {
+                if (firstArray[i] >= 'a' && firstArray[i] <= 'z' || firstArray[i] >= 'A' && firstArray[i] <= 'Z') {
+                    commomStr = firstStr.substring(0,i+1);
+                    firstNum = firstStr.substring(i+1, firstArray.length);
+                    break;
+                }
+            }
+
+            char[] lastArray = lastStr.toCharArray();
+            for (int i = lastArray.length-1; i>=0; i--) {
+                if (lastArray[i] >= 'a' && lastArray[i] <= 'z' || lastArray[i] >= 'A' && lastArray[i] <= 'Z') {
+                    lastNum = lastStr.substring(i+1, lastArray.length);
+                    break;
+                }
+            }
+
+
+            if(StringUtil.isNotEmpty(firstNum) && StringUtil.isNotEmpty(lastNum)){
+                int first = Integer.parseInt(firstNum);
+                int last = Integer.parseInt(lastNum);
+                TExhibitorInfo tExhibitorInfo = exhibitorManagerService.loadExhibitorInfoByEid(tExhibitor.getEid());
+                for(int k=first;k<=last;k++){
+                    StringBuffer sb = new StringBuffer();
+                    sb.append(commomStr + k);
+                    if(sb.toString().length() != firstStr.length()){
+                        sb = new StringBuffer();
+                        sb.append(commomStr + "0" + k);
+                    }
+                    SelloutExhibitorInfoAndBooth selloutExhibitorInfoAndBooth = new SelloutExhibitorInfoAndBooth(sb.toString(),
+                            ((tExhibitor.getCountry() == null || (tExhibitor.getCountry() != null && tExhibitor.getCountry() == 44))?tExhibitorInfo.getCompany():tExhibitorInfo.getCompanyEn()));
+                    converExhibitorInfoAndBoothList.add(selloutExhibitorInfoAndBooth);
+                }
+            }
+        }
+        return converExhibitorInfoAndBoothList;
+    }
+
+    /**
+     * 根据展位号取消预定的展位信息
+     * @param boothNum
+     */
+    @ResponseBody
+    @RequestMapping(value = "cancelReserveExhibitorInfoAndBoothNum", method = RequestMethod.POST)
+    public BaseResponse cancelReserveExhibitorInfoAndBoothNum(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle,
+                                                              @RequestParam("boothNum") String boothNum) {
+        BaseResponse response = new BaseResponse();
+        try {
+            List<TXicecMapIntetion> tXicecMapIntetionList = xicecMapDao.queryByHql("from TXicecMapIntetion where booth_num=?", new Object[]{boothNum});
+            for(TXicecMapIntetion tXicecMapIntetion:tXicecMapIntetionList){
+                xicecMapDao.delete(tXicecMapIntetion);
+            }
+            response.setResultCode(0);
+        }catch (Exception e) {
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 根据展位号添加预定的展位信息
+     * @param boothNum
+     */
+    @ResponseBody
+    @RequestMapping(value = "addReserveExhibitorInfoAndBoothNum")
+    public ReserverExhibitorInfoAndBooth addReserveExhibitorInfoAndBoothNum(@ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle,
+                                                           @RequestParam("boothNum") String boothNum) {
+        ReserverExhibitorInfoAndBooth reserverExhibitorInfoAndBooth = new ReserverExhibitorInfoAndBooth();
+        try {
+            TXicecMapIntetion tXicecMapIntetion = new TXicecMapIntetion();
+            tXicecMapIntetion.setBooth_num(boothNum);
+            tXicecMapIntetion.setTag(principle.getAdmin().getId());
+            xicecMapDao.create(tXicecMapIntetion);
+            reserverExhibitorInfoAndBooth.setBoothNum(boothNum);
+            reserverExhibitorInfoAndBooth.setTagName(principle.getAdmin().getName());
+        }catch (Exception e) {
+        }
+        return reserverExhibitorInfoAndBooth;
     }
 }

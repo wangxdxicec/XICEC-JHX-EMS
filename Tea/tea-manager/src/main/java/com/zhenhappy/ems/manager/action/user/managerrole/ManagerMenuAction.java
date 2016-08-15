@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @SessionAttributes(value = ManagerPrinciple.MANAGERPRINCIPLE)
 public class ManagerMenuAction extends BaseAction {
     //展会结束相关数据归档设置
-    @RequestMapping(value = "resetAllExhibitorToDefault")
-    public String resetAllExhibitorToDefault(){
-        return "user/managerreset/resetview";
-    }
+    @RequestMapping(value = "resetAllExhibitorToDefaultIndex")
+    public String resetAllExhibitorToDefaultIndex(){ return "user/managerreset/resetview"; }
 
     //展会相关时间参数设置
-    @RequestMapping(value = "resetExhibitorBuddhaTime")
-    public String resetExhibitorBuddhaTime(){
+    @RequestMapping(value = "resetExhibitorTeaFairTimeIndex")
+    public String resetExhibitorTeaFairTimeIndex(){
         return "user/managerreset/exhibitor_time";
     }
 

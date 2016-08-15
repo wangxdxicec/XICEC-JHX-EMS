@@ -27,7 +27,6 @@ public class TExhibitorBuddhaTime {
         this.id = id;
     }
 
-    @Basic
     @Column(name = "buddha_Fair_Show_Date")
     public String getBuddha_Fair_Show_Date() {
         return buddha_Fair_Show_Date;
@@ -37,7 +36,6 @@ public class TExhibitorBuddhaTime {
         this.buddha_Fair_Show_Date = buddha_Fair_Show_Date;
     }
 
-    @Basic
     @Column(name = "exhibitor_Info_Submit_Deadline")
     public String getExhibitor_Info_Submit_Deadline() {
         return exhibitor_Info_Submit_Deadline;
@@ -47,7 +45,6 @@ public class TExhibitorBuddhaTime {
         this.exhibitor_Info_Submit_Deadline = exhibitor_Info_Submit_Deadline;
     }
 
-    @Basic
     @Column(name = "buddha_Fair_Show_Date_Begin")
     public String getBuddha_Fair_Show_Date_Begin() {
         return buddha_Fair_Show_Date_Begin;

@@ -87,13 +87,13 @@ public class PublicAction {
                     //默认国内展区
                     httpServletRequest.getSession().setAttribute("zone", new Integer(1));
                 }
+
+                //加载前台界面相关时间对象
+                TExhibitorTime tExhibitorTime = exhibitorTimeService.loadExhibitorTime();
+                httpServletRequest.getSession().setAttribute("tExhibitorTime", tExhibitorTime);
+
+                response.setResultCode(0);
             }
-
-            //加载前台界面相关时间对象
-            TExhibitorTime tExhibitorTime = exhibitorTimeService.loadExhibitorTime();
-            httpServletRequest.getSession().setAttribute("tExhibitorTime", tExhibitorTime);
-
-            response.setResultCode(0);
         } catch (Exception e) {
             log.error("login error.username:" + request.getUsername(), e);
             response.setResultCode(3);

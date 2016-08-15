@@ -20,6 +20,7 @@
         <framework.log.level>WARN</framework.log.level>
         <system.log.level>DEBUG</system.log.level>
     </properties>
+
     <profiles>
         <profile>
             <id>local</id>
@@ -30,6 +31,9 @@
                 <db.password>123456</db.password>
                 <appendix>D:\Users\Buddha</appendix>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>dev</id>
@@ -40,6 +44,9 @@
                 <db.password>123456</db.password>
                 <appendix>/Users/Kristine-Mac/Documents/Workspaces/appendix/buddha</appendix>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>product</id>
@@ -50,9 +57,6 @@
                 <db.password>gogo03Jhx</db.password>
                 <appendix>C:\Program Files\Apache Software Foundation\appendix\Buddha</appendix>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
     </profiles>
 

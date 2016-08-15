@@ -17,6 +17,7 @@ public class QueryCustomerRequest extends EasyuiRequest {
     private Integer isRabbicFlag;  //0：表示非法师；1：表示法师
     private Integer sourceValue;  //0：表示网站；1：表示手机
     private Integer pre;  //1：表示本次的数据；
+    private Integer customerType;
 
     public Integer getInlandOrForeign() {
         return inlandOrForeign;
@@ -120,5 +121,13 @@ public class QueryCustomerRequest extends EasyuiRequest {
 
     public void setPre(Integer pre) {
         this.pre = pre;
+    }
+
+    public Integer getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(Integer customerType) {
+        this.customerType = customerType;
     }
 }

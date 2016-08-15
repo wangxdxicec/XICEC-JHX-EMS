@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.ExhibitorGroupDao;
-import com.zhenhappy.ems.entity.TExhibitor;
+import com.zhenhappy.ems.dao.TeaExhibitorDao;
 import com.zhenhappy.ems.entity.TExhibitorGroup;
+import com.zhenhappy.ems.entity.TeaExhibitor;
 import com.zhenhappy.ems.manager.dto.AddExhibitorGroupRequest;
 import com.zhenhappy.ems.manager.dto.ModifyExhibitorGroupRequest;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorGroupRequest;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ExhibitorGroupManagerService {
 	@Autowired
-	private ExhibitorDao exhibitorDao;
+	private TeaExhibitorDao exhibitorDao;
 	@Autowired
 	private ExhibitorGroupDao exhibitorGroupDao;
 	@Autowired
@@ -199,9 +199,9 @@ public class ExhibitorGroupManagerService {
     	List<TExhibitorGroup> groups = exhibitorGroupDao.loadExhibitorGroupsByIds(ids);
     	if(groups != null){
 	    	for(TExhibitorGroup group:groups){
-	    		List<TExhibitor> exhibitors = exhibitorManagerService.loadExhibitorByGroupId(group.getId());
+	    		List<TeaExhibitor> exhibitors = exhibitorManagerService.loadExhibitorByGroupId(group.getId());
 	    		if(exhibitors != null){
-	    			for(TExhibitor exhibitor:exhibitors){
+	    			for(TeaExhibitor exhibitor:exhibitors){
 	    				exhibitor.setGroup(null);
 	    				exhibitorDao.update(exhibitor);
 		    		}

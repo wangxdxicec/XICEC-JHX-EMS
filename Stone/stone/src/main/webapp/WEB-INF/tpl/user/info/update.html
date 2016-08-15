@@ -95,22 +95,22 @@
                 <div style="color: #f1b426;font-size: 16px;border-bottom: 1px #dbdbdb solid;line-height: 32px;font-weight: bolder"><@spring.message "info.update.exhibition.title"/></div>
                 <#if .now?date gt exhibitor_data_end_html?date>
                     <div class="alert alert-block">已截止</div>
-                    <#else>
-                        <div class="alert alert-block"> ${tExhibitorTime.company_Info_Data_End_Html}截止，所提交的信息将同步到官网、会刊、App和微信公众号等平台供采购商查阅。</div>
+                <#else>
+                    <div class="alert alert-block"> ${tExhibitorTime.company_Info_Data_End_Html}截止，所提交的信息将同步到官网、会刊、App和微信公众号等平台供采购商查阅。</div>
                 </#if>
                 <div style="color: red"><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>为必填项</div>
                 <div class="control-group">
                     <label for="inputCompanyZh" class="control-label" required><@spring.message "info.update.exhibition.company_zh"/></label>
 
                     <div class="controls">
-                        <textarea disabled="disabled" catValidate="required:true" name="company" class="form-control" id="inputCompanyZh">${updateInfo.company!''}</textarea><span style="font-weight: bolder;color: red;padding-left: 5px;">*请核对，如有误请联系组委会</span>
+                        <textarea readonly="readonly" catValidate="required:true" name="company" class="form-control" id="inputCompanyZh">${updateInfo.company!''}</textarea><span style="font-weight: bolder;color: red;padding-left: 5px;">*请核对，如有误请联系组委会</span>
                     </div>
                 </div>
                 <div class="control-group">
                     <label for="inputCompanyEn" class="control-label"><@spring.message "info.update.exhibition.company_en"/></label>
 
                     <div class="controls">
-                        <textarea disabled="disabled" catValidate="required:true" name="companyEn" class="form-control" id="inputCompanyEn">${updateInfo.companyEn!''}</textarea><span style="font-weight: bolder;color: red;padding-left: 5px;">*请核对，如有误请联系组委会</span>
+                        <textarea readonly="readonly" catValidate="required:true" name="companyEn" class="form-control" id="inputCompanyEn">${updateInfo.companyEn!''}</textarea><span style="font-weight: bolder;color: red;padding-left: 5px;">*请核对，如有误请联系组委会</span>
                     </div>
                 </div>
                 <div class="control-group">

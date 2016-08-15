@@ -325,7 +325,7 @@
     })(jQuery);
 
     function loadData() {
-        $("#olddatas").html("")
+        $("#olddatas").html("");
         $.ajax({
             url: "${base}/user/queryJoiners",
             type: "POST",
@@ -361,12 +361,13 @@
                         data.email = joiner.email;
                         data.position = joiner.position;
                         data.telphone = joiner.telphone;
+                        data.isNew = joiner.isNew;
                         if(joiner.isDelete == 0) data.isDelete = 1;
                         else data.isDelete = 0;
                         $.ajax({
                             data: $.toJSON(data),
                             type: "POST",
-                            url: "${base}/user/saveJoiner",
+                            url: "${base}/user/updateJoiner",
                             success: function (data) {
                                 if (data.resultCode == 0) {
                                     $("#addJoinerForm input").val("");
@@ -409,7 +410,7 @@
 			}
         });
 
-        $("#newdatas").html("")
+        $("#newdatas").html("");
         $.ajax({
             url: "${base}/user/queryJoiners",
             type: "POST",
@@ -445,12 +446,13 @@
                         data.email = joiner.email;
                         data.position = joiner.position;
                         data.telphone = joiner.telphone;
+                        data.isNew = joiner.isNew;
                         if(joiner.isDelete == 0) data.isDelete = 1;
                         else data.isDelete = 0;
                         $.ajax({
                             data: $.toJSON(data),
                             type: "POST",
-                            url: "${base}/user/saveJoiner",
+                            url: "${base}/user/updateJoiner",
                             success: function (data) {
                                 if (data.resultCode == 0) {
                                     $("#addJoinerForm input").val("");
@@ -640,7 +642,7 @@
             $.ajax({
                 data: $.toJSON(data),
                 type: "POST",
-                url: "${base}/user/saveJoiner",
+                url: "${base}/user/updateJoiner",
                 success: function (data) {
                     if (data.resultCode == 0) {
                         loadData();

@@ -40,7 +40,7 @@ public class TVisa {
 	private String passportPage;
 	private String businessLicense;
 	private Integer joinerId;
-	private Integer status;
+	private Integer status;  //0：表示未提交（已存在记录）；1：表示提交；2：表示未提交（新增加记录）
 	private Date createTime;
 	private Date updateTime;
 	private String address;

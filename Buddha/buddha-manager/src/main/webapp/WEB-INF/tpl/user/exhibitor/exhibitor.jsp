@@ -203,8 +203,23 @@
         </table>
     </form>
 </div>
-
 <!-- 批量修改展区表单 -->
+
+<!-- 修改展位号表单 -->
+<div id="modifyExhibitorsBoothDlg" data-options="iconCls:'icon-add',modal:true">
+	<form id="modifyExhibitorsBoothForm" name="modifyExhibitorsBoothForm">
+		<table style="width: 320px;margin: 20px auto">
+			<tr>
+				<td style="width: 90px;text-align: right">展位号：</td>
+				<td>
+					<input class="easyui-validatebox" type="text" id="modifyBooth" name="modifyBooth">
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<!-- 修改展位号表单 -->
+
 <div id="modifyExhibitorsAreaDlg" data-options="iconCls:'icon-add',modal:true">
     <form id="modifyExhibitorsAreaForm" name="modifyExhibitorsAreaForm">
         <table style="width: 320px;margin: 20px auto">
@@ -280,7 +295,7 @@
     <div>
         <div id="addExhibitor" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加展商账号</div>
 		<div id="modifyExhibitorsTag" class="easyui-linkbutton" iconCls="icon-edit" plain="true">修改所属人</div>
-		<div id="modifyExhibitorsGroup" class="easyui-linkbutton" iconCls="icon-edit" plain="true">修改展团</div>
+		<div id="modifyExhibitorsBooth" class="easyui-linkbutton" iconCls="icon-edit" plain="true">修改展位号</div>
 		<div id="modifyExhibitorsArea" class="easyui-linkbutton" iconCls="icon-edit" plain="true">修改展区</div>
         <div id="removeExhibitor" class="easyui-linkbutton" iconCls="icon-remove" plain="true">注销展商账号</div>
         <div id="enableExhibitor" class="easyui-linkbutton" iconCls="icon-edit" plain="true">启用展商账号</div>
@@ -371,25 +386,10 @@
 			$.messager.alert('提示', '请至少选择一项展商再修改所属人');
 		}
 	});
-	//批量修改展团
-	$('#modifyExhibitorsGroup').click(function(){
+	//修改展位号
+	$('#modifyExhibitorsBooth').click(function(){
 		if(checkedItems.length > 0){
-			$.ajax({
-	       		type:"POST",
-	       		dataType:"json",
-	       		url:"${base}/user/queryExhibitorGroupByPage",
-	       		success : function(result) {
-	       			if(result){
-	       				$("#modifyGroup").html('');
-	       				$("#modifyGroup").append('<option value="">请选择</option>');
-	       				for(var i=0,a;a=result.rows[i++];){
-//	        				    console.log(a);
-	       					$("#modifyGroup").append('<option value="'+a.id+'">'+a.groupName+'</option>');
-	       				}
-	       			}
-	       		}
-	       	});
-	        $("#modifyExhibitorsGroupDlg").dialog("open");
+	        $("#modifyExhibitorsBoothDlg").dialog("open");
 		}else{
 			$.messager.alert('提示', '请至少选择一项展商再修改所属人');
 		}
@@ -1075,8 +1075,8 @@
 		// 批量修改所属人弹出框
         $('#modifyExhibitorsTagDlg').dialog({
             title: '批量修改所属人',
-            width: 350,
-            height: 140,
+            width: 360,
+            height: 150,
             closed: true,
             cache: false,
             modal: true,
@@ -1124,11 +1124,11 @@
                 }
             ]
         });
-     	// 批量修改展团弹出框
-        $('#modifyExhibitorsGroupDlg').dialog({
-            title: '批量修改所属人',
-            width: 350,
-            height: 140,
+     	// 批量修改展位号弹出框
+        $('#modifyExhibitorsBoothDlg').dialog({
+            title: '批量修改展位号',
+            width: 360,
+            height: 150,
             closed: true,
             cache: false,
             modal: true,
@@ -1138,17 +1138,17 @@
                     iconCls: 'icon-ok',
                     handler: function () {
                     	if(checkedItems.length > 0){
-                    		var group = document.getElementById("modifyGroup").value;
+                    		var boothValue = document.getElementById("modifyBooth").value;
                     		$.ajax({
-                                url: "${base}/user/modifyExhibitorsGroup",
+                                url: "${base}/user/modifyExhibitorsBooth",
                                 type: "post",
                                 dataType: "json",
-                                data: {"eids": checkedItems, "group": group},
+                                data: {"eids": checkedItems, "boothValue": boothValue},
                                 traditional: true,
                                 success: function (data) {
                                     if (data.resultCode == 0) {
                                     	$("#exhibitors").datagrid("reload");
-                                    	$("#modifyExhibitorsGroupDlg").dialog("close");
+                                    	$("#modifyExhibitorsBoothDlg").dialog("close");
                                     	checkedItems = [];
                                         $.messager.show({
                                             title: '成功',
@@ -1158,7 +1158,7 @@
                                         });
 										$("#exhibitors").datagrid("unselectAll");
                                     } else {
-                                        $.messager.alert('错误', '系统错误');
+                                        $.messager.alert('错误', data.description);
                                     }
                                 }
                             });
@@ -1170,17 +1170,18 @@
                 {
                     text: '取消',
                     handler: function () {
-                    	document.getElementById("modifyExhibitorsGroupForm").reset();  
-                    	$("#modifyExhibitorsGroupDlg").dialog("close");
+                    	document.getElementById("modifyExhibitorsBoothForm").reset();
+                    	$("#modifyExhibitorsBoothDlg").dialog("close");
                     }
                 }
             ]
         });
+
 		// 批量修改展区弹出框
         $('#modifyExhibitorsAreaDlg').dialog({
             title: '批量修改展区',
-            width: 350,
-            height: 140,
+            width: 360,
+            height: 150,
             closed: true,
             cache: false,
             modal: true,

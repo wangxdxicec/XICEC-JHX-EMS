@@ -749,6 +749,26 @@ public class ExhibitorManagerService extends ExhibitorService {
     		}
     	}
     }
+
+    /**
+     * 根据eids批量修改所属人展团
+     * @param eids
+     * @param boothValue
+     * @param adminId
+     */
+    @Transactional
+    public void modifyExhibitorsBooth(Integer[] eids, String boothValue, Integer adminId) {
+        if(eids != null){
+            List<TExhibitor> exhibitors = exhibitorDao.loadExhibitorsByEids(eids);
+            for(Integer eid: eids){
+                TExhibitorBooth exhibitorBooth = queryBoothByEid(eid);
+                if(exhibitorBooth != null){
+                    exhibitorBooth.setBoothNumber(boothValue);
+                    getHibernateTemplate().update(exhibitorBooth);
+                }
+            }
+        }
+    }
     
     /**
      * 根据eids批量修改展区

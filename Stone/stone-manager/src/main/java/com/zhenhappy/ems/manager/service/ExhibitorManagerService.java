@@ -6,6 +6,7 @@ import com.zhenhappy.ems.dao.ExhibitorInfoDao;
 import com.zhenhappy.ems.dto.ExhibitorBooth;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.ExhibitorBoothDao;
+import com.zhenhappy.ems.manager.dao.xicecmap.XicecMapDao;
 import com.zhenhappy.ems.manager.dto.AddExhibitorRequest;
 import com.zhenhappy.ems.manager.dto.ModifyExhibitorRequest;
 import com.zhenhappy.ems.manager.dto.ModifyExhibitorInfoRequest;
@@ -13,8 +14,11 @@ import com.zhenhappy.ems.manager.dto.QueryBoothNumAndMeipai;
 import com.zhenhappy.ems.manager.dto.QueryExhibitor;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorRequest;
 import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
+import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionRequest;
+import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionResponse;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
+import com.zhenhappy.ems.manager.entity.xicecmap.TXicecMapIntetion;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.ExhibitorService;
@@ -63,6 +67,8 @@ public class ExhibitorManagerService extends ExhibitorService {
     private ProductManagerService productManagerService;
     @Autowired
     private ExhibitorBoothDao exhibitorBoothDao;
+    @Autowired
+    private XicecMapDao xicecMapDao;
 
     /**
      * 分页获取展商列表
@@ -143,7 +149,7 @@ public class ExhibitorManagerService extends ExhibitorService {
                 System.out.println("eid=" + exhibitor.getEid() + "公司中文名=" +  exhibitor.getCompany() + "公司英文名=" +  exhibitor.getCompanye() + "\n" +  "没有展商详细信息");
             }else{
                 exhibitor.setInfoFlag(selectColor(exhibitor, exhibitorInfo));
-                if(null != exhibitor.getIsLogin() && exhibitor.getIsLogin() == 0){
+                if(exhibitor.getIsLogout() == 0 && null != exhibitor.getIsLogin() && exhibitor.getIsLogin() == 0){
                     exhibitor.setInfoFlag(5);
                 }
             }
@@ -654,10 +660,10 @@ public class ExhibitorManagerService extends ExhibitorService {
         exhibitor.setCreateUser(adminId);
         exhibitor.setCreateTime(new Date());
         Integer eid = (Integer) getHibernateTemplate().save(exhibitor);
-        //---add by wangxd, begin---
+        /*//---add by wangxd, begin---
         exhibitorInfo.setEid(eid);
         getHibernateTemplate().save(exhibitorInfo);
-        //---add by wangxd, end---
+        //---add by wangxd, end---*/
         ModifyExhibitorInfoRequest modifyExhibitorInfoRequest = new ModifyExhibitorInfoRequest();
         modifyExhibitorInfoRequest.setEid(eid);
         /*modifyExhibitorInfoRequest.setCompany(exhibitor.getCompany());
@@ -890,6 +896,7 @@ public class ExhibitorManagerService extends ExhibitorService {
                     exhibitorInfo.setCompany(request.getCompany().trim());
                     exhibitorInfo.setCompanyEn(request.getCompanyEn().trim());
                     exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(request.getCompany().trim()));
+                    exhibitorInfo.setCreateTime(new Date());
     				exhibitorInfo.setUpdateTime(new Date());
 					if(adminId != null){
 						exhibitorInfo.setAdminUser(adminId);
@@ -903,6 +910,7 @@ public class ExhibitorManagerService extends ExhibitorService {
     			}
 				exhibitorInfo.setCompany(request.getCompany().trim());
 				exhibitorInfo.setCompanyEn(request.getCompanyEn().trim());
+                exhibitorInfo.setCompanyT(JChineseConvertor.getInstance().s2t(request.getCompany().trim()));
     			exhibitorInfo.setPhone(request.getPhone());
 				exhibitorInfo.setFax(request.getFax());
 				exhibitorInfo.setEmail(request.getEmail());
@@ -1108,4 +1116,56 @@ public class ExhibitorManagerService extends ExhibitorService {
 		}
 	}
 
+    /**
+     * 分页查询展位预向列表
+     * @param request
+     * @return
+     */
+    public QueryXicecMapIntetionResponse queryXicecMapIntetionByPage(QueryXicecMapIntetionRequest request) {
+        List<String> conditions = new ArrayList<String>();
+        try {
+            if (StringUtils.isNotEmpty(request.getBooth_num())) {
+                conditions.add(" (booth_num like '%" + request.getBooth_num() + "%' OR booth_num like '%" + new String(request.getBooth_num().getBytes("ISO-8859-1"),"GBK") + "%' OR booth_num like '%" + new String(request.getBooth_num().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+            }
+            if (request.getTag() != null) {
+                conditions.add(" tag = " + request.getTag().intValue() + " ");
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String conditionsSql = StringUtils.join(conditions, " and ");
+        String conditionsSqlNoOrder = "";
+        if(StringUtils.isNotEmpty(conditionsSql)){
+            conditionsSqlNoOrder = " where " + conditionsSql;
+        }
+        Page page = new Page();
+        page.setPageSize(request.getRows());
+        page.setPageIndex(request.getPage());
+        List<TXicecMapIntetion> tXicecMapIntetionList = xicecMapDao.queryPageByHQL("select count(*) from TXicecMapIntetion " + conditionsSqlNoOrder,
+                "select new com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionInfo(id, booth_num, tag) from TXicecMapIntetion "  + conditionsSqlNoOrder, new Object[]{}, page);
+        QueryXicecMapIntetionResponse response = new QueryXicecMapIntetionResponse();
+        response.setResultCode(0);
+        response.setRows(tXicecMapIntetionList);
+        response.setTotal(page.getTotalCount());
+        return response;
+    }
+
+    /**
+     * 通过展位号判断当前是否被卖出去
+     * @param boothNum
+     * @return
+     */
+    @Transactional
+    public boolean isSellOutByBoothNum(String boothNum){
+        boolean flag = false;
+        List<TExhibitorBooth> boothList = getHibernateTemplate().find("from TExhibitorBooth where boothNumber = ?", new Object[]{boothNum});
+        for(TExhibitorBooth tExhibitorBooth: boothList){
+            TExhibitor tExhibitor = exhibitorDao.query(tExhibitorBooth.getEid());
+            if(tExhibitor.getIsLogout() == 0){
+                flag = true;
+                break;
+            }
+        }
+        return flag;
+    }
 }

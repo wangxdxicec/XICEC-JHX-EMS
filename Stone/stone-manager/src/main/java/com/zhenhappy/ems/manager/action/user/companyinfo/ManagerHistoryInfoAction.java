@@ -40,7 +40,6 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -96,10 +95,16 @@ public class ManagerHistoryInfoAction extends BaseAction {
         return "/user/companyinfo/managerShareInfo";
     }
 
-    //地图试验
+    //高德地图试验
     @RequestMapping(value = "mapTest")
     public String mapTest(){
         return "/user/companyinfo/mapTest";
+    }
+
+    //会展地图试验
+    @RequestMapping(value = "xicecmapTest")
+    public String xicecmapTest(){
+        return "/user/companyinfo/xicecTest";
     }
 
     /**

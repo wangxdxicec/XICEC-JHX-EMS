@@ -87,6 +87,7 @@ public class TVisitorInfo implements java.io.Serializable {
     private String guid;
     private Integer govementFlag;
     private String rabbi;
+    private Integer customer_type;
 
     // Constructors
 
@@ -98,53 +99,6 @@ public class TVisitorInfo implements java.io.Serializable {
     public TVisitorInfo(Integer id) {
         this.id = id;
     }
-
-    /** full constructor */
-    /*public TVisitorInfo(Integer id, String email, String checkingNo,
-                        String password, String firstName, String lastName, String sex,
-                        String company, String position, Integer country, String province,
-                        String city, String address, String backupEmail,
-                        String mobileCode, String mobile, String telCode,
-                        String tel, String telCode2, String faxCode,
-                        String fax, String faxCode2, String website, String remark,
-                        String createIp, Date createTime, String updateIp,
-                        Date updateTime, Integer sendEmailNum,Date sendEmailDate,
-                        Boolean isDisabled, String guid, String govement, String rabbi) {
-        this.id = id;
-        this.email = email;
-        this.checkingNo = checkingNo;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.sex = sex;
-        this.company = company;
-        this.position = position;
-        this.country = country;
-        this.province = province;
-        this.city = city;
-        this.address = address;
-        this.backupEmail = backupEmail;
-        this.mobileCode = mobileCode;
-        this.mobilePhone = mobile;
-        this.telCode = telCode;
-        this.tel = tel;
-        this.telCode2 = telCode2;
-        this.faxCode = faxCode;
-        this.fax = fax;
-        this.faxCode2 = faxCode2;
-        this.website = website;
-        this.remark = remark;
-        this.createIp = createIp;
-        this.createTime = createTime;
-        this.updateIp = updateIp;
-        this.updateTime = updateTime;
-        this.sendEmailNum = sendEmailNum;
-        this.sendEmailTime = sendEmailDate;
-        this.isDisabled = isDisabled;
-        this.guid = guid;
-        this.govement = govement;
-        this.rabbi = rabbi;
-    }*/
 
     public TVisitorInfo(Integer id, String email, String checkingNo,
                      String password, String firstName, String lastName, String sex,
@@ -162,7 +116,7 @@ public class TVisitorInfo implements java.io.Serializable {
                      String tmp_Knowfrom,String tmp_KnowfromOthers,String tmp_V_name1,String tmp_V_title1,
                      String tmp_V_position1,String tmp_V_contact1,String tmp_V_name2,String tmp_V_title2,
                      String tmp_V_position2,String tmp_V_contact2,String tmp_V_name3,String tmp_V_title3,
-                     String tmp_V_position3,String tmp_V_contact3,String guid, Integer govement, String rabbi) {
+                     String tmp_V_position3,String tmp_V_contact3,String guid, Integer govement, String rabbi, Integer customer_type) {
         this.id = id;
         this.email = email;
         this.checkingNo = checkingNo;
@@ -230,6 +184,7 @@ public class TVisitorInfo implements java.io.Serializable {
         this.guid = guid;
         this.govementFlag = govement;
         this.rabbi = rabbi;
+        this.customer_type = customer_type;
     }
 
     // Property accessors
@@ -699,5 +654,14 @@ public class TVisitorInfo implements java.io.Serializable {
 
     public void setRabbi(String rabbi) {
         this.rabbi = rabbi;
+    }
+
+    @Column(name = "customer_type")
+    public Integer getCustomer_type() {
+        return customer_type;
+    }
+
+    public void setCustomer_type(Integer customer_type) {
+        this.customer_type = customer_type;
     }
 }

@@ -2,16 +2,13 @@ package com.zhenhappy.ems.manager.service;
 
 import java.util.List;
 
-import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.TagDao;
-import com.zhenhappy.ems.entity.TExhibitor;
-import com.zhenhappy.ems.entity.TProduct;
+import com.zhenhappy.ems.dao.TeaExhibitorDao;
 import com.zhenhappy.ems.entity.TTag;
-import com.zhenhappy.ems.manager.dto.QueryProductsResponse;
+import com.zhenhappy.ems.entity.TeaExhibitor;
 import com.zhenhappy.ems.manager.dto.QueryTagRequest;
 import com.zhenhappy.ems.manager.dto.QueryTagResponse;
 import com.zhenhappy.ems.manager.exception.DuplicateTagException;
-import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.util.Page;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +24,7 @@ public class TagManagerService {
 	@Autowired
 	private TagDao tagDao;
 	@Autowired
-    private ExhibitorDao exhibitorDao;
+    private TeaExhibitorDao exhibitorDao;
 	@Autowired
     private HibernateTemplate hibernateTemplate;
 	
@@ -118,9 +115,9 @@ public class TagManagerService {
     	List<TTag> tags = tagDao.loadTagsByTids(tids);
     	if(tags != null){
 	    	for(TTag tag:tags){
-	    		List<TExhibitor> exhibitors = queryExhibitorByTag(tag.getId());
+	    		List<TeaExhibitor> exhibitors = queryExhibitorByTag(tag.getId());
 	    		if(exhibitors != null){
-	    			for(TExhibitor exhibitor:exhibitors){
+	    			for(TeaExhibitor exhibitor:exhibitors){
 	    				exhibitor.setTag(null);
 	    				exhibitorDao.update(exhibitor);
 		    		}
@@ -135,8 +132,8 @@ public class TagManagerService {
      * @param tid
      */
     @Transactional
-    public List<TExhibitor> queryExhibitorByTag(Integer tid) {
-    	List<TExhibitor> exhibitors = exhibitorDao.queryByHql("from TExhibitor where tag=?", new Object[]{tid});
+    public List<TeaExhibitor> queryExhibitorByTag(Integer tid) {
+    	List<TeaExhibitor> exhibitors = exhibitorDao.queryByHql("from TeaExhibitor where tag=?", new Object[]{tid});
     	return exhibitors;
     }
 }

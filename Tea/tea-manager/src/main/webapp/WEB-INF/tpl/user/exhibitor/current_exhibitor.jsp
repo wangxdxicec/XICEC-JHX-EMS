@@ -288,7 +288,7 @@
 		<div id="modifyExhibitorsArea" class="easyui-linkbutton" iconCls="icon-edit" plain="true">修改展区</div>
         <div id="removeExhibitor" class="easyui-linkbutton" iconCls="icon-remove" plain="true">注销展商账号</div>
         <div id="enableExhibitor" class="easyui-linkbutton" iconCls="icon-edit" plain="true">启用展商账号</div>
-        <div id="deleteExhibitor" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除展商账号</div>
+        <%--<div id="deleteExhibitor" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除展商账号</div>--%>
         <div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
 		<div class="easyui-menubutton" menu="#import" iconCls="icon-undo">导入</div>
     </div>
@@ -1229,6 +1229,11 @@
                     iconCls: 'icon-ok',
                     handler: function () {
                     	var file = document.getElementById("file").value;
+						var country = document.getElementById("countryImport").value;
+						var province = document.getElementById("provinceImport").value;
+						var area = document.getElementById("areaImport").value;
+						var group = document.getElementById("groupImport").value;
+						var tag = document.getElementById("tagImport").value;
                     	if(file == null || file == ""){
                     		$.messager.alert('提示', '请选择所要上传的文件！');
                     	} else {
@@ -1243,7 +1248,8 @@
 		                    		$.ajaxFileUpload({
 										url:'upload/exhibitors',
 										dataType: 'text/html',
-										data:$("#importExhibitorsForm").serializeJson(),
+										data:{"file":$("#importExhibitorsForm").serializeJson(), "isCurrent": 1,
+										"country":country, "province": province, "area": area, "group": group, "tag": tag},
 										fileElementId:'file',
 										success: function (data){
 											$("#importExhibitorsDlg").dialog("close");
