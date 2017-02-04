@@ -76,11 +76,11 @@
 					登记时间<br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
-				<th data-options="field: 'customerType', formatter: formatCustomerType, width: $(this).width()/8">
+				<%--<th data-options="field: 'customerType', formatter: formatCustomerType, width: $(this).width()/8">
 					类别<br/>
 					<select id="customer_type" style="width:100%;height:15px;" onchange="filter(this.options[this.options.selectedIndex].value);">
 					</select>
-				</th>
+				</th>--%>
 			</tr>
 			</thead>
 		</table>
@@ -391,9 +391,9 @@
 		if(document.getElementById("createdTime").value != ""){
 			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
 		}
-		if(document.getElementById("customer_type").value != ""){
+		/*if(document.getElementById("customer_type").value != ""){
 			filterParm += '&customerType=' + encodeURI(document.getElementById("customer_type").value);
-		}
+		}*/
 		filterParm += '&inlandOrForeign=1';
 		filterParm += '&isRabbicFlag=0';
 		$('#customers').datagrid('options').url = '${base}/user/queryCustomersByPage' + filterParm;
@@ -434,9 +434,9 @@
 		if(document.getElementById("createdTime").value != ""){
 			filterParm += '&createTime=' + encodeURI(document.getElementById("createdTime").value);
 		}
-		if(document.getElementById("customer_type").value != ""){
+		/*if(document.getElementById("customer_type").value != ""){
 			filterParm += '&customerType=' + encodeURI(document.getElementById("customer_type").value);
-		}
+		}*/
 		filterParm += '&inlandOrForeign=1';
 		filterParm += '&isRabbicFlag=0';
 		$('#customers').datagrid('options').url = '${base}/user/queryCustomersByPage' + filterParm;

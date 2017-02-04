@@ -15,7 +15,11 @@ public class WVisaDaoImp extends BaseDaoHibernateImp<WVisa> implements WVisaDao 
 
 	@Override
 	public List<WVisa> loadWVisasByVids(Integer[] vids) {
-		Query q = this.getSession().createQuery("select new WVisa(v.id,v.WCustomerInfo,v.fullPassportName,v.gender,v.nationality,v.passportNo,v.expDate,v.dateOfBirth,v.chineseEmbassy,v.consulateOfCity,v.durationBeginTime,v.durationEndTime,v.passportPage,v.businessLicense,v.wthInfoId,v.createTime,v.updateTime,v.needPost,v.expressTp,v.expressNo,v.isDisabled) from WVisa v where v.id in (:vids)");
+		Query q = this.getSession().createQuery("select new WVisa(v.id,v.WCustomerInfo," +
+				"v.fullPassportName,v.gender,v.nationality,v.passportNo,v.expDate,v.dateOfBirth," +
+				"v.chineseEmbassy,v.consulateOfCity,v.durationBeginTime,v.durationEndTime," +
+				"v.passportPage,v.businessLicense,v.wthInfoId,v.createTime,v.updateTime,v.needPost," +
+				"v.expressTp,v.expressNo,v.isDisabled) from WVisa v where v.id in (:vids)");
 		q.setParameterList("vids", vids);
 		return q.list();
 	}

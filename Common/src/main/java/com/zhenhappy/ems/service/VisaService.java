@@ -35,6 +35,26 @@ public class VisaService {
         return visas;
     }
 
+    public List<TVisa> queryVisaListByEid(Integer eid) {
+        List<TVisa> tVisaList = new ArrayList<TVisa>();
+        List<TExhibitorJoiner> tExhibitorJoinerList = hibernateTemplate.find("from TExhibitorJoiner where eid in (?) and isDelete = 0 ", new Object[]{eid});
+        for(TExhibitorJoiner tExhibitorJoiner:tExhibitorJoinerList){
+            TVisa tVisa = queryVisasByJoinerId(tExhibitorJoiner.getId());
+            if(tVisa == null){
+                tVisa = new TVisa();
+                tVisa.setJoinerId(tExhibitorJoiner.getId());
+                tVisa.setPassportName(tExhibitorJoiner.getName());
+                tVisa.setUpdateTime(new Date());
+                tVisa.setCreateTime(new Date());
+                tVisa.setEid(tExhibitorJoiner.getEid());
+                tVisa.setStatus(2);
+                hibernateTemplate.save(tVisa);
+            }
+            tVisaList.add(tVisa);
+        }
+        return tVisaList;
+    }
+
 	/**
 	 * Visa must combine with joiner。
 	 * @param eid
@@ -97,6 +117,16 @@ public class VisaService {
             hibernateTemplate.save(visa);
         } else {
 			visa.setUpdateTime(new Date());
+            hibernateTemplate.update(visa);
+        }
+    }
+
+    @Transactional
+    public void save(TVisa visa) {
+        if (visa.getId() == null) {
+            visa.setCreateTime(new Date());
+            hibernateTemplate.save(visa);
+        } else {
             hibernateTemplate.update(visa);
         }
     }

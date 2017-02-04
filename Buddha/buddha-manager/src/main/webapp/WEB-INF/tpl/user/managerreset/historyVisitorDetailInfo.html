@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>金泓信展商管理后台</title>
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
+    <script type="text/javascript" src="${base}/resource/jquery.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/common.js"></script>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        input {
+            width: 200px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 归档资料信息 -->
+<div class="easyui-panel" title="归档资料信息" style="width: auto;height: auto;">
+    <#if historyVisitorDetailInfo?exists>
+        <table id="historyVisitorDetailInfoTable" name="historyVisitorDetailInfoTable" style="width: 90%;height:90%; margin-top: 5px;table-layout:fixed;">
+            <tr style="height: 30px">
+                <td style="width: 10%;text-align: right">公司名：</td>
+                <td style="width: 25%;"><#if historyVisitorDetailInfo.company?exists>${historyVisitorDetailInfo.company}</#if></td>
+                <td style="width: 10%;text-align: right">地址：</td>
+                <td style="width: 10%;"><#if historyVisitorDetailInfo.address?exists>${historyVisitorDetailInfo.address}</#if></td>
+                <td style="width: 10%;text-align: right">联系人：</td>
+                <td style="width: 25%;"><#if historyVisitorDetailInfo.contact?exists>${historyVisitorDetailInfo.contact}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 10%;text-align: right">手机：</td>
+                <td style="width: 20%;"><#if historyVisitorDetailInfo.mobile?exists>${historyVisitorDetailInfo.mobile}</#if></td>
+                <td style="width: 10%;text-align: right">电话：</td>
+                <td style="width: 20%;"><#if historyVisitorDetailInfo.telphone?exists>${historyVisitorDetailInfo.telphone}</#if></td>
+                <td style="width: 10%;text-align: right">邮箱：</td>
+                <td style="width: 20%;"><#if historyVisitorDetailInfo.email?exists>${historyVisitorDetailInfo.email}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 5%;text-align: right">传真：</td>
+                <td style="width: 10%;"><#if historyVisitorDetailInfo.fax?exists>${historyVisitorDetailInfo.fax}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 10%;text-align: right">电话记录：</td>
+                <td style="width: 90%;"><#if historyVisitorDetailInfo.tel_remark?exists>${historyVisitorDetailInfo.tel_remark}</#if></td>
+            </tr>
+        </table>
+	<#else>
+		<div style="margin:10px 10px">历史客商资料缺少。</div>
+    </#if>
+</div>
+</body>
+</html>

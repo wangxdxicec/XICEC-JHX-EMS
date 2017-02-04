@@ -73,6 +73,7 @@ public class JoinerAction extends BaseAction {
         	exhibitorJoiner.setPosition(request.getPosition());
         	exhibitorJoiner.setTelphone(request.getTelphone());
         	exhibitorJoiner.setEmail(request.getEmail());
+            exhibitorJoiner.setAdminUpdateTime(new Date());
         	exhibitorJoiner.setCreateTime(new Date());
             if(principle.getAdmin().getId() != null || "".equals(principle.getAdmin().getId())){
             	exhibitorJoiner.setAdmin(principle.getAdmin().getId());

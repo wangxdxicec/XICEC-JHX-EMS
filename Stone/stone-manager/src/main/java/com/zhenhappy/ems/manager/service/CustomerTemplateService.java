@@ -26,5 +26,7 @@ public interface CustomerTemplateService {
 
     @Transactional
     public void modifyMessageManagerTemplate(String value1, String value2, String value3, String value4, String value5,
-                                           String value6, String value7, String value8) throws Exception;
+                                           String value6, String value7, String value8, String value9,
+                                             String value10, String value11, String value12, String value13, String value14,
+                                             String value15, String value16, String value17) throws Exception;
 }

@@ -24,20 +24,75 @@
     <div class="row-fluid" style="width:1000px;margin:0px auto">
         <#include "/user/left.html" />
         <div class="span9">
-            <p style="text-align:center;font-size:14px;font-weight:bold;">VISA INFORMATION</p>
-            <p style="font-size:14px;font-weight:bold;"><b>VISA APPLICATION TO CHINA</b></p>
-            <p>• All foreigners MUST obtain an Entry Visa before proceeding to China. Exhibitors are strongly recommended to process the application two months before departure from the country of origin.</p>
-            <p>• The Organizing Committee of Xiamen Tea Fair provides the <strong>Official Invitation Letter</strong> free of charge to assist exhibitors and trade visitors in Visa procedure. We will coordinate and forward the information of the application to the Chinese authorities for issuing the Invitation Letter, which will be ready within 5 working days and presented to your company by Fax or E-mail.</p>
-            <p>&nbsp; </p>
-            <p style="font-size:14px;font-weight:bold;"><b>ATTENTION!</b></p>
-            <p style="color:#ff0000;">• The Official Invitation Letter we provide is NOT a Visa, but ONLY AN INVITATION that helps you gain a Visa from Chinese Embassy/Consulate in your country;</p>
-            <p>• Only the Visa Invitations during the fair period can be provided;</p>
-            <p>• Passports must be valid for at least SIX MONTHS beyond the intended date of entry into China;</p>
-            <p>• The first page (the page with your photo) of your passport is necessary, please upload together with the invitation application form;</p>
-            <p>• Attendees from IRAN, PAKISTAN,&nbsp;EGYPT, SAUDI ARABIA,&nbsp;BANGLADESH, SRI LANKA, etc., should also provide the Business License of your company;</p>
-            <p>• Official letters of invitation can be provided until <font style="color: red;font-weight: bold"> August 20,2015</font> and will be sent only by fax or Email. Express deliveries by DHL, TNT, FEDEX, UPS or other forwarding agent can be granted only to recipients who will pay all shipment charges. </p>
-            <p>• Normal invitation will be ready within 5 working days. In case of errors (Passport Name, Passport No., etc), it will take 10 more days to correct.</p>
-            <p>• Thank you for your cooperation!</p>
+            <p style="text-align:center;font-size:14px;font-weight:bold;">签证邀请函申请</p>
+            <div class="panel-body" style="min-height: 400px">
+                <div class="alert alert-block">
+                    <#if rc.locale=="zh_CN">
+                        <p><a href="#" onclick="javascript:$('#readBefore').toggle();"><b>小贴士</b></a></p>
+                        <li>
+                            强烈建议参展商在<b>${tExhibitorTime.tea_Fair_Contact_Submit_Deadline_Zh}</b>之前取得入境签证。
+                        </li>
+                        <li>
+                            <b>护照</b>到期日期应在2017年5月份以后。
+                        </li>
+                        <li>
+                            厦门石材展的官方邀请函由厦门市商务局签发。请注意：<b>它不是签证</b>。
+                        </li>
+                        <li>
+                            <p><b>正式邀请函申请程序：</b></p>
+                            <p>请咨询您附近的中国大使馆或领事如何申请入境签证。</p>
+                            <p>如果申请材料需要正式邀请函：</p>
+                            <p>1．点击“添加”来选择一个参展人员。</p>
+                            <p>2．填写护照信息并提交。</p>
+                            <p>3．做好邀请函需要7天。邀请函扫描将通过电子邮件发送，请注意查收。</p>
+                        </li>
+                        <li>
+                            如果需要<b>邀请函原件</b>，请提供DHL/TNT/UPS/联邦快递的到付账号、您的详细地址、联系方式到：<a href="mailto:info@teafair.com.cn">info@teafair.com.cn</a>。快递费将由收件人支付。请至少预留7天时间来邮寄。
+                        </li>
+                        <li>
+                            如有其它疑问，请联系<a href="mailto:info@teafair.com.cn">info@teafair.com.cn</a>。
+                        </li>
+                        <#else>
+                            <p><a href="#" onclick="javascript:$('#readBefore').toggle();"><b>Read Before Apply</b></a>
+                            </p>
+                            <ul id="readBefore">
+                                <li>
+                                    Exhibitors are strongly advised to obtain VISA to China <b>before
+                                    ${tExhibitorTime.tea_Fair_Contact_Submit_Deadline_Zh}</b>.
+                                </li>
+                                <li>
+                                    Date of expiry on the <b>passport</b> should be after May 2017.
+                                </li>
+                                <li>
+                                    The Official Invitation Letter is released by Xiamen Municipal Bureau of Commerce.
+                                    It is <b>NOT a Visa</b>.
+                                </li>
+                                <li>
+                                    <p><b>Official Invitation Letter Application Procedure:</b></p>
+                                    <p>Consult the Chinese Embassy or Consulate nearest you for applying VISA to
+                                        China.</p>
+                                    <p>If Official Invitation Letter is required in the application materials, do the
+                                        follows:</p>
+                                    <p>1. Click “Add” to choose a participant.</p>
+                                    <p>2. Fill in the form and submit.</p>
+                                    <p>3. Wait for the Invitation for 1 week. The scan of invitation will be sent by
+                                        email.</p>
+                                </li>
+                                <li>
+                                    If the <b>original invitation</b> is required, express deliveries by DHL, TNT,
+                                    FEDEX, UPS etc. are available if paid by consignee. Please send your express
+                                    address to <a href="mailto:info@teafair.com.cn">info@cxisf.com</a>. The delivery
+                                    time
+                                    should be counted in your Visa application.
+                                </li>
+                                <li>
+                                    Any further question, please contact <a
+                                        href="mailto:info@teafair.com.cn">info@cxisf.com</a>.
+                                </li>
+                            </ul>
+                    </#if>
+                </div>
+                </div>
             <div style="margin-top: 20px">
                 <button id="sub_visa" class="btn btn-large btn-warning" type="button"><@spring.message "visa.addvisa"/></button>
             </div>

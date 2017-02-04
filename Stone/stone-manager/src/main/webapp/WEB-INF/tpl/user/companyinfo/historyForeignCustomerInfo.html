@@ -340,7 +340,7 @@
                     url: "${base}/user/emailAllHistoryInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id}, "type":1},
                     beforeSend: function (XMLHttpRequest) {
                         $.messager.show({
                             title: '处理中...',
@@ -378,7 +378,7 @@
                     url: "${base}/user/emailAllHistoryInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id}, "type":1},
                     beforeSend: function (XMLHttpRequest) {
                         $.messager.show({
                             title: '处理中...',
@@ -423,7 +423,7 @@
                     url: "${base}/user/msgAllInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id},"type":"3"},
                     beforeSend: function (XMLHttpRequest) {
                         $.messager.show({
                             title: '处理中...',

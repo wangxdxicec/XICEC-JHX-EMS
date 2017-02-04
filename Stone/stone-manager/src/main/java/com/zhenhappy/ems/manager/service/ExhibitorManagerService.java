@@ -3,21 +3,22 @@ package com.zhenhappy.ems.manager.service;
 import com.zhenhappy.ems.dao.ExhibitorClassDao;
 import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
-import com.zhenhappy.ems.dto.ExhibitorBooth;
+import com.zhenhappy.ems.dao.TInvoiceApplyDao;
+import com.zhenhappy.ems.dto.BaseResponse;
+import com.zhenhappy.ems.dto.QueryProductType2Response;
 import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.ExhibitorBoothDao;
+import com.zhenhappy.ems.manager.dao.backupinfo.*;
 import com.zhenhappy.ems.manager.dao.xicecmap.XicecMapDao;
-import com.zhenhappy.ems.manager.dto.AddExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.ModifyExhibitorInfoRequest;
-import com.zhenhappy.ems.manager.dto.QueryBoothNumAndMeipai;
-import com.zhenhappy.ems.manager.dto.QueryExhibitor;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorRequest;
-import com.zhenhappy.ems.manager.dto.QueryExhibitorResponse;
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.dto.backupinfo.QueryExhibitorBackup;
+import com.zhenhappy.ems.manager.dto.backupinfo.QueryExhibitorBackupRequest;
+import com.zhenhappy.ems.manager.dto.backupinfo.QueryProductOrContactOrJoinerRequest;
 import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionRequest;
 import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionResponse;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
+import com.zhenhappy.ems.manager.entity.backupinfo.*;
 import com.zhenhappy.ems.manager.entity.xicecmap.TXicecMapIntetion;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.manager.util.JChineseConvertor;
@@ -31,9 +32,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +53,8 @@ public class ExhibitorManagerService extends ExhibitorService {
 
     @Autowired
     private ExhibitorDao exhibitorDao;
+    @Autowired
+    private TInvoiceApplyDao invoiceApplyDao;
     @Autowired
     private ExhibitorInfoDao exhibitorInfoDao;
     @Autowired
@@ -69,6 +75,19 @@ public class ExhibitorManagerService extends ExhibitorService {
     private ExhibitorBoothDao exhibitorBoothDao;
     @Autowired
     private XicecMapDao xicecMapDao;
+    @Autowired
+    private TVisaManagerService tVisaManagerService;
+    //备份数据
+    @Autowired
+    private ExhibitorBackupInfoDao exhibitorBackupInfoDao;
+    @Autowired
+    private ProductBackupInfoDao productBackupInfoDao;
+    @Autowired
+    private ContactBackupInfoDao contactBackupInfoDao;
+    @Autowired
+    private ExhibitorJoinerBackupInfoDao exhibitorJoinerBackupInfoDao;
+    @Autowired
+    private VisaBackupInfoDao visaBackupInfoDao;
 
     /**
      * 分页获取展商列表
@@ -241,6 +260,52 @@ public class ExhibitorManagerService extends ExhibitorService {
 //        List<TExhibitor> exhibitors = exhibitorDao.query();
 		List<TExhibitor> exhibitors = exhibitorDao.queryByHql("from TExhibitor where isLogout = 0", new Object[]{});
 		return exhibitors.size() > 0 ? exhibitors : null;
+    }
+
+    /**
+     * 查询增值税专用发票
+     * @return
+     */
+    @Transactional
+    public List<TInvoiceApplyExtend> loadAllInvoiceApplyByInvoiceFlag() {
+        List<TInvoiceApplyExtend> invoiceApplyList = invoiceApplyDao.queryByHql("from TInvoiceApplyExtend where invoice_flag = 3", new Object[]{});
+        return invoiceApplyList.size() > 0 ? invoiceApplyList : null;
+    }
+
+    /**
+     * 根据eids查询增值税专用发票
+     * @return
+     */
+    @Transactional
+    public List<TInvoiceApplyExtend> loadSelectedInvoiceApplyByInvoiceFlag(Integer[] eids) {
+        List<TInvoiceApplyExtend> invoiceApplyExtendArrayList = new ArrayList<TInvoiceApplyExtend>();
+        for (Integer eid:eids){
+            TInvoiceApplyExtend invoiceApplyExtend = loadInvoiceApplyExtendByEid(eid);
+            if (invoiceApplyExtend != null) invoiceApplyExtendArrayList.add(invoiceApplyExtend);
+        }
+        return invoiceApplyExtendArrayList.size() > 0 ? invoiceApplyExtendArrayList : null;
+    }
+
+    /**
+     * 根据eid查询增值税专用发票
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public TInvoiceApplyExtend loadInvoiceApplyExtendByEid(Integer eid) {
+        List<TInvoiceApplyExtend> invoiceApplyList = invoiceApplyDao.queryByHql("from TInvoiceApplyExtend where invoice_flag = 3 and eid=?", new Object[]{eid});
+        return invoiceApplyList.size() > 0 ? invoiceApplyList.get(0) : null;
+    }
+
+    /**
+     * 根据eid查询增值税专用发票
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public TInvoiceApplyExtend getInvoiceApplyExtendByEid(Integer eid) {
+        List<TInvoiceApplyExtend> invoiceApplyList = invoiceApplyDao.queryByHql("from TInvoiceApplyExtend where eid=?", new Object[]{eid});
+        return invoiceApplyList.size() > 0 ? invoiceApplyList.get(0) : null;
     }
 
     /**
@@ -487,15 +552,21 @@ public class ExhibitorManagerService extends ExhibitorService {
                 boothNumAndMeipai.setCompany(exhibitorInfo.getCompany());
                 /*boothNumAndMeipai.setCompany(exhibitor.getCompany());*/
 				boothNumAndMeipai.setEid(exhibitor.getEid());
-				if(StringUtils.isNotEmpty(booth.getBoothNumber())) boothNumAndMeipai.setBoothNumber(booth.getBoothNumber());
-				else boothNumAndMeipai.setBoothNumber("");
+				if(StringUtils.isNotEmpty(booth.getBoothNumber()))
+                    boothNumAndMeipai.setBoothNumber(booth.getBoothNumber());
+				else
+                    boothNumAndMeipai.setBoothNumber("");
                 /*石材展需求开始*/
                 TExhibitorInfo info = loadExhibitorInfoByEid(exhibitor.getEid());
                 if(info != null){
-                    if(StringUtils.isNotEmpty(info.getMeipai())) boothNumAndMeipai.setMeipai(info.getMeipai());
-                    else boothNumAndMeipai.setMeipai("");
-                    if(StringUtils.isNotEmpty(info.getMeipaiEn()))  boothNumAndMeipai.setMeipaiEn(info.getMeipaiEn());
-                    else boothNumAndMeipai.setMeipaiEn("");
+                    if(StringUtils.isNotEmpty(info.getMeipai()))
+                        boothNumAndMeipai.setMeipai(info.getMeipai());
+                    else
+                        boothNumAndMeipai.setMeipai("");
+                    if(StringUtils.isNotEmpty(info.getMeipaiEn()))
+                        boothNumAndMeipai.setMeipaiEn(info.getMeipaiEn());
+                    else
+                        boothNumAndMeipai.setMeipaiEn("");
                 }
 				if(StringUtils.isEmpty(booth.getBoothNumber()) && StringUtils.isEmpty(info.getMeipai()) && StringUtils.isEmpty(info.getMeipaiEn())) continue;
                 else boothNumAndMeipais.add(boothNumAndMeipai);
@@ -541,8 +612,39 @@ public class ExhibitorManagerService extends ExhibitorService {
      * @return
      */
     @Transactional
+    public boolean queryBoothByBoothNumIsActive(String boothNum) {
+        boolean flag = false;
+        List<TExhibitorBooth> booths = getHibernateTemplate().find("from TExhibitorBooth where boothNumber = ?", new Object[]{boothNum});
+        if(booths != null && booths.size()>0){
+            for(TExhibitorBooth booth:booths){
+                TExhibitor tExhibitor = loadExhibitorByEid(booth.getEid());
+                if(tExhibitor != null && tExhibitor.getIsLogout() == 0){
+                    return true;
+                }
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 根据展位号查询展位信息
+     * @param boothNum
+     * @return
+     */
+    @Transactional
     public TExhibitorBooth queryBoothByBoothNum(String boothNum) {
         List<TExhibitorBooth> booths = getHibernateTemplate().find("from TExhibitorBooth where boothNumber = ?", new Object[]{boothNum});
+        return booths.size() > 0 ? booths.get(0) : null;
+    }
+
+    /**
+     * 根据展位号查询展位信息
+     * @param boothNum
+     * @return
+     */
+    @Transactional
+    public TExhibitorBooth queryBoothByBoothNumAndEid(String boothNum, Integer eidValue) {
+        List<TExhibitorBooth> booths = getHibernateTemplate().find("from TExhibitorBooth where boothNumber = ? and eid <> ?", new Object[]{boothNum, eidValue});
         return booths.size() > 0 ? booths.get(0) : null;
     }
 
@@ -632,7 +734,7 @@ public class ExhibitorManagerService extends ExhibitorService {
     	if(loadAllExhibitorByCompany(request.getCompanyName().trim()) != null) throw new DuplicateUsernameException("公司中文名重复");
     	if(loadAllExhibitorByCompanye(request.getCompanyNameE().trim()) != null) throw new DuplicateUsernameException("公司英文名重复");
     	if(request.getBoothNumber() != null && !"".equals(request.getBoothNumber())){
-    		if(queryBoothByBoothNum(request.getBoothNumber()) != null) throw new DuplicateUsernameException("展位号重复");
+    		if(queryBoothByBoothNumIsActive(request.getBoothNumber())) throw new DuplicateUsernameException("展位号已经存在");
     	}
     	TExhibitor exhibitor = new TExhibitor();
         TExhibitorInfo exhibitorInfo = new TExhibitorInfo();
@@ -659,6 +761,7 @@ public class ExhibitorManagerService extends ExhibitorService {
         exhibitor.setIsLogout(0);
         exhibitor.setCreateUser(adminId);
         exhibitor.setCreateTime(new Date());
+        exhibitor.setSend_invitation_flag(0);
         Integer eid = (Integer) getHibernateTemplate().save(exhibitor);
         /*//---add by wangxd, begin---
         exhibitorInfo.setEid(eid);
@@ -674,7 +777,9 @@ public class ExhibitorManagerService extends ExhibitorService {
     	if(eid != null){
     		TExhibitorBooth booth = new TExhibitorBooth();
             booth.setBoothNumber(request.getBoothNumber().trim().replace(" ", ""));
-            booth.setExhibitionArea(request.getBoothNumber().trim().replace(" ", "").substring(0,1) + "厅");
+            //2016-11-21由陈丽宽新增的功能需求，调整为手动输入展厅数据
+            //booth.setExhibitionArea(request.getBoothNumber().trim().replace(" ", "").substring(0,1) + "厅");
+            booth.setExhibitionArea(request.getExhibitionPosition());
             booth.setEid(eid);
             booth.setMark("");
             booth.setCreateTime(new Date());
@@ -698,7 +803,27 @@ public class ExhibitorManagerService extends ExhibitorService {
     	}
     	if(loadAllExhibitorByCompany(request.getCompanyName().trim(), request.getEid()) != null) throw new DuplicateUsernameException("公司中文名重复");
     	if(loadAllExhibitorByCompanye(request.getCompanyNameE().trim(), request.getEid()) != null) throw new DuplicateUsernameException("公司英文名重复");
-    	TExhibitor exhibitor = exhibitorDao.query(request.getEid());
+
+        if(StringUtils.isNotEmpty(request.getBoothNumber())) {
+            TExhibitorBooth booth = queryBoothByBoothNumAndEid(request.getBoothNumber(), request.getEid());
+            if(booth != null){
+                TExhibitor tExhibitorTemp = loadExhibitorByEid(booth.getEid());
+                if(tExhibitorTemp != null && tExhibitorTemp.getIsLogout() == 0){
+                    throw new DuplicateUsernameException(request.getBoothNumber() + "展位号，已经卖出去，请重新确认下此展位号");
+                }
+            }
+        }
+
+        List<TVisa> visas = getHibernateTemplate().find("from TVisa where eid = ?", request.getEid());
+        if (visas.size() != 0){
+            for (TVisa visa : visas){
+                visa.setBoothNo(request.getBoothNumber());
+                //只保存对应的值，但更新时间不做修改
+                tVisaManagerService.save(visa);
+            }
+        }
+
+        TExhibitor exhibitor = exhibitorDao.query(request.getEid());
         TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(request.getEid());
     	if(exhibitor != null){
     		if(StringUtils.isNotEmpty(request.getUsername().trim())){
@@ -726,8 +851,10 @@ public class ExhibitorManagerService extends ExhibitorService {
 	        exhibitor.setTag(request.getTag());
 	        exhibitor.setArea(request.getArea());
             exhibitor.setContractId(request.getContractId().trim());
-            if(StringUtils.isNotEmpty(request.getExhibitionArea())) exhibitor.setExhibitionArea(request.getExhibitionArea());
-            else exhibitor.setExhibitionArea("0");
+            if(StringUtils.isNotEmpty(request.getExhibitionArea()))
+                exhibitor.setExhibitionArea(request.getExhibitionArea());
+            else
+                exhibitor.setExhibitionArea("0");
 	        exhibitorDao.update(exhibitor);
             exhibitorInfoDao.update(exhibitorInfo);
     	}
@@ -1030,8 +1157,10 @@ public class ExhibitorManagerService extends ExhibitorService {
     		if(queryBoothByEid(eid) != null) invoice.setExhibitorNo(queryBoothByEid(eid).getBoothNumber());
     		else invoice.setExhibitorNo("");
     	}else{
-    		if(queryBoothByEid(eid) != null) invoice = new TInvoiceApply(queryBoothByEid(eid).getBoothNumber(), invoiceNo, invoiceTitle, eid, new Date());
-    		else invoice = new TInvoiceApply("", invoiceNo, invoiceTitle, eid, new Date());
+    		if(queryBoothByEid(eid) != null)
+                invoice = new TInvoiceApply(queryBoothByEid(eid).getBoothNumber(), invoiceNo, invoiceTitle, eid, new Date());
+    		else
+                invoice = new TInvoiceApply("", invoiceNo, invoiceTitle, eid, new Date());
     	}
     	invoiceService.create(invoice);
 	}
@@ -1167,5 +1296,379 @@ public class ExhibitorManagerService extends ExhibitorService {
             }
         }
         return flag;
+    }
+
+    /**
+     * 备份展商数据
+     * @return
+     */
+    @Transactional
+    public void backupExhibitorData() {
+        List<TExhibitor> tExhibitorList = loadAllExhibitorList();
+        for(TExhibitor tExhibitor:tExhibitorList) {
+            TExhibitorBackupInfo tExhibitorBackupInfo = new TExhibitorBackupInfo();
+            tExhibitorBackupInfo.setEid(tExhibitor.getEid());
+            tExhibitorBackupInfo.setUsername(tExhibitor.getUsername());
+            tExhibitorBackupInfo.setPassword(tExhibitor.getPassword());
+            tExhibitorBackupInfo.setLevel(tExhibitor.getLevel());
+            tExhibitorBackupInfo.setArea(tExhibitor.getArea());
+            tExhibitorBackupInfo.setLastLoginTime(tExhibitor.getLastLoginTime());
+            tExhibitorBackupInfo.setLastLoginIp(tExhibitor.getLastLoginIp());
+            tExhibitorBackupInfo.setIsLogout(tExhibitor.getIsLogout());
+            tExhibitorBackupInfo.setCreateUser(tExhibitor.getCreateUser());
+            tExhibitorBackupInfo.setCreateTime(tExhibitor.getCreateTime());
+            tExhibitorBackupInfo.setUpdateUser(tExhibitor.getUpdateUser());
+            tExhibitorBackupInfo.setUpdateTime(tExhibitor.getUpdateTime());
+            tExhibitorBackupInfo.setTag(tExhibitor.getTag());
+            tExhibitorBackupInfo.setProvince(tExhibitor.getProvince());
+            tExhibitorBackupInfo.setCountry(tExhibitor.getCountry());
+            tExhibitorBackupInfo.setGroup(tExhibitor.getGroup());
+            tExhibitorBackupInfo.setContractId(tExhibitor.getContractId());
+            tExhibitorBackupInfo.setExhibitionArea(tExhibitor.getExhibitionArea());
+            tExhibitorBackupInfo.setExhibitor_type(tExhibitor.getExhibitor_type());
+            tExhibitorBackupInfo.setIsLogin(tExhibitor.getIsLogin());
+            tExhibitorBackupInfo.setSend_invitation_flag(tExhibitor.getSend_invitation_flag());
+
+            TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(tExhibitor.getEid());
+            if(exhibitorInfo != null){
+                tExhibitorBackupInfo.setExhibitor_info_einfoid(exhibitorInfo.getEinfoid());
+                tExhibitorBackupInfo.setExhibitor_info_organization_code(exhibitorInfo.getOrganizationCode());
+                tExhibitorBackupInfo.setExhibitor_info_company(exhibitorInfo.getCompany());
+                tExhibitorBackupInfo.setExhibitor_info_company_en(exhibitorInfo.getCompanyEn());
+                tExhibitorBackupInfo.setExhibitor_info_company_t(exhibitorInfo.getCompanyT());
+                tExhibitorBackupInfo.setExhibitor_info_phone(exhibitorInfo.getPhone());
+                tExhibitorBackupInfo.setExhibitor_info_fax(exhibitorInfo.getFax());
+                tExhibitorBackupInfo.setExhibitor_info_email(exhibitorInfo.getEmail());
+                tExhibitorBackupInfo.setExhibitor_info_website(exhibitorInfo.getWebsite());
+                tExhibitorBackupInfo.setExhibitor_info_zipcode(exhibitorInfo.getZipcode());
+                tExhibitorBackupInfo.setExhibitor_info_main_product(exhibitorInfo.getMainProduct());
+                tExhibitorBackupInfo.setExhibitor_info_main_product_en(exhibitorInfo.getMainProductEn());
+                tExhibitorBackupInfo.setExhibitor_info_logo(exhibitorInfo.getLogo());
+                tExhibitorBackupInfo.setExhibitor_info_mark(exhibitorInfo.getMark());
+                tExhibitorBackupInfo.setExhibitor_info_is_delete(exhibitorInfo.getIsDelete());
+                tExhibitorBackupInfo.setExhibitor_info_create_time(exhibitorInfo.getCreateTime());
+                tExhibitorBackupInfo.setExhibitor_info_update_time(exhibitorInfo.getUpdateTime());
+                tExhibitorBackupInfo.setExhibitor_info_admin_user(exhibitorInfo.getAdminUser());
+                tExhibitorBackupInfo.setExhibitor_info_admin_update_time(exhibitorInfo.getAdminUpdateTime());
+                tExhibitorBackupInfo.setExhibitor_info_address(exhibitorInfo.getAddress());
+                tExhibitorBackupInfo.setExhibitor_info_address_en(exhibitorInfo.getAddressEn());
+                tExhibitorBackupInfo.setExhibitor_info_meipai(exhibitorInfo.getMeipai());
+                tExhibitorBackupInfo.setExhibitor_info_meipai_en(exhibitorInfo.getMeipaiEn());
+                tExhibitorBackupInfo.setExhibitor_info_emark(exhibitorInfo.getEmark());
+                tExhibitorBackupInfo.setExhibitor_info_company_hignlight(exhibitorInfo.getCompany_hignlight());
+                tExhibitorBackupInfo.setExhibitor_info_email_address(exhibitorInfo.getEmail_address());
+                tExhibitorBackupInfo.setExhibitor_info_email_contact(exhibitorInfo.getEmail_contact());
+                tExhibitorBackupInfo.setExhibitor_info_email_telphone(exhibitorInfo.getEmail_telphone());
+
+                //获取产品列表
+                List<TExhibitorClass> exhibitorClasses = queryExhibitorClassByEid(exhibitorInfo.getEinfoid());
+                if(exhibitorClasses.size() != 0){
+                    List<TProductType> productTypes1 = productManagerService.queryProductsTypeByLv(1);
+                    List<TProductType> productTypes2 = productManagerService.queryProductsTypeByLv(2);
+                    StringBuffer productBuffer = new StringBuffer();
+                    for(TProductType productType1:productTypes1){
+                        for(TProductType productType2:productTypes2){
+                            if(productType1.getId().intValue() == productType2.getParentId().intValue()){
+                                QueryProductType2Response p = new QueryProductType2Response(productType2.getId(),productType2.getClassName(),"icon-ok",false);
+                                for(TExhibitorClass exhibitorClass:exhibitorClasses){
+                                    if(productType1 != null && productType1.getId() != null && exhibitorClass != null
+                                            && exhibitorClass.getParentClassId() != null && (productType1.getId().intValue() == exhibitorClass.getParentClassId())){
+                                        if(p.getId().intValue() == exhibitorClass.getClassId()){
+                                            productBuffer.append(p.getText() + "   ");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    tExhibitorBackupInfo.setExhibitor_product_type(productBuffer.toString());
+                }
+            }
+
+            TExhibitorTerm tExhibitorTerm = getExhibitorTermByEid(tExhibitor.getEid());
+            if(tExhibitorTerm != null){
+                tExhibitorBackupInfo.setExhibitor_term_join_term(tExhibitorTerm.getJoinTerm());
+                tExhibitorBackupInfo.setExhibitor_term_booth_number(tExhibitorTerm.getBoothNumber());
+                tExhibitorBackupInfo.setExhibitor_term_mark(tExhibitorTerm.getMark());
+                tExhibitorBackupInfo.setExhibitor_term_is_delete(tExhibitorTerm.getIsDelete());
+                tExhibitorBackupInfo.setExhibitor_term_create_user(tExhibitorTerm.getCreateUser());
+                tExhibitorBackupInfo.setExhibitor_term_create_time(tExhibitorTerm.getCreateTime());
+                tExhibitorBackupInfo.setExhibitor_term_update_user(tExhibitorTerm.getUpdateUser());
+                tExhibitorBackupInfo.setExhibitor_term_update_time(tExhibitorTerm.getUpdateTime());
+            }
+
+            TExhibitorBooth tExhibitorBooth = queryBoothByEid(tExhibitor.getEid());
+            if(tExhibitorBooth != null){
+                tExhibitorBackupInfo.setExhibitor_booth_booth_number(tExhibitorBooth.getBoothNumber());
+                tExhibitorBackupInfo.setExhibitor_booth_exhibition_area(tExhibitorBooth.getExhibitionArea());
+                tExhibitorBackupInfo.setExhibitor_booth_mark(tExhibitorBooth.getMark());
+                tExhibitorBackupInfo.setExhibitor_booth_create_user(tExhibitorBooth.getCreateUser());
+                tExhibitorBackupInfo.setExhibitor_booth_create_time(tExhibitorBooth.getCreateTime());
+                tExhibitorBackupInfo.setExhibitor_booth_update_user(tExhibitorBooth.getUpdateUser());
+                tExhibitorBackupInfo.setExhibitor_booth_update_time(tExhibitorBooth.getUpdateTime());
+            }
+
+            TInvoiceApplyExtend tInvoiceApplyExtend = getInvoiceApplyExtendByEid(tExhibitor.getEid());
+            if(tInvoiceApplyExtend != null){
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_exhibitor_no(tInvoiceApplyExtend.getExhibitorNo());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_no(tInvoiceApplyExtend.getInvoiceNo());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_title(tInvoiceApplyExtend.getTitle());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_create_time(tInvoiceApplyExtend.getCreateTime());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_flag(tInvoiceApplyExtend.getInvoice_flag());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_company(tInvoiceApplyExtend.getInvoice_company());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_taxpayer_no(tInvoiceApplyExtend.getInvoice_taxpayer_no());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_bank_name(tInvoiceApplyExtend.getInvoice_bank_name());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_bank_account(tInvoiceApplyExtend.getInvoice_bank_account());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_company_address(tInvoiceApplyExtend.getInvoice_company_address());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_company_contact(tInvoiceApplyExtend.getInvoice_company_contact());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_company_tel(tInvoiceApplyExtend.getInvoice_company_tel());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_general_tax_type(tInvoiceApplyExtend.getInvoice_general_tax_type());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_general_taxpayer_flag(tInvoiceApplyExtend.getInvoice_general_taxpayer_flag());
+                tExhibitorBackupInfo.setExhibitor_invoice_apply_invoice_image_address(tInvoiceApplyExtend.getInvoice_image_address());
+            }
+            tExhibitorBackupInfo.setExhibitor_backup_date(new Date());
+            exhibitorBackupInfoDao.create(tExhibitorBackupInfo);
+
+            //产品列表
+            List<TProduct> productList = productManagerService.loadProductsByEinfoid(exhibitorInfo.getEinfoid());
+            for(TProduct tProduct:productList){
+                TProductBackupInfo tProductBackupInfo = new TProductBackupInfo();
+                tProductBackupInfo.setExhibitor_info_backup_id(tExhibitorBackupInfo.getId());
+                tProductBackupInfo.setProductName(tProduct.getProductName());
+                tProductBackupInfo.setProductNameEn(tProduct.getProductNameEn());
+                tProductBackupInfo.setProductModel(tProduct.getProductModel());
+                tProductBackupInfo.setProductModelEn(tProduct.getProductModelEn());
+                tProductBackupInfo.setOrigin(tProduct.getOrigin());
+                tProductBackupInfo.setOriginEn(tProduct.getOriginEn());
+                tProductBackupInfo.setKeyWords(tProduct.getKeyWords());
+                tProductBackupInfo.setKeyWordsEn(tProduct.getKeyWordsEn());
+                tProductBackupInfo.setDescription(tProduct.getDescription());
+                tProductBackupInfo.setDescriptionEn(tProduct.getDescriptionEn());
+                tProductBackupInfo.setProductBrand(tProduct.getProductBrand());
+                tProductBackupInfo.setProductBrandEn(tProduct.getProductBrandEn());
+                tProductBackupInfo.setProductSpec(tProduct.getProductSpec());
+                tProductBackupInfo.setProductBrandEn(tProduct.getProductBrandEn());
+                tProductBackupInfo.setProductCount(tProduct.getProductCount());
+                tProductBackupInfo.setProductCountEn(tProduct.getProductCountEn());
+                tProductBackupInfo.setPackageDescription(tProduct.getPackageDescription());
+                tProductBackupInfo.setPackageDescriptionEn(tProduct.getPackageDescriptionEn());
+                tProductBackupInfo.setPriceDescription(tProduct.getPriceDescription());
+                tProductBackupInfo.setPriceDescriptionEn(tProduct.getPriceDescriptionEn());
+                tProductBackupInfo.setFlag(tProduct.getFlag());
+                tProductBackupInfo.setCreateTime(tProduct.getCreateTime());
+                tProductBackupInfo.setUpdateTime(tProduct.getUpdateTime());
+                tProductBackupInfo.setAdmin(tProduct.getAdmin());
+                tProductBackupInfo.setAdminUpdateTime(tProduct.getAdminUpdateTime());
+                productBackupInfoDao.create(tProductBackupInfo);
+            }
+
+            //联系人列表
+            List<TContact> contactList = contactService.loadContactByEid(exhibitorInfo.getEid());
+            for(TContact tContact:contactList){
+                TContactBackupInfo tContactBackupInfo = new TContactBackupInfo();
+                tContactBackupInfo.setExhibitor_info_backup_id(tExhibitorBackupInfo.getId());
+                tContactBackupInfo.setName(tContact.getName());
+                tContactBackupInfo.setPosition(tContact.getPosition());
+                tContactBackupInfo.setPhone(tContact.getPhone());
+                tContactBackupInfo.setEmail(tContact.getEmail());
+                tContactBackupInfo.setAddress(tContact.getAddress());
+                tContactBackupInfo.setExpressNumber(tContact.getExpressNumber());
+                tContactBackupInfo.setEid(tContact.getEid());
+                tContactBackupInfo.setIsDelete(tContact.getIsDelete());
+                contactBackupInfoDao.create(tContactBackupInfo);
+            }
+
+            //参展人员列表
+            List<TExhibitorJoiner> tExhibitorJoinerList = joinerManagerService.loadExhibitorJoinerByEid(exhibitorInfo.getEid());
+            for(TExhibitorJoiner tExhibitorJoiner:tExhibitorJoinerList){
+                TExhibitorJoinerBackupInfo tExhibitorJoinerBackupInfo = new TExhibitorJoinerBackupInfo();
+                tExhibitorJoinerBackupInfo.setExhibitor_info_backup_id(tExhibitorBackupInfo.getId());
+                tExhibitorJoinerBackupInfo.setName(tExhibitorJoiner.getName());
+                tExhibitorJoinerBackupInfo.setPosition(tExhibitorJoiner.getPosition());
+                tExhibitorJoinerBackupInfo.setTelphone(tExhibitorJoiner.getTelphone());
+                tExhibitorJoinerBackupInfo.setEmail(tExhibitorJoiner.getEmail());
+                tExhibitorJoinerBackupInfo.setIsDelete(tExhibitorJoiner.getIsDelete());
+                tExhibitorJoinerBackupInfo.setCreateTime(tExhibitorJoiner.getCreateTime());
+                tExhibitorJoinerBackupInfo.setAdmin(tExhibitorJoiner.getAdmin());
+                tExhibitorJoinerBackupInfo.setAdminUpdateTime(tExhibitorJoiner.getAdminUpdateTime());
+                tExhibitorJoinerBackupInfo.setIsNew(tExhibitorJoiner.getIsNew());
+                exhibitorJoinerBackupInfoDao.create(tExhibitorJoinerBackupInfo);
+
+                //对应的VISA列表
+                TVisa tVisa = tVisaManagerService.loadTVisaListByJoinerid(tExhibitorJoiner.getId());
+                if(tVisa != null){
+                    TVisaBackupInfo tVisaBackupInfo = new TVisaBackupInfo();
+                    tVisaBackupInfo.setJoinerId(tExhibitorJoiner.getId());
+                    tVisaBackupInfo.setExhibitor_info_backup_id(tExhibitorBackupInfo.getId());
+                    tVisaBackupInfo.setPassportName(tVisa.getPassportName());
+                    tVisaBackupInfo.setGender(tVisa.getGender());
+                    tVisaBackupInfo.setNationality(tVisa.getNationality());
+                    tVisaBackupInfo.setJobTitle(tVisa.getJobTitle());
+                    tVisaBackupInfo.setCompanyName(tVisa.getCompanyName());
+                    tVisaBackupInfo.setBoothNo(tVisa.getBoothNo());
+                    tVisaBackupInfo.setDetailedAddress(tVisa.getDetailedAddress());
+                    tVisaBackupInfo.setTel(tVisa.getTel());
+                    tVisaBackupInfo.setFax(tVisa.getFax());
+                    tVisaBackupInfo.setEmail(tVisa.getEmail());
+                    tVisaBackupInfo.setCompanyWebsite(tVisa.getCompanyWebsite());
+                    tVisaBackupInfo.setPassportNo(tVisa.getPassportNo());
+                    tVisaBackupInfo.setExpDate(tVisa.getExpDate());
+                    tVisaBackupInfo.setBirth(tVisa.getBirth());
+                    tVisaBackupInfo.setApplyFor(tVisa.getApplyFor());
+                    tVisaBackupInfo.setFrom(tVisa.getFrom());
+                    tVisaBackupInfo.setTo(tVisa.getTo());
+                    tVisaBackupInfo.setPassportPage(tVisa.getPassportPage());
+                    tVisaBackupInfo.setBusinessLicense(tVisa.getBusinessLicense());
+                    tVisaBackupInfo.setStatus(tVisa.getStatus());
+                    tVisaBackupInfo.setCreateTime(tVisa.getCreateTime());
+                    tVisaBackupInfo.setUpdateTime(tVisa.getUpdateTime());
+                    tVisaBackupInfo.setAddress(tVisa.getAddress());
+                    visaBackupInfoDao.create(tVisaBackupInfo);
+                }
+            }
+        }
+    }
+
+    /**
+     * 分页获取备份展商数据列表
+     * @param request
+     * @return
+     */
+    public QueryExhibitorResponse queryAllExhibitorBackupInfosByPage(QueryExhibitorBackupRequest request) throws UnsupportedEncodingException {
+        List<String> conditions = new ArrayList<String>();
+        if (request.getTag() != null) {
+            conditions.add(" e.tag = " + request.getTag().intValue() + " ");
+        }
+        if (request.getGroup() != null) {
+            conditions.add(" e.group = " + request.getGroup().intValue() + " ");
+        }
+        if (StringUtils.isNotEmpty(request.getBoothNumber())) {
+            conditions.add(" (e.exhibitor_booth_booth_number like '%" + request.getBoothNumber() + "%' OR e.exhibitor_booth_booth_number like '%" + new String(request.getBoothNumber().getBytes("ISO-8859-1"),"GBK") + "%' OR e.exhibitor_booth_booth_number like '%" + new String(request.getBoothNumber().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+        }
+        if (StringUtils.isNotEmpty(request.getCompany())) {
+            conditions.add(" (e.exhibitor_info_company like '%" + request.getCompany() + "%' OR e.exhibitor_info_company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"GBK") + "%' OR e.exhibitor_info_company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+        }
+        if (StringUtils.isNotEmpty(request.getCompanye())) {
+            conditions.add(" (e.exhibitor_info_company_en like '%" + request.getCompanye() + "%' OR e.exhibitor_info_company_en like '%" + new String(request.getCompanye().getBytes("ISO-8859-1"),"GBK") + "%' OR e.exhibitor_info_company_en like '%" + new String(request.getCompanye().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+        }
+        if (StringUtils.isNotEmpty(request.getContractId())) {
+            conditions.add(" (e.contractId like '%" + request.getContractId() + "%' OR e.contractId like '%" + new String(request.getContractId().getBytes("ISO-8859-1"),"GBK") + "%' OR e.contractId like '%" + new String(request.getContractId().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+        }
+        if (request.getArea() != null) {
+            conditions.add(" e.area = " + request.getArea().intValue() + " ");
+        }
+        if (request.getCountry() != null) {
+            conditions.add(" e.country = " + request.getCountry().intValue() + " ");
+        }
+        if (request.getProvince() != null) {
+            conditions.add(" e.province = " + request.getProvince().intValue() + " ");
+        }
+        if (request.getIsLogout() != null) {
+            conditions.add(" e.isLogout = " + request.getIsLogout().intValue() + " ");
+        }
+
+        String conditionsSql = StringUtils.join(conditions, " and ");
+        String conditionsSqlNoOrder = "";
+        if(StringUtils.isNotEmpty(conditionsSql)){
+            conditionsSqlNoOrder = " where " + conditionsSql;
+        }
+
+        String conditionsSqlOrder = "";
+        if(StringUtils.isNotEmpty(conditionsSql)){
+            conditionsSqlOrder = " where " + conditionsSql + " order by e.updateTime ASC ";
+        }else{
+            conditionsSqlOrder = " order by e.updateTime ASC ";
+        }
+
+        Page page = new Page();
+        page.setPageSize(request.getRows());
+        page.setPageIndex(request.getPage());
+        List<QueryExhibitorBackup> tExhibitorBackupInfoList = exhibitorDao.queryPageByHQL("select count(*) from TExhibitorBackupInfo e " + conditionsSqlNoOrder,
+                "select new com.zhenhappy.ems.manager.dto.backupinfo.QueryExhibitorBackup(e.id, e.eid, e.username, e.password, e.area, e.exhibitor_info_company, e.exhibitor_info_company_en," +
+                        " e.country, e.province, e.isLogout, e.isLogin, e.tag, e.group, e.exhibitor_booth_booth_number, e.exhibitionArea, e.contractId, e.updateTime) "
+                        + "from TExhibitorBackupInfo e " + conditionsSqlOrder, new Object[]{}, page);
+        /*for(QueryExhibitorBackup tExhibitorBackupInfo:tExhibitorBackupInfoList){
+            tExhibitorBackupInfo.setInfoFlag(selectColor(tExhibitorBackupInfo, exhibitorInfo));
+            if(tExhibitorBackupInfo.getIsLogout() == 0 && null != tExhibitorBackupInfo.getIsLogin() && tExhibitorBackupInfo.getIsLogin() == 0){
+                tExhibitorBackupInfo.setInfoFlag(5);
+            }
+        }*/
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        response.setResultCode(0);
+        response.setRows(tExhibitorBackupInfoList);
+        response.setTotal(page.getTotalCount());
+        return response;
+    }
+
+    /**
+     * 根据id查询展商备份数据
+     * @param id
+     * @return
+     */
+    @Transactional
+    public TExhibitorBackupInfo loadExhibitorBackupInfoById(Integer id) {
+        return exhibitorBackupInfoDao.query(id);
+    }
+
+    /**
+     * 根据id查询产品备份数据
+     * @param id
+     * @return
+     */
+    @Transactional
+    public List<TProductBackupInfo> loadProductBackupInfoById(Integer id) {
+        return productBackupInfoDao.queryByHql("from TProductBackupInfo where exhibitor_info_backup_id=?", new Object[]{id});
+    }
+
+    /**
+     * 根据id查询联系人备份数据
+     * @param id
+     * @return
+     */
+    @Transactional
+    public List<TContactBackupInfo> loadContactBackupInfoById(Integer id) {
+        return contactBackupInfoDao.queryByHql("from TContactBackupInfo where exhibitor_info_backup_id=?", new Object[]{id});
+    }
+
+    /**
+     * 根据id查询参展人员备份数据
+     * @param id
+     * @return
+     */
+    @Transactional
+    public List<TExhibitorJoinerBackupInfo> loadExhibitorJoinerBackupInfoById(Integer id) {
+        return exhibitorJoinerBackupInfoDao.queryByHql("from TExhibitorJoinerBackupInfo where exhibitor_info_backup_id=?", new Object[]{id});
+    }
+
+    /**
+     * 根据id查询参展人员备份数据
+     * @param joinerId
+     * @return
+     */
+    @Transactional
+    public TExhibitorJoinerBackupInfo loadExhibitorJoinerBackupInfoByJoinerId(Integer joinerId) {
+        List<TExhibitorJoinerBackupInfo> tExhibitorJoinerBackupInfoList = exhibitorJoinerBackupInfoDao.queryByHql("from TExhibitorJoinerBackupInfo where id=?", new Object[]{joinerId});
+        return tExhibitorJoinerBackupInfoList.size()>0?tExhibitorJoinerBackupInfoList.get(0):null;
+    }
+
+    /**
+     * 根据id查询参展人员备份数据
+     * @param id
+     * @return
+     */
+    @Transactional
+    public List<TVisaBackupInfo> loadExhibitorVisaBackupInfoByExhibitorInfoBackupId(Integer id) {
+        return visaBackupInfoDao.queryByHql("from TVisaBackupInfo where exhibitor_info_backup_id=?", new Object[]{id});
+    }
+
+    /**
+     * 根据id查询参展人员备份数据
+     * @param id
+     * @return
+     */
+    @Transactional
+    public TVisaBackupInfo loadExhibitorVisaBackupInfoById(Integer id) {
+        List<TVisaBackupInfo> tVisaBackupInfoList = visaBackupInfoDao.queryByHql("from TVisaBackupInfo where id=?", new Object[]{id});
+        return tVisaBackupInfoList.size() > 0 ? tVisaBackupInfoList.get(0) : null;
     }
 }

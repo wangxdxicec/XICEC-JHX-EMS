@@ -19,6 +19,8 @@ public class ModifyExhibitorRequest extends BaseRequest {
     private Integer area;
     private String contractId;
     private String exhibitionArea;
+    private String boothExhibitionArea;
+    private String boothNumber;
 
     public Integer getEid() {
 		return eid;
@@ -114,5 +116,21 @@ public class ModifyExhibitorRequest extends BaseRequest {
 
     public void setExhibitionArea(String exhibitionArea) {
         this.exhibitionArea = exhibitionArea;
+    }
+
+    public String getBoothExhibitionArea() {
+        return boothExhibitionArea;
+    }
+
+    public void setBoothExhibitionArea(String boothExhibitionArea) {
+        this.boothExhibitionArea = boothExhibitionArea;
+    }
+
+    public String getBoothNumber() {
+        return boothNumber;
+    }
+
+    public void setBoothNumber(String boothNumber) {
+        this.boothNumber = boothNumber;
     }
 }

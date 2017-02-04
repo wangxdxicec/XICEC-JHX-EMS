@@ -48,7 +48,7 @@
 	</style>
 </head>
 <body  onload="queryExhibitorTimeData()">
-<div style="height: auto;" class="easyui-panel" title="时间参数">
+<div style="height: auto;" class="easyui-panel" title="境内时间参数">
 	<table align="center" style="margin-left: 10px;margin-top: 5px">
 		<tr>
 			<td style="width: 300px">公司基本信息截止时间（中文）：</td>
@@ -150,7 +150,7 @@
 	</div>
 </div>
 
-<div style="height: auto;" class="easyui-panel" title="菜单移动">
+<div style="height: auto;" class="easyui-panel" title="境内菜单移动">
 	<table style="margin-left: 10px;margin-top: 5px">
 		<tr>
 			<td style="width: 300px">菜单移动开关：</td>
@@ -161,6 +161,122 @@
 	</table>
 	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
 		<button type="button" class="btn btn-primary" id="saveSwitchData">确认修改</button>
+	</div>
+</div>
+
+<div style="height: auto;" class="easyui-panel" title="境外时间参数">
+	<table align="center" style="margin-left: 10px;margin-top: 5px">
+		<tr>
+			<td style="width: 300px">公司基本信息截止时间（中文）：</td>
+			<td>
+				<input id="company_Info_Submit_Deadline_Zh_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">公司基本信息截止时间（英文）：</td>
+			<td>
+				<input id="company_Info_Submit_Deadline_En_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">参展人员证件办理截止时间（中文）：</td>
+			<td>
+				<input id="participant_List_Submit_Deadline_Zh_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">参展人员证件办理截止时间（英文）：</td>
+			<td>
+				<input id="participant_List_Submit_Deadline_En_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">发票信息办理截止时间（中文）：</td>
+			<td>
+				<input id="invoice_Information_Submit_Deadline_Zh_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">发票信息办理截止时间（英文）：</td>
+			<td>
+				<input id="invoice_Information_Submit_Deadline_En_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">广告预订办理截止时间（中文）：</td>
+			<td>
+				<input id="advertisement_Submit_Deadline_Zh_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">广告预订办理截止时间（英文）：</td>
+			<td>
+				<input id="advertisement_Submit_Deadline_En_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">公司基本信息创建截止时间（中文）：</td>
+			<td>
+				<input id="company_Info_Insert_Submit_Deadline_Zh_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">公司基本信息创建截止时间（英文）：</td>
+			<td>
+				<input id="company_Info_Insert_Submit_Deadline_En_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">Visa信息登记截止时间（中文）：</td>
+			<td>
+				<input id="visa_Info_Submit_Deadline_Zh_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">Visa信息登记截止时间（英文）：</td>
+			<td>
+				<input id="visa_Info_Submit_Deadline_En_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">展会登记截止时间：</td>
+			<td>
+				<input id="stone_fair_end_year_Foreign" style="width:60%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">展会登记开始时间：</td>
+			<td>
+				<input id="stone_fair_begin_year_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">展会开展时间（中文）：</td>
+			<td>
+				<input id="stone_Fair_Show_Date_Zh_Foreign" style="width:70%;" type="text"/>
+			</td>
+
+			<td style="width: 300px">展会开展时间（英文）：</td>
+			<td>
+				<input id="stone_Fair_Show_Date_En_Foreign" style="width:70%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 300px">展会登记截止时间（另一种格式）：</td>
+			<td>
+				<input id="company_Info_Data_End_Html_Foreign" style="width:60%;" type="text"/>
+			</td>
+		</tr>
+	</table>
+	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
+		<button type="button" class="btn btn-primary" id="saveDataForeign">确认修改</button>
+	</div>
+</div>
+
+<div style="height: auto;" class="easyui-panel" title="境外菜单移动">
+	<table style="margin-left: 10px;margin-top: 5px">
+		<tr>
+			<td style="width: 300px">菜单移动开关：</td>
+			<td>
+				<input id="menu_move_switch_foreign" name="menu_move_switch_foreign" type="checkbox">
+			</td>
+		</tr>
+	</table>
+	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
+		<button type="button" class="btn btn-primary" id="saveSwitchDataForeign">确认修改</button>
 	</div>
 </div>
 <script>
@@ -174,27 +290,52 @@
 				if(data.rows.length>0) {
 					for(var i = 0; i < data.rows.length; i++){
 						var map = data.rows[i];
-						document.getElementById("company_Info_Submit_Deadline_Zh").value = map.company_Info_Submit_Deadline_Zh;
-						document.getElementById("company_Info_Submit_Deadline_En").value = map.company_Info_Submit_Deadline_En;
-						document.getElementById("participant_List_Submit_Deadline_Zh").value = map.participant_List_Submit_Deadline_Zh;
-						document.getElementById("participant_List_Submit_Deadline_En").value = map.participant_List_Submit_Deadline_En;
-						document.getElementById("invoice_Information_Submit_Deadline_Zh").value = map.invoice_Information_Submit_Deadline_Zh;
-						document.getElementById("invoice_Information_Submit_Deadline_En").value = map.invoice_Information_Submit_Deadline_En;
-						document.getElementById("advertisement_Submit_Deadline_Zh").value = map.advertisement_Submit_Deadline_Zh;
-						document.getElementById("advertisement_Submit_Deadline_En").value = map.advertisement_Submit_Deadline_En;
-						document.getElementById("company_Info_Insert_Submit_Deadline_Zh").value = map.company_Info_Insert_Submit_Deadline_Zh;
-						document.getElementById("company_Info_Insert_Submit_Deadline_En").value = map.company_Info_Insert_Submit_Deadline_En;
-						document.getElementById("stone_fair_end_year").value = map.stone_fair_end_year;
-						document.getElementById("stone_fair_begin_year").value = map.stone_fair_begin_year;
-						document.getElementById("company_Info_Data_End_Html").value = map.company_Info_Data_End_Html;
-						document.getElementById("visa_Info_Submit_Deadline_Zh").value = map.visa_Info_Submit_Deadline_Zh;
-						document.getElementById("visa_Info_Submit_Deadline_En").value = map.visa_Info_Submit_Deadline_En;
-						document.getElementById("stone_Fair_Show_Date_Zh").value = map.stone_Fair_Show_Date_Zh;
-						document.getElementById("stone_Fair_Show_Date_En").value = map.stone_Fair_Show_Date_En;
-						if(map.menu_move_switch == 1){
-							$(":checkbox[name='menu_move_switch']").prop("checked", true);
-						}else{
-							$(":checkbox[name='menu_move_switch']").prop("checked", false);
+						if(2 == map.area_time) {
+							document.getElementById("company_Info_Submit_Deadline_Zh_Foreign").value = map.company_Info_Submit_Deadline_Zh;
+							document.getElementById("company_Info_Submit_Deadline_En_Foreign").value = map.company_Info_Submit_Deadline_En;
+							document.getElementById("participant_List_Submit_Deadline_Zh_Foreign").value = map.participant_List_Submit_Deadline_Zh;
+							document.getElementById("participant_List_Submit_Deadline_En_Foreign").value = map.participant_List_Submit_Deadline_En;
+							document.getElementById("invoice_Information_Submit_Deadline_Zh_Foreign").value = map.invoice_Information_Submit_Deadline_Zh;
+							document.getElementById("invoice_Information_Submit_Deadline_En_Foreign").value = map.invoice_Information_Submit_Deadline_En;
+							document.getElementById("advertisement_Submit_Deadline_Zh_Foreign").value = map.advertisement_Submit_Deadline_Zh;
+							document.getElementById("advertisement_Submit_Deadline_En_Foreign").value = map.advertisement_Submit_Deadline_En;
+							document.getElementById("company_Info_Insert_Submit_Deadline_Zh_Foreign").value = map.company_Info_Insert_Submit_Deadline_Zh;
+							document.getElementById("company_Info_Insert_Submit_Deadline_En_Foreign").value = map.company_Info_Insert_Submit_Deadline_En;
+							document.getElementById("stone_fair_end_year_Foreign").value = map.stone_fair_end_year;
+							document.getElementById("stone_fair_begin_year_Foreign").value = map.stone_fair_begin_year;
+							document.getElementById("company_Info_Data_End_Html_Foreign").value = map.company_Info_Data_End_Html;
+							document.getElementById("visa_Info_Submit_Deadline_Zh_Foreign").value = map.visa_Info_Submit_Deadline_Zh;
+							document.getElementById("visa_Info_Submit_Deadline_En_Foreign").value = map.visa_Info_Submit_Deadline_En;
+							document.getElementById("stone_Fair_Show_Date_Zh_Foreign").value = map.stone_Fair_Show_Date_Zh;
+							document.getElementById("stone_Fair_Show_Date_En_Foreign").value = map.stone_Fair_Show_Date_En;
+							if(map.menu_move_switch == 1){
+								$(":checkbox[name='menu_move_switch_foreign']").prop("checked", true);
+							}else{
+								$(":checkbox[name='menu_move_switch_foreign']").prop("checked", false);
+							}
+						}else if(1 == map.area_time){
+							document.getElementById("company_Info_Submit_Deadline_Zh").value = map.company_Info_Submit_Deadline_Zh;
+							document.getElementById("company_Info_Submit_Deadline_En").value = map.company_Info_Submit_Deadline_En;
+							document.getElementById("participant_List_Submit_Deadline_Zh").value = map.participant_List_Submit_Deadline_Zh;
+							document.getElementById("participant_List_Submit_Deadline_En").value = map.participant_List_Submit_Deadline_En;
+							document.getElementById("invoice_Information_Submit_Deadline_Zh").value = map.invoice_Information_Submit_Deadline_Zh;
+							document.getElementById("invoice_Information_Submit_Deadline_En").value = map.invoice_Information_Submit_Deadline_En;
+							document.getElementById("advertisement_Submit_Deadline_Zh").value = map.advertisement_Submit_Deadline_Zh;
+							document.getElementById("advertisement_Submit_Deadline_En").value = map.advertisement_Submit_Deadline_En;
+							document.getElementById("company_Info_Insert_Submit_Deadline_Zh").value = map.company_Info_Insert_Submit_Deadline_Zh;
+							document.getElementById("company_Info_Insert_Submit_Deadline_En").value = map.company_Info_Insert_Submit_Deadline_En;
+							document.getElementById("stone_fair_end_year").value = map.stone_fair_end_year;
+							document.getElementById("stone_fair_begin_year").value = map.stone_fair_begin_year;
+							document.getElementById("company_Info_Data_End_Html").value = map.company_Info_Data_End_Html;
+							document.getElementById("visa_Info_Submit_Deadline_Zh").value = map.visa_Info_Submit_Deadline_Zh;
+							document.getElementById("visa_Info_Submit_Deadline_En").value = map.visa_Info_Submit_Deadline_En;
+							document.getElementById("stone_Fair_Show_Date_Zh").value = map.stone_Fair_Show_Date_Zh;
+							document.getElementById("stone_Fair_Show_Date_En").value = map.stone_Fair_Show_Date_En;
+							if(map.menu_move_switch == 1){
+								$(":checkbox[name='menu_move_switch']").prop("checked", true);
+							}else{
+								$(":checkbox[name='menu_move_switch']").prop("checked", false);
+							}
 						}
 					}
 				}
@@ -227,7 +368,8 @@
 							"visa_Info_Submit_Deadline_Zh": $("#visa_Info_Submit_Deadline_Zh").val(),
 							"visa_Info_Submit_Deadline_En": $("#visa_Info_Submit_Deadline_En").val(),
 							"stone_Fair_Show_Date_Zh": $("#stone_Fair_Show_Date_Zh").val(),
-							"stone_Fair_Show_Date_En": $("#stone_Fair_Show_Date_En").val()},
+							"stone_Fair_Show_Date_En": $("#stone_Fair_Show_Date_En").val(),
+							"exhibitor_area": 1},
 						success: function (data) {
 							if (data.resultCode == 1) {
 								$.messager.alert('错误', '更新时间参数失败错误');
@@ -261,7 +403,86 @@
 						type: "post",
 						dataType: "json",
 						traditional: true,
-						data: {"menu_move_switch": value},
+						data: {"menu_move_switch": value, "exhibitor_area": 1},
+						success: function (data) {
+							if (data.resultCode == 1) {
+								$.messager.alert('错误', '更新菜单移动属性失败错误');
+							} else if (data.resultCode > 1) {
+								$.messager.alert('错误', '服务器错误');
+							} else {
+								queryExhibitorTimeData();
+								$.messager.show({
+									title: '成功',
+									msg: '修改菜单移动属性成功',
+									timeout: 2000,
+									showType: 'slide'
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		$("#saveDataForeign").click(function () {
+			$.messager.confirm('确认修改','你确定要修改时间参数?',function(r){
+				if (r){
+					$.ajax({
+						url: "${base}/user/modifyExhibitorTime",
+						type: "post",
+						dataType: "json",
+						traditional: true,
+						data: {"company_Info_Submit_Deadline_Zh": $("#company_Info_Submit_Deadline_Zh_Foreign").val(),
+							"company_Info_Submit_Deadline_En": $("#company_Info_Submit_Deadline_En_Foreign").val(),
+							"participant_List_Submit_Deadline_Zh": $("#participant_List_Submit_Deadline_Zh_Foreign").val(),
+							"participant_List_Submit_Deadline_En": $("#participant_List_Submit_Deadline_En_Foreign").val(),
+							"invoice_Information_Submit_Deadline_Zh": $("#invoice_Information_Submit_Deadline_Zh_Foreign").val(),
+							"invoice_Information_Submit_Deadline_En": $("#invoice_Information_Submit_Deadline_En_Foreign").val(),
+							"advertisement_Submit_Deadline_Zh": $("#advertisement_Submit_Deadline_Zh_Foreign").val(),
+							"advertisement_Submit_Deadline_En": $("#advertisement_Submit_Deadline_En_Foreign").val(),
+							"company_Info_Insert_Submit_Deadline_Zh": $("#company_Info_Insert_Submit_Deadline_Zh_Foreign").val(),
+							"company_Info_Insert_Submit_Deadline_En": $("#company_Info_Insert_Submit_Deadline_En_Foreign").val(),
+							"stone_fair_end_year": $("#stone_fair_end_year_Foreign").val(),
+							"stone_fair_begin_year": $("#stone_fair_begin_year_Foreign").val(),
+							"company_Info_Data_End_Html": $("#company_Info_Data_End_Html_Foreign").val(),
+							"visa_Info_Submit_Deadline_Zh": $("#visa_Info_Submit_Deadline_Zh_Foreign").val(),
+							"visa_Info_Submit_Deadline_En": $("#visa_Info_Submit_Deadline_En_Foreign").val(),
+							"stone_Fair_Show_Date_Zh": $("#stone_Fair_Show_Date_Zh_Foreign").val(),
+							"stone_Fair_Show_Date_En": $("#stone_Fair_Show_Date_En_Foreign").val(),
+							"exhibitor_area": 2},
+						success: function (data) {
+							if (data.resultCode == 1) {
+								$.messager.alert('错误', '更新时间参数失败错误');
+							} else if (data.resultCode > 1) {
+								$.messager.alert('错误', '服务器错误');
+							} else {
+								queryExhibitorTimeData();
+								$.messager.show({
+									title: '成功',
+									msg: '修改时间参数成功',
+									timeout: 2000,
+									showType: 'slide'
+								});
+							}
+						}
+					});
+				}
+			});
+		});
+		$("#saveSwitchDataForeign").click(function () {
+			var value;
+			if($(":checkbox[name='menu_move_switch_foreign']").is(':checked')){
+				value = 1;
+			} else{
+				value = 0;
+			}
+			$.messager.confirm('确认修改','你确定要设置菜单移动属性?',function(r){
+				if (r){
+					$.ajax({
+						url: "${base}/user/modifyExhibitorMenuMove",
+						type: "post",
+						dataType: "json",
+						traditional: true,
+						data: {"menu_move_switch_foreign": value, "exhibitor_area": 2},
 						success: function (data) {
 							if (data.resultCode == 1) {
 								$.messager.alert('错误', '更新菜单移动属性失败错误');

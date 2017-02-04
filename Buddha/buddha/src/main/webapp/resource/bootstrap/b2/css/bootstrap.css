@@ -3374,6 +3374,22 @@ input[type="button"].btn-block {
   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
 
+.btn-primaryEx {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #fec841;
+  background-image: -moz-linear-gradient(top, #fec841, #fec841);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fec841), to(#fec841));
+  background-image: -webkit-linear-gradient(top, #fec841, #fec841);
+  background-image: -o-linear-gradient(top, #fec841, #fec841);
+  background-image: linear-gradient(to bottom, #fec841, #fec841);
+  background-repeat: repeat-x;
+  border-color: #fec841 #fec841 #fec841;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffec841', endColorstr='#fffec841', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
@@ -5183,7 +5199,7 @@ input[type="submit"].btn.btn-mini {
   bottom: 0;
   left: 0;
   z-index: 1040;
-  background-color: #000000;
+  background-color: #f0efeb;
 }
 
 .modal-backdrop.fade {
@@ -5192,8 +5208,8 @@ input[type="submit"].btn.btn-mini {
 
 .modal-backdrop,
 .modal-backdrop.fade.in {
-  opacity: 0.8;
-  filter: alpha(opacity=80);
+  opacity: 1;
+  filter: alpha(opacity=100);
 }
 
 .modal {

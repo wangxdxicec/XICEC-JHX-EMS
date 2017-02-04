@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<#import "/common/spring.ftl" as spring />
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title><@spring.message "site"/></title>
+
+
+    <#include "/common/common-js.html" />
+    <link href="${resource}/bootstrap/b2/css/bootstrap.css" rel="stylesheet">
+    <script src="${resource}/js/jquery.json-2.4.js"></script>
+    <style type="text/css">
+        .table > tbody > tr > td {
+            vertical-align: middle;
+        }
+
+        body {
+            padding-bottom: 40px;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+</head>
+<!-- Bootstrap core CSS -->
+
+<body>
+<#include "/user/header.html" />
+<div class="container-fluid">
+    <div class="row-fluid" style="width:1000px;margin:0px auto">
+        <#include "/user/left.html" />
+        <div class="span9">
+            <#if rc.locale=="zh_CN">
+                <div class="alert alert-block">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <h4>温馨提醒：</h4>
+                    展前一个月组委会将给付清全款的企业快递《展位确认函》（参展商报到的唯一凭证）、《参展指南》等资料，请提供详细快递地址。
+                </div>
+            </#if>
+            <form class="form-horizontal" id="emailForm">
+                <div class="control-group">
+                    <#if rc.locale=="zh_CN">
+                        <label class="control-label" for="email_address">地址</label>
+                        <div class="controls">
+                            <input type="text" value="${exhibitorInfo.email_address!""}" name="email_address" id="email_address" placeholder="邮件地址">
+                        </div>
+                    <#else>
+                        <label class="control-label" for="email_address">Add</label>
+                        <div class="controls">
+                            <input type="text" value="${exhibitorInfo.email_address!""}" name="email_address" id="email_address" placeholder="Add">
+                        </div>
+                    </#if>
+                </div>
+                <div class="control-group">
+                    <#if rc.locale=="zh_CN">
+                        <label class="control-label" for="email_contact">收件人</label>
+                        <div class="controls">
+                            <input type="text" value="${exhibitorInfo.email_contact!""}" name="email_contact" id="email_contact" placeholder="收件人">
+                        </div>
+                    <#else>
+                        <label class="control-label" for="email_contact">Contact</label>
+                        <div class="controls">
+                            <input type="text" value="${exhibitorInfo.email_contact!""}" name="email_contact" id="email_contact" placeholder="Contact">
+                        </div>
+                    </#if>
+                </div>
+                <div class="control-group">
+                    <#if rc.locale=="zh_CN">
+                        <label class="control-label" for="email_telphone">手机</label>
+                        <div class="controls">
+                            <input type="text" value="${exhibitorInfo.email_telphone!""}" name="email_telphone" id="email_telphone" placeholder="手机">
+                        </div>
+                    <#else>
+                        <label class="control-label" for="email_telphone">Mobile Phone</label>
+                        <div class="controls">
+                            <input type="text" value="${exhibitorInfo.email_telphone!""}" name="email_telphone" id="email_telphone" placeholder="Mobile Phone Number">
+                        </div>
+                    </#if>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <input type="hidden" value="${exhibitorInfo.eid!""}" name="eid">
+                        <#if rc.locale=="zh_CN">
+                        <button type="button" id="sub" class="btn">提交</button>
+                        <#else>
+                            <button type="button" id="sub" class="btn">Submit</button>
+                        </#if>
+                    </div>
+                </div>
+            </form>
+            <!--<div class="alert alert-block">
+                <h4>备注!</h4>
+                以人民币现金或个人名义人民币汇款，需填写发票抬头；若以公司账户汇款，则组委会以汇款名称为准开具相关发票。如有不详敬请咨询：0592-5959888
+            </div>-->
+        </div>
+        <!--/span-->
+    </div>
+    <!--/row-->
+</div>
+<#include "/footer.html" />
+<!--/.container-->
+<script src="${resource}/bootstrap/b2/js/bootstrap.js"></script>
+<script>
+    (function ($) {
+        $.fn.serializeJson = function () {
+            var serializeObj = {};
+            var array = this.serializeArray();
+            var str = this.serialize();
+            $(array).each(function () {
+                if (serializeObj[this.name]) {
+                    if ($.isArray(serializeObj[this.name])) {
+                        serializeObj[this.name].push(this.value);
+                    } else {
+                        serializeObj[this.name] = [serializeObj[this.name], this.value];
+                    }
+                } else {
+                    serializeObj[this.name] = this.value;
+                }
+            });
+            return serializeObj;
+        };
+    })(jQuery);
+    $(document).ready(function () {
+        $("#leftInvoice").parent().parent().parent().parent().prev().addClass("left_current");
+        $("#leftInvoice").addClass("active");
+        $("#leftInvoice").parent().parent().parent().parent().show();
+        $("#sub").click(function () {
+            var parameters = $("#emailForm").serializeJson();
+            if(parameters.email_address==''){
+                alert("邮件地址不能为空");
+                return
+            }/*else{
+                if(!checkEmail(parameters.email_address)){
+                    alert(words.mailNotRight);
+                    return;
+                }
+            }*/
+            if(parameters.email_telphone==''){
+                alert("手机号不能为空");
+                return
+            }
+            if(parameters.email_contact==''){
+                alert("收件人不能为空");
+                return
+            }
+            $.ajax({
+                url:"${base}/user/email/save",
+                type:"POST",
+                dataType:"json",
+                data:parameters,
+                success:function(data){
+                    if(data.resultCode==0){
+                        alert("提交成功");
+                        window.location.href = window.location.href;
+                    }else{
+                        alert("提交失败");
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

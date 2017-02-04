@@ -12,6 +12,10 @@
     pageContext.setAttribute("base", base);
 %>
 
+<script type="text/javascript" src="${base}/resource/js/jquery-1.12.4.js"></script>
+<script type="text/javascript" src="${base}/resource/js/jquery-ui.js"></script>
+<link type="text/css" href="${base}/resource/css/style.css" rel="stylesheet" />
+
 <link rel="stylesheet" type="text/css" href="${base}/resource/ckeditor/samples/sample.css">
 <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
 <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">

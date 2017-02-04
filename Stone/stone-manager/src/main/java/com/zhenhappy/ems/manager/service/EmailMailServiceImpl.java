@@ -1,9 +1,9 @@
 package com.zhenhappy.ems.manager.service;
 
 import com.zhenhappy.ems.dao.SendMailDetailDao;
-import com.zhenhappy.ems.entity.Email;
-import com.zhenhappy.ems.entity.TEmailSendDetail;
-import com.zhenhappy.ems.entity.TVisitorMailLog;
+import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.manager.action.user.ExhibitorInvisitorMailUtil;
+import com.zhenhappy.ems.manager.action.user.PDFReaderUtil;
 import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.service.EmailMailService;
 import com.zhenhappy.ems.service.VisitorLogMailService;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.*;
@@ -61,6 +63,8 @@ public class EmailMailServiceImpl implements EmailMailService {
     private SendMailDetailDao sendMailDetailDao;
     @Autowired
     VisitorLogMailService visitorLogMailService;
+    @Autowired
+    private TagManagerService tagManagerService;
 
     /**
      * 同步发送
@@ -170,11 +174,73 @@ public class EmailMailServiceImpl implements EmailMailService {
 
             Properties props = System.getProperties();
             props.put("mail.smtp.auth", "true");
+            props.put("username", "do-not-reply@stonefair.org.cn");
+            props.put("password", "Jhxsf2015~");
+            props.put("mail.debug", "true");
+            props.setProperty("mail.debug", "true");
             // 发送邮件
             mailSender.send(mailMessage);
 
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             throw e;
+        }
+    }
+
+    public void sendInvisitorMailByAsynchronousMode(ExhibitorInvisitorEmail exhibitorInvisitorEmail) throws Exception {
+        if (exhibitorInvisitorEmail.getContactList() == null || exhibitorInvisitorEmail.getContactList().size() == 0) {
+            throw new IllegalArgumentException("收件人不能为空");
+        }
+
+        PDFReaderUtil pdfReaderUtil = new PDFReaderUtil();
+        pdfReaderUtil.writePDF(pdfReaderUtil.exhibitorInvitationInputPath,
+                pdfReaderUtil.exhibitorInvitationSavePath + "Booth Confirmation of Xiamen Stone Fair 2017.pdf",
+                exhibitorInvisitorEmail.getCompanyName(), exhibitorInvisitorEmail.getUserName(), exhibitorInvisitorEmail.getPassword(),
+                pdfReaderUtil.exhibitorSelectPath,
+                exhibitorInvisitorEmail.getBoothNumber(), exhibitorInvisitorEmail.getExhibitorArea(),
+                exhibitorInvisitorEmail.getRawSpaceOrShellScheme());
+
+        ExhibitorInvisitorMailUtil exhibitorInvisitorMailUtil = new ExhibitorInvisitorMailUtil();
+        exhibitorInvisitorMailUtil.setHost("smtp.exmail.qq.com");// 邮件发送服务器
+        exhibitorInvisitorMailUtil.setFrom(exhibitorInvisitorEmail.getSendEamilAccount());
+        exhibitorInvisitorMailUtil.setSubject("Booth Confirmation of Xiamen Stone Fair 2017");
+        exhibitorInvisitorMailUtil.setUserName(exhibitorInvisitorEmail.getSendEamilAccount());
+        exhibitorInvisitorMailUtil.setPassWord(exhibitorInvisitorEmail.getSendEmailPassword());
+
+        for(TContact tContact:exhibitorInvisitorEmail.getContactList()) {
+            if(tContact.getEmail().contains(",")){
+                String[] emailList = tContact.getEmail().split(",");
+                for(String emailTemp: emailList){
+                    exhibitorInvisitorMailUtil.setTo(emailTemp);
+                    Template template = freeMarker.getConfiguration().getTemplate("mail/email_content.html");
+
+                    // FreeMarker通过Map传递动态数据
+                    Map<Object, Object> model = new HashMap<Object, Object>();
+                    model.put("exhibitorName", tContact.getName()); // 注意动态数据的key和模板标签中指定的属性相匹配
+
+                    // 解析模板并替换动态数据，最终content将替换模板文件中的${content}标签。
+                    String emailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+                    exhibitorInvisitorMailUtil.setContent(emailContent);
+
+                    exhibitorInvisitorMailUtil.attachfile(pdfReaderUtil.exhibitorInvitationSavePath + "Booth Confirmation of Xiamen Stone Fair 2017.pdf");
+                    exhibitorInvisitorMailUtil.attachfile(pdfReaderUtil.exhibitorConfirmFilePath);
+                    exhibitorInvisitorMailUtil.sendMail();
+                }
+            }else{
+                exhibitorInvisitorMailUtil.setTo(tContact.getEmail());
+                Template template = freeMarker.getConfiguration().getTemplate("mail/email_content.html");
+
+                // FreeMarker通过Map传递动态数据
+                Map<Object, Object> model = new HashMap<Object, Object>();
+                model.put("exhibitorName", tContact.getName()); // 注意动态数据的key和模板标签中指定的属性相匹配
+
+                // 解析模板并替换动态数据，最终content将替换模板文件中的${content}标签。
+                String emailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+                exhibitorInvisitorMailUtil.setContent(emailContent);
+
+                exhibitorInvisitorMailUtil.attachfile(pdfReaderUtil.exhibitorInvitationSavePath + "Booth Confirmation of Xiamen Stone Fair 2017.pdf");
+                exhibitorInvisitorMailUtil.attachfile(pdfReaderUtil.exhibitorConfirmFilePath);
+                exhibitorInvisitorMailUtil.sendMail();
+            }
         }
     }
 
@@ -263,6 +329,19 @@ public class EmailMailServiceImpl implements EmailMailService {
         }else{
             return null;
         }
+    }
+
+    private String getExhibitorInvisitorMailText(Email email) throws Exception {
+        // 通过指定模板名获取FreeMarker模板实例
+        Template template = freeMarker.getConfiguration().getTemplate("mail/VisitorReplay.html");
+
+        // FreeMarker通过Map传递动态数据
+        Map<Object, Object> model = new HashMap<Object, Object>();
+        model.put("email", email); // 注意动态数据的key和模板标签中指定的属性相匹配
+
+        // 解析模板并替换动态数据，最终content将替换模板文件中的${content}标签。
+        String htmlText = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+        return htmlText;
     }
 
     /**

@@ -18,6 +18,9 @@
 			width: 200px;
 			height: 20px;
 		}
+
+		#bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=50);}
+		.loading{display: none; position: absolute; top: 50%; left: 50%; z-index:1002; }
 	</style>
 </head>
 <body>
@@ -86,8 +89,9 @@
 					<span id="sisActivated" class="sortable">状态</span><br/>
 					<select id="customerIsActivated" style="width:104%;height:21px;" onchange="filter();">
 						<option selected value="">全部</option>
-						<option value="0">注销</option>
-						<option value="1">激活</option>
+						<option value="0">未激活</option>
+						<option value="1">网页激活</option>
+						<option value="2">短信激活</option>
 					</select>
 				</th>
 			</tr>
@@ -119,8 +123,11 @@
 		<div class="easyui-menubutton" menu="#msg" iconCls="icon-redo">短信</div>
 	</div>
 	<div id="msg" style="width:180px;">
-		<div id="msgAllCustomers" iconCls="icon-redo">群发所有客商短信</div>
-		<div id="msgSelectedCustomers" iconCls="icon-redo">群发所选客商短信</div>
+		<div id="msgAllCustomers" iconCls="icon-redo">群发所有已登记已激活客商短信</div>
+		<div id="msgSelectedCustomers" iconCls="icon-redo">群发所选已登记已激活客商短信</div>
+		<div class="menu-sep"></div>
+		<div id="msgAllUnActiveCustomers" iconCls="icon-redo">群发所有已登记未激活客商短信</div>
+		<div id="msgSelectedUnActiveCustomers" iconCls="icon-redo">群发所选已登记未激活客商短信</div>
 	</div>
 	<div style="display:inline-block;">
 		<div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
@@ -148,7 +155,7 @@
 		<button type="button" class="btn btn-primary" id="exportDataDetail">导出数据</button>
 	</td>
 </div>
-
+<div class="loading"><img src="${base}/resource/load.gif"></div>
 <script>
 	var checkedItems = [];
 	//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
@@ -225,28 +232,22 @@
 			$.messager.alert('提示', '请至少选择一项客商再操作');
 		}
 	});
-	//群发所有客商短信
+	//群发所有已登记已激活客商短信
 	$('#msgAllCustomers').click(function(){
-		$.messager.confirm('确认删除','你确定要群发所有客商短信吗?',function(r){
+		$.messager.confirm('确认发送','你确定要群发所有已登记已激活客商短信吗?',function(r){
 			if (r){
+				$("#bg,.loading").show();
 				$.ajax({
 					url: "${base}/user/msgAllInlandStoneCustomers",
 					type: "post",
-					data: {"cids": "-1"},
+					data: {"cids": "-1","type":"1"},
 					dataType: "json",
-					beforeSend:function(XMLHttpRequest){
-						$.messager.show({
-							title: '处理中...',
-							msg: '正在群发短信，请稍等...',
-							timeout: 10000,
-							showType: 'slide'
-						});
-					},
 					success: function (data) {
+						$("#bg,.loading").hide();
 						if (data.resultCode == 0) {
 							$.messager.show({
 								title: '成功',
-								msg: '群发所有客商短信成功',
+								msg: '群发所有已登记已激活客商短信成功',
 								timeout: 5000,
 								showType: 'slide'
 							});
@@ -259,30 +260,85 @@
 			}
 		});
 	});
-	//群发所选客商短信
+	//群发所选已登记已激活客商短信
 	$('#msgSelectedCustomers').click(function(){
 		if(checkedItems.length > 0){
-			$.messager.confirm('确认删除','你确定要群发所选客商短信吗?',function(r){
+			$.messager.confirm('确认发送','你确定要群发所选已登记已激活客商短信吗?',function(r){
 				if (r){
+					$("#bg,.loading").show();
 					$.ajax({
 						url: "${base}/user/msgAllInlandStoneCustomers",
 						type: "post",
-						data: {"cids": checkedItems},
+						data: {"cids": checkedItems,"type":"1"},
 						dataType: "json",
 						traditional: true,
-						beforeSend:function(XMLHttpRequest){
-							$.messager.show({
-								title: '处理中...',
-								msg: '正在群发短信，请稍等...',
-								timeout: 10000,
-								showType: 'slide'
-							});
-						},
 						success: function (data) {
+							$("#bg,.loading").hide();
 							if (data.resultCode == 0) {
 								$.messager.show({
 									title: '成功',
-									msg: '群发所选客商短信成功',
+									msg: '群发所选已登记已激活客商短信成功',
+									timeout: 5000,
+									showType: 'slide'
+								});
+								$("#customers").datagrid("reload");
+							} else {
+								$.messager.alert('错误', '系统错误');
+							}
+						}
+					});
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项客商再操作');
+		}
+	});
+	//群发所有已登记未激活客商短信
+	$('#msgAllUnActiveCustomers').click(function(){
+		$.messager.confirm('确认发送','你确定要群发所有已登记未激活客商短信吗?',function(r){
+			if (r){
+				$("#bg,.loading").show();
+				$.ajax({
+					url: "${base}/user/msgAllInlandStoneCustomers",
+					type: "post",
+					data: {"cids": "-1","type":"2"},
+					dataType: "json",
+					success: function (data) {
+						$("#bg,.loading").hide();
+						if (data.resultCode == 0) {
+							$.messager.show({
+								title: '成功',
+								msg: '群发所有已登记未激活客商短信成功',
+								timeout: 5000,
+								showType: 'slide'
+							});
+							$("#customers").datagrid("reload");
+						} else {
+							$.messager.alert('错误', '系统错误');
+						}
+					}
+				});
+			}
+		});
+	});
+	//群发所选已登记未激活客商短信
+	$('#msgSelectedUnActiveCustomers').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认发送','你确定要群发所选已登记未激活客商短信吗?',function(r){
+				if (r){
+					$("#bg,.loading").show();
+					$.ajax({
+						url: "${base}/user/msgAllInlandStoneCustomers",
+						type: "post",
+						data: {"cids": checkedItems,"type":"2"},
+						dataType: "json",
+						traditional: true,
+						success: function (data) {
+							$("#bg,.loading").hide();
+							if (data.resultCode == 0) {
+								$.messager.show({
+									title: '成功',
+									msg: '群发所选已登记未激活客商短信成功',
 									timeout: 5000,
 									showType: 'slide'
 								});
@@ -362,9 +418,11 @@
 
 	function formatActiviteStatus(val, row) {
 		if (val == 0) {
-			return '注销';
-		} else {
-			return '激活';
+			return '未激活';
+		} else if(val == 1){
+			return '网页激活';
+		} else if(val == 2){
+			return '短信激活';
 		}
 	}
 
@@ -462,6 +520,13 @@
 		});
 
 		// 国内客商列表渲染
+		$('#tabs').tabs({
+			onClose: function(title,index){
+				filter();
+				return false;
+			}
+		});
+
 		$('#customers').datagrid({
 			onSelect:function (rowIndex, rowData){
 				var row = $('#customers').datagrid('getSelections');

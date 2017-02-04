@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1"
-	 xmlns="http://www.w3.org/2000/svg"
-	 xmlns:xlink="http://www.w3.org/1999/xlink"
-	 xmlns:amcharts="http://amcharts.com/ammap"
-	 x="0px"
-	 y="0px"
-	 viewBox="0 0 10000 8000"
-	 enable-background="new 0 0 10000 8000"
-	 xml:space="preserve">
-	<defs>
-        <style type="text/css">
-            .land
-            {
-            fill-opacity: 1;
-            stroke:white;
-            stroke-opacity: 1;
-            stroke-width:0.5;
-            }
-        </style>
-
-        <amcharts:ammap projection="mercator" leftLongitude="99.639555" topLatitude="7.364329"
-                        rightLongitude="119.270884" bottomLatitude="0.853582"></amcharts:ammap>
-    </defs>
-
+<!-- Generator: Adobe Illustrator 17.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 10000 8000" enable-background="new 0 0 10000 8000" xml:space="preserve">
+<image display="none" overflow="visible" opacity="0.37" enable-background="new    " width="10000" height="8000" xlink:href="展位图-UV.jpg" >
+</image>
+<image display="none" overflow="visible" opacity="0.35" enable-background="new    " width="10000" height="8000" xlink:href="展位图-Model.jpg" >
+</image>
 <path d="M9797,6930l-10-5693V286h-3h-7h-214V151v-8v-2h-165l-390.8-3v0.3l-0.4-0.5l-94.4,81.3L8706.7,383l-104.3,73.7l0.2,0.3h-0.6
 	v109v241v436v373v162h5h5h127v405h-151v5v5v794h-258v-353v-5v-5h-53v-211h-5h-5H2204v5v5v204h-86v5v5v54h5h5h15v211h-254v-387v-8v-2
 	h-180v-381v-9v-1h-256v-60v-10h-10h-384v-63h-5h-5H255v5v5v4987h5h5h391v645.8l-0.6,0.1l0.6,5v2.1h0.2l0.3,2.8L1841,7502l0,0h10
@@ -3730,150 +3714,6 @@
 </g>
 <g id="C3L">
 	<path id="C3L30" title="C3L30" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4372,4094.2h-129.7
-		v-73.7H4372V4094.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4280.3335 4064.6667)" font-family="'ArialNarrow'" font-size="14">C3L30</text>
-<path id="C3L29" title="C3L29" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4501.7,4094.2H4372
-		v-73.7h129.7V4094.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4410.0005 4064.6667)" font-family="'ArialNarrow'" font-size="14">C3L29</text>
-<path id="C3L28" title="C3L28" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4631,4107.3h-88.3
-		v-87.8h88.3V4107.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4557.0005 4064.6663)" font-family="'ArialNarrow'" font-size="14">C3L28</text>
-<path id="C3L19" title="C3L19" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4771.3,4107.3H4683
-		v-87.8h88.3V4107.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4697.3335 4064.6663)" font-family="'ArialNarrow'" font-size="14">C3L19</text>
-<path id="C3L27" title="C3L27" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4631,4209.3h-88.3
-		v-87.8h88.3V4209.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4557.0005 4166.666)" font-family="'ArialNarrow'" font-size="14">C3L27</text>
-<path id="C3L20" title="C3L20" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4771.3,4209.3H4683
-		v-87.8h88.3V4209.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4697.3335 4166.666)" font-family="'ArialNarrow'" font-size="14">C3L20</text>
-<path id="C3L26" title="C3L26" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4631,4310.3h-88.3
-		v-87.8h88.3V4310.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4557.0005 4267.6665)" font-family="'ArialNarrow'" font-size="14">C3L26</text>
-<path id="C3L21" title="C3L21" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4771.3,4310.3H4683
-		v-87.8h88.3V4310.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4697.3335 4267.6665)" font-family="'ArialNarrow'" font-size="14">C3L21</text>
-<path id="C3L25" title="C3L25" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4631,4412.7h-88.3
-		v-87.8h88.3V4412.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4557.0005 4370.0825)" font-family="'ArialNarrow'" font-size="14">C3L25</text>
-<path id="C3L22" title="C3L22" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4771.3,4412.7H4683
-		v-87.8h88.3V4412.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4697.3335 4370.0825)" font-family="'ArialNarrow'" font-size="14">C3L22</text>
-<path id="C3L24" title="C3L24" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4631,4514.7h-88.3
-		v-87.8h88.3V4514.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4557.0005 4472.0825)" font-family="'ArialNarrow'" font-size="14">C3L24</text>
-<path id="C3L23" title="C3L23" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4771.3,4514.7H4683
-		v-87.8h88.3V4514.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4697.3335 4472.0825)" font-family="'ArialNarrow'" font-size="14">C3L23</text>
-<path id="C3L06" title="C3L06" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5795.4,4528.8h-88.3
-		V4441h88.3V4528.8z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5721.417 4486.166)" font-family="'ArialNarrow'" font-size="14">C3L06</text>
-<path id="C3L05" title="C3L05" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5943.8,4528.8h-88.3
-		V4441h88.3V4528.8z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5869.751 4486.166)" font-family="'ArialNarrow'" font-size="14">C3L05</text>
-<path id="C3L07" title="C3L07" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5795.4,4426.8h-88.3
-		V4339h88.3V4426.8z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5721.417 4384.1655)" font-family="'ArialNarrow'" font-size="14">C3L07</text>
-<path id="C3L04" title="C3L04" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5943.8,4426.8h-88.3
-		V4339h88.3V4426.8z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5869.751 4384.1655)" font-family="'ArialNarrow'" font-size="14">C3L04</text>
-<path id="C3L08" title="C3L08" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5795.4,4322.5h-88.3
-		v-87.8h88.3V4322.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5721.417 4279.8325)" font-family="'ArialNarrow'" font-size="14">C3L08</text>
-<path id="C3L03" title="C3L03" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5943.8,4322.5h-88.3
-		v-87.8h88.3V4322.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5869.751 4279.8325)" font-family="'ArialNarrow'" font-size="14">C3L03</text>
-<path id="C3L09" title="C3L09" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5795.4,4218.2h-88.3
-		v-87.8h88.3V4218.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5721.417 4175.499)" font-family="'ArialNarrow'" font-size="14">C3L09</text>
-<path id="C3L02" title="C3L02" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5943.8,4218.2h-88.3
-		v-87.8h88.3V4218.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5869.751 4175.499)" font-family="'ArialNarrow'" font-size="14">C3L02</text>
-<path id="C3L10" title="C3L10" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5795.4,4113.8h-88.3
-		V4026h88.3V4113.8z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5721.417 4071.1658)" font-family="'ArialNarrow'" font-size="14">C3L10</text>
-<path id="C3L01" title="C3L01" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5943.8,4113.8h-88.3
-		V4026h88.3V4113.8z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5869.751 4071.1658)" font-family="'ArialNarrow'" font-size="14">C3L01</text>
-<path id="C3L31" title="C3L31" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M6116.8,4097.3h-131.8
-		V4024h131.8V4097.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 6016.7515 4071.1653)" font-family="'ArialNarrow'" font-size="14">C3L31</text>
-<path id="C3L32" title="C3L32" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M6248.6,4097.3h-131.8
-		V4024h131.8V4097.3z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 6148.5835 4071.1653)" font-family="'ArialNarrow'" font-size="14">C3L32</text>
-<path id="C3L18" title="C3L18" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4997.5,4268.7h-88
-		v-217.2h88V4268.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4926 4165.4165)" font-family="'ArialNarrow'" font-size="14">C3L18</text>
-<path id="C3L15" title="C3L15" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5195,4268.7h-145.7
-		v-217.2H5195V4268.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5093.334 4165.416)" font-family="'ArialNarrow'" font-size="14">C3L15</text>
-<path id="C3L14" title="C3L14" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5422.5,4268.7h-133.8
-		v-217.2h133.8V4268.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5332.667 4165.416)" font-family="'ArialNarrow'" font-size="14">C3L14</text>
-<path id="C3L11" title="C3L11" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5552,4266.7h-87.3
-		v-217.2h87.3V4266.7z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5487.4478 4163.416)" font-family="'ArialNarrow'" font-size="14">C3L11</text>
-<path id="C3L17" title="C3L17" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4997.5,4531.6h-88
-		v-217.2h88V4531.6z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4926 4428.3335)" font-family="'ArialNarrow'" font-size="14">C3L17</text>
-<path id="C3L16" title="C3L16" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5195,4531.6h-197.5
-		v-217.2H5195V4531.6z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5093.334 4428.333)" font-family="'ArialNarrow'" font-size="14">C3L16</text>
-<path id="C3L13" title="C3L13" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5422.5,4531.6h-133.8
-		v-217.2h133.8V4531.6z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5332.667 4428.333)" font-family="'ArialNarrow'" font-size="14">C3L13</text>
-<path id="C3L12" title="C3L12" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5552,4529.6h-87.3
-		v-217.2h87.3V4529.6z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5487.4478 4426.333)" font-family="'ArialNarrow'" font-size="14">C3L12</text>
-<path id="C3L49" title="C3L49" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4594.2,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4554.5 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L49</text>
-<path id="C3L48" title="C3L48" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4638,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4598.3335 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L48</text>
-<path id="C3L47" title="C3L47" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4681.8,4600.5H4638
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4642.167 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L47</text>
-<path id="C3L46" title="C3L46" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4724.9,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4685.2495 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L46</text>
-<path id="C3L45" title="C3L45" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4768.7,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4729.0825 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L45</text>
-<path id="C3L43" title="C3L43" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4813.7,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4774.0825 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L43</text>
-<path id="C3L42" title="C3L42" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4857.6,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4817.916 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L42</text>
-<path id="C3L41" title="C3L41" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4901.4,4600.5h-43.8
-		v-29h43.8V4600.5z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 4861.7495 4590.3335)" font-family="'ArialNarrow'" font-size="14">C3L41</text>
-<path id="C3L40" title="C3L40" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5617.8,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5578.0835 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L40</text>
-<path id="C3L39" title="C3L39" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5661.6,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5621.917 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L39</text>
-<path id="C3L38" title="C3L38" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5705.4,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5665.75 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L38</text>
-<path id="C3L37" title="C3L37" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5749.3,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5709.5835 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L37</text>
-<path id="C3L36" title="C3L36" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5793.8,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5754.0835 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L36</text>
-<path id="C3L35" title="C3L35" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5837.6,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5797.917 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L35</text>
-<path id="C3L34" title="C3L34" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5881.4,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5841.7505 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L34</text>
-<path id="C3L33" title="C3L33" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M5925.3,4600.2h-43.8
-		v-29h43.8V4600.2z"  onclick="changeColor(evt)"/>
-<text transform="matrix(1 0 0 1 5885.584 4590.0005)" font-family="'ArialNarrow'" font-size="14">C3L33</text>
-<path id="C3L30" title="C3L30" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4372,4094.2h-129.7
 		v-73.7H4372V4094.2z"  onclick="changeColor(evt)"/>
 <text transform="matrix(1 0 0 1 4280.3335 4064.6667)" font-family="'ArialNarrow'" font-size="14">C3L30</text>
 <path id="C3L29" title="C3L29" company="" tag="" class="land" opacity="0.47" fill="#00FFFF" stroke="#000000" stroke-miterlimit="10" d="M4501.7,4094.2H4372

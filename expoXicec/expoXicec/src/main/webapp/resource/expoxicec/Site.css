@@ -1,0 +1,266 @@
+* {
+    font-family: Arial, 'Microsoft YaHei', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: Arial, 'Microsoft YaHei', sans-serif;
+}
+
+.logo img, login-logo img {
+    height: 50px;
+}
+
+.margin-bottom-tiny {
+    margin-bottom: 5px;
+}
+
+.project-item {
+    background-color: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.project-item h4 {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.document-container {
+}
+
+.boothtab {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.document-item {
+    width: 100%;
+    display: block;
+    padding-bottom: 80%;
+    box-sizing: border-box;
+    border: 1px solid #fff;
+    overflow: hidden;
+    margin-bottom: 15px;
+    background-color: #fff;
+    position: relative;
+    transition: all ease-in-out .1s;
+    border-radius: 3px;
+}
+
+.document-item:hover {
+    border-color: #3c8dbc;
+    box-shadow: rgba(0, 0, 0, 0.4) 0 0 3px;
+}
+
+.document-item button {
+    opacity: 0.5;
+    transition: all ease-in-out .1s;
+}
+
+.document-item:hover button {
+    opacity: 1;
+}
+
+.document-thumb {
+    display: block;
+    height: 100%;
+    width: 100%;
+    padding-bottom: 80%;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: cover;
+    position: absolute;
+}
+
+.btn-delete-document {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 12px;
+}
+
+/*.document-item-content {
+    cursor:pointer;
+    width: 100%;
+    height: 100%;
+    padding: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: cover;
+}*/
+a.document-noimage-icon {
+    position: absolute;
+    display: block;
+    text-align: center;
+    padding-top: 20px;
+    width: 100%;
+}
+
+/*.document-item-content button {
+        position: absolute;
+        right: 2px;
+    }*/
+
+.btn-adddocument {
+    border: 3px dashed #bbb;
+    color: #bbb;
+    border-radius: 10px;
+    padding-bottom: 70%;
+}
+
+.btn-adddocument:hover {
+    border-color: #666;
+    color: #666;
+    box-shadow: none !important;
+}
+
+.document-item > i {
+    top: 35%;
+    left: 50%;
+    position: absolute;
+    margin-left: -0.5em;
+    margin-top: -0.5em;
+}
+
+.document-item > .filerequire {
+    text-align: center;
+    font-size: 12px;
+    position: absolute;
+    bottom: 0;
+    padding: 5px;
+    width: 100%;
+}
+
+.document-control {
+    width: 100%;
+    position: absolute;
+    background-color: #fff;
+    font-size: 12px;
+    left: 0;
+    bottom: 0;
+    line-height: 100%;
+    padding: 5px;
+}
+
+.hidden-fileinput {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.loading-template .document-item {
+    border-color: #ddd;
+}
+
+.timeline-item {
+    border: 1px solid #bbb;
+}
+
+.audithistory {
+    display: none;
+}
+
+.btn-toggle-history {
+    transition: all ease-in-out .1s;
+    cursor: pointer;
+    border: 1px solid rgb(210, 214, 222);
+}
+
+.btn-toggle-history:hover {
+    background-color: #eee !important;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #eee;
+}
+
+.boothstatus {
+    cursor: pointer;
+}
+
+.box-header > .box-title {
+    font-size: 16px;
+}
+
+.upload-success-notify {
+    width: 140px;
+    height: 140px;
+    display: block;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    box-sizing: border-box;
+    padding: 15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -70px;
+    margin-top: -70px;
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+    box-shadow: rgba(255, 255, 255, 0.5) 0 0 4px;
+}
+
+.upload-success-notify > i {
+    font-size: 60px;
+    margin: 10px 0;
+    display: block;
+}
+
+.btn-help-fixed {
+    position: fixed;
+    right: 95px;
+    bottom: 50px;
+    display: block;
+    opacity: .8;
+}
+
+@media (max-width: 767px) {
+    .btn-help-fixed {
+        position: fixed;
+        right: 5px;
+        bottom: 5px;
+        display: block;
+        opacity: .8;
+    }
+}
+
+.modal-dialog-preview {
+    width: 80%;
+}
+
+@media (max-width: 767px) {
+    .modal-dialog-preview {
+        width: auto;
+    }
+}
+
+@media (min-width: 768px) {
+    .modal-dialog-preview {
+        width: 80%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .modal-dialog-preview {
+        width: 65%;
+    }
+}
+
+.text-ellipsis {
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.progress {
+    background-color: #ddd;
+}

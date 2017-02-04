@@ -21,6 +21,8 @@ public class LoginFilter implements Filter {
 		whiteList.add("/manager/user/exportBoothInfoToExcel_2");
 		whiteList.add("/manager/user/showProductImg");
         whiteList.add("/manager/user/showLogo");
+        //根据客商回复的短信进行二次发送
+        whiteList.add("/manager/user/msgReturnContent");
     }
 
     @Override

@@ -34,6 +34,7 @@ public class WVisa implements java.io.Serializable {
 	private String expressTp;
 	private String expressNo;
 	private Boolean isDisabled;
+	private String hotel;
 
 	// Constructors
 
@@ -269,4 +270,12 @@ public class WVisa implements java.io.Serializable {
 		this.isDisabled = isDisabled;
 	}
 
+	@Column(name = "hotel")
+	public String getHotel() {
+		return hotel;
+	}
+
+	public void setHotel(String hotel) {
+		this.hotel = hotel;
+	}
 }

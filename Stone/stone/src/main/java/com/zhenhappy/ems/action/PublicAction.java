@@ -4,12 +4,10 @@ import com.zhenhappy.ems.dto.ExhibitorBooth;
 import com.zhenhappy.ems.dto.LoginRequest;
 import com.zhenhappy.ems.dto.LoginResponse;
 import com.zhenhappy.ems.dto.Principle;
-import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.ExhibitorTimeService;
-import com.zhenhappy.ems.service.MailService;
 import com.zhenhappy.ems.stonetime.TExhibitorTime;
 import com.zhenhappy.ems.sys.Constants;
 import com.zhenhappy.ems.util.ImageMarkLogoByText;
@@ -27,8 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by lianghaijian on 2014-03-31.
@@ -89,8 +89,35 @@ public class PublicAction {
                 }
 
                 //加载前台界面相关时间对象
-                TExhibitorTime tExhibitorTime = exhibitorTimeService.loadExhibitorTime();
+                TExhibitorTime tExhibitorTime = new TExhibitorTime();
+                if (exhibitor.getArea() != null && 2 == exhibitor.getArea()) {
+                    tExhibitorTime = exhibitorTimeService.loadExhibitorTimeByArea(2);
+                }else {
+                    tExhibitorTime = exhibitorTimeService.loadExhibitorTimeByArea(1);
+                }
+
+                if(StringUtils.isNotEmpty(tExhibitorTime.getCompany_Info_Data_End_Html()) && tExhibitorTime.getCompany_Info_Data_End_Html() != null){
+                    String[] temp = tExhibitorTime.getCompany_Info_Data_End_Html().split(" ");
+                    httpServletRequest.getSession().setAttribute("exhibitor_data_end_html_show", temp[0]);
+                }
+                if(StringUtils.isNotEmpty(tExhibitorTime.getParticipant_List_Submit_Deadline_Zh()) && tExhibitorTime.getParticipant_List_Submit_Deadline_Zh() != null){
+                    String[] temp = tExhibitorTime.getParticipant_List_Submit_Deadline_Zh().split(" ");
+                    httpServletRequest.getSession().setAttribute("participant_data_end_html_zh_show", temp[0]);
+                }
+                if(StringUtils.isNotEmpty(tExhibitorTime.getInvoice_Information_Submit_Deadline_Zh()) && tExhibitorTime.getInvoice_Information_Submit_Deadline_Zh() != null){
+                    String[] temp = tExhibitorTime.getInvoice_Information_Submit_Deadline_Zh().split(" ");
+                    httpServletRequest.getSession().setAttribute("invoice_data_end_html_zh_show", temp[0]);
+                }
+                if(StringUtils.isNotEmpty(tExhibitorTime.getVisa_Info_Submit_Deadline_Zh()) && tExhibitorTime.getVisa_Info_Submit_Deadline_Zh() != null){
+                    String[] temp = tExhibitorTime.getVisa_Info_Submit_Deadline_Zh().split(" ");
+                    httpServletRequest.getSession().setAttribute("visa_data_end_html_zh_show", temp[0]);
+                }
+                if(StringUtils.isNotEmpty(tExhibitorTime.getAdvertisement_Submit_Deadline_Zh()) && tExhibitorTime.getAdvertisement_Submit_Deadline_Zh() != null){
+                    String[] temp = tExhibitorTime.getAdvertisement_Submit_Deadline_Zh().split(" ");
+                    httpServletRequest.getSession().setAttribute("advertisement_data_end_html_zh_show", temp[0]);
+                }
                 httpServletRequest.getSession().setAttribute("tExhibitorTime", tExhibitorTime);
+                httpServletRequest.getSession().setAttribute("exhibitor", exhibitor);
 
                 response.setResultCode(0);
             }
@@ -102,7 +129,8 @@ public class PublicAction {
     }
 
     @RequestMapping(value = "changeLanguage", method = RequestMethod.GET)
-    public void changeLanguage(HttpServletRequest request, HttpServletResponse response, @RequestParam("locale") String locale) {
+    public void changeLanguage(HttpServletRequest request, HttpServletResponse response,
+                               @RequestParam("locale") String locale) {
         String refer = request.getHeader("referer");
         if (locale.equals("us")) {
             request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.US);

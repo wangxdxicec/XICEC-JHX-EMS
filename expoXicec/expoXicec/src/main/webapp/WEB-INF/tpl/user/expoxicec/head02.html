@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<link href="${resource}/expoxicec/common.css" rel="stylesheet">
+<style>
+    .greeting {
+        float: right;
+        margin-right: 15px;
+
+    }
+
+    .innergre {
+        float: left;
+        position: relative;
+        overflow: visible;
+        cursor: pointer;
+    }
+
+    .submenu {
+        position: absolute;
+        bottom: -30px;
+        line-height: 32px;
+        left: 15px;
+        display: none;
+        border-bottom: 1px solid #CCC;
+    }
+
+    .innergre:hover .submenu {
+        display: block;
+    }
+
+    .submenu > li > a {
+        background: rgba(240, 240, 240, 0.5);
+        font-size: 14px;
+        text-align: left;
+        color: #666666;
+        padding: 7px 25px;
+    }
+</style>
+
+<div class="top">
+    <div class="topInner">
+        <img src="${resource}/images/login/logo.png" alt="jinhongxin_logo">
+        <span>厦门会展金泓信展览</span>
+        <div class="greeting">
+            <#if tExpoXicec?exists>
+                <div class="innergre">
+            	<span style="padding:0 40px;">你好，<a href="" class="userID">${tExpoXicec.username}</a>
+            	</span>
+                    <ul class="submenu">
+                        <li><a href="" id="resetpassword">修改密码</a></li>
+                    </ul>
+                </div>
+                <a href="${base}/logout.html" class="">退出</a>
+            </#if>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="deadline" id="time">
+                <script>
+                    document.getElementById('time').innerHTML = new Date().toLocaleTimeString();
+                    setInterval("document.getElementById('time').innerHTML = new Date().toLocaleTimeString();",1000);
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

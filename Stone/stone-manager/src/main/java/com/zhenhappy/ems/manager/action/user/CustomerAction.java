@@ -7,10 +7,15 @@ import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
 import com.zhenhappy.ems.entity.WCountry;
 import com.zhenhappy.ems.entity.WCustomer;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.dto.visitorgroup.QueryVisitorGroupRequest;
+import com.zhenhappy.ems.manager.dto.visitorgroup.QueryVisitorMemberListRequest;
 import com.zhenhappy.ems.manager.entity.WCustomerEx;
+import com.zhenhappy.ems.manager.entity.backupinfo.TVisitorBackupInfo;
+import com.zhenhappy.ems.manager.entity.visitorgroup.TVisitorGroupInfo;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.util.EmailPattern;
+import com.zhenhappy.util.Page;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +69,8 @@ public class CustomerAction extends BaseAction {
             }
         }
         modelAndView.addObject("customer", wCustomerEx);
-        modelAndView.addObject("customerSurvey", customerInfoManagerService.loadCustomerSurveyInfoById(id));
+        modelAndView.addObject("customerSurvey", customerInfoManagerService.loadCustomerSurveyInfoByCustomerId(id));
+        modelAndView.addObject("customerInfoYear", customerInfoManagerService.loadVisitorInfoYearByCustomerId(id));
         /*modelAndView.addObject("exhibitor", exhibitorManagerService.loadExhibitorByEid(eid));
         modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(eid));
         modelAndView.addObject("booth", exhibitorManagerService.queryBoothByEid(eid));
@@ -74,6 +80,31 @@ public class CustomerAction extends BaseAction {
 //        modelAndView.addObject("exhibitorMeipai", meipaiService.getMeiPaiByEid(eid));
         *//*石材展需求结束*//*
         modelAndView.addObject("invoice", invoiceService.getByEid(eid));*/
+        return modelAndView;
+    }
+
+    /**
+     * 显示客商详细页面
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "directToEmailSendFailureCustomerInfo")
+    public ModelAndView directToEmailSendFailureCustomerInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/customer/emailSendFailureCustomerInfo");
+        modelAndView.addObject("id", id);
+        WCustomer wCustomer = customerInfoManagerService.loadCustomerInfoById(id);
+        WCustomerEx wCustomerEx = new WCustomerEx();
+        if(wCustomer != null){
+            int countryIndex = wCustomer.getCountry();
+            WCountry country = countryProvinceService.loadCountryById(countryIndex);
+            if(country != null){
+                BeanUtils.copyProperties(wCustomer, wCustomerEx);
+                wCustomerEx.setCountryValue(country.getChineseName());
+            }
+        }
+        modelAndView.addObject("customer", wCustomerEx);
+        modelAndView.addObject("customerSurvey", customerInfoManagerService.loadCustomerSurveyInfoByCustomerId(id));
         return modelAndView;
     }
 
@@ -192,6 +223,25 @@ public class CustomerAction extends BaseAction {
         } catch (Exception e) {
             response.setResultCode(1);
             log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询国内客商邮件发送失败
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryCustomersBySendEmailFailurePage")
+    public QueryCustomerResponse queryCustomersBySendEmailFailurePage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryCustomersBySendEmailFailurePage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers for send email failure error.", e);
         }
         return response;
     }
@@ -393,6 +443,115 @@ public class CustomerAction extends BaseAction {
         } catch (Exception e) {
             response.setResultCode(1);
             log.error("query tags error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 备份客商数据
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "backupCustomerData", method = RequestMethod.POST)
+    public BaseResponse backupCustomerData() {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.backupCustomerData();
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("backup customer info error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询备份客商数据
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryAllCustomerBackupInfosByPage")
+    public QueryCustomerResponse queryAllCustomerBackupInfosByPage(@ModelAttribute QueryCustomerBackupInfoRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryAllCustomerBackupInfosByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 显示客商详细页面
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "directToCustomerBackupInfo")
+    public ModelAndView directToCustomerBackupInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/databackup/customerBackupDetailInfo");
+        modelAndView.addObject("id", id);
+        TVisitorBackupInfo tVisitorBackupInfo = customerInfoManagerService.loadCustomerBackupInfoById(id);
+        modelAndView.addObject("customer", tVisitorBackupInfo);
+        return modelAndView;
+    }
+
+    /**
+     * 分页查询参观团信息
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryVisitorGroupByPage")
+    public QueryCustomerResponse queryVisitorGroupByPage(@ModelAttribute QueryVisitorGroupRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryVisitorGroupByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 显示参观团详细页面
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "directToVisitorGroupInfo")
+    public ModelAndView directToVisitorGroupInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/customer/visitorGroupDetailInfo");
+        modelAndView.addObject("id", id);
+        TVisitorGroupInfo tVisitorGroupInfo = customerInfoManagerService.loadVisitorGroupDetailInfoById(id);
+        modelAndView.addObject("tVisitorGroupInfo", tVisitorGroupInfo);
+        return modelAndView;
+    }
+
+    /**
+     * 根据id查询参观团对应成员列表
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryVisitorMemberListByGroupId", method = RequestMethod.POST)
+    public QueryExhibitorResponse queryVisitorMemberListByGroupId(@ModelAttribute QueryVisitorMemberListRequest request) {
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        try {
+            Page page = new Page();
+            page.setPageSize(request.getRows());
+            page.setPageIndex(request.getPage());
+            List<TVisitorGroupInfo> tVisitorGroupInfoList = customerInfoManagerService.loadProductBackupInfoById(request.getId());
+            response.setRows(tVisitorGroupInfoList);
+            response.setResultCode(0);
+            response.setTotal(page.getTotalCount());
+        } catch (Exception e) {
+            response = new QueryExhibitorResponse();
+            log.error("query visitor member list error.",e);
         }
         return response;
     }

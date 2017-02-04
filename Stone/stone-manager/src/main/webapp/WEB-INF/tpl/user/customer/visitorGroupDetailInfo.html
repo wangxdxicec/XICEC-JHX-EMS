@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>金泓信展商管理后台</title>
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
+    <script type="text/javascript" src="${base}/resource/jquery.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/empty-view.js"></script>
+    <script type="text/javascript" src="${base}/resource/ajaxfileupload.js"></script>
+    <script type="text/javascript" src="${base}/resource/common.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/easyui-validate.js"></script>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        input {
+            width: 200px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 参观团信息 -->
+<div style="height: auto;" class="easyui-panel" title="账号信息">
+    <!-- 参观团信息内容 -->
+    <table id="groupInfoTable" name="groupInfoTable" border="0" style="width: 100%;margin-top: 5px;margin-bottom: 10px">
+        <tr style="height: 30px">
+            <td style="width: 10%;text-align: right">确认号：</td>
+            <td style="width: 10%;"><#if tVisitorGroupInfo.group_registration_number?exists>${tVisitorGroupInfo.group_registration_number}</#if></td>
+            <td style="width: 15%;text-align: right">参观团名称：</td>
+            <td style="width: 20%;"><#if tVisitorGroupInfo.group_name?exists>${tVisitorGroupInfo.group_name}</#if></td>
+            <td style="width: 15%;text-align: right">参观团密码：</td>
+            <td style="width: 20%;"><#if tVisitorGroupInfo.group_password?exists>${tVisitorGroupInfo.group_password}</#if></td>
+        </tr>
+        <tr>
+            <td style="width: 10%;text-align: right">团长姓名：</td>
+            <td style="width: 10%;"><#if tVisitorGroupInfo.group_header_name?exists>${tVisitorGroupInfo.group_header_name}</#if></td>
+            <td style="width: 15%;text-align: right">团长手机号：</td>
+            <td style="width: 20%;"><#if tVisitorGroupInfo.group_header_telphone?exists>${tVisitorGroupInfo.group_header_telphone}</#if></td>
+            <td style="width: 15%;text-align: right">团长职位：</td>
+            <td style="width: 20%;"><#if tVisitorGroupInfo.group_header_position?exists>${tVisitorGroupInfo.group_header_position}</#if></td>
+        </tr>
+        <tr>
+            <td style="width: 10%;text-align: right">团长邮箱：</td>
+            <td style="width: 10%;"><#if tVisitorGroupInfo.group_header_email?exists>${tVisitorGroupInfo.group_header_email}</#if></td>
+            <td style="width: 15%;text-align: right">团长地址：</td>
+            <td style="width: 20%;"><#if tVisitorGroupInfo.group_header_address?exists>${tVisitorGroupInfo.group_header_address}</#if></td>
+        </tr>
+    </table>
+</div>
+
+<!-- 参观团成员列表 -->
+<div style="height: 250px;" class="easyui-panel" title="成员列表">
+    <table id="groupMember${id}" data-options="url:'${base}/user/queryVisitorMemberListByGroupId',
+            								 loadMsg: '数据加载中......',
+									         singleSelect:false,	//只能单行选择：关闭
+									         fit:true,
+									         fitColumns:true,
+									         idField:'id',
+											 queryParams: {id:${id}},
+									         rownumbers: true,
+									         pagination:'true',
+									         pageSize:'20'">
+        <thead>
+        <tr>
+            <th data-options="field:'ck',checkbox:true"></th>
+            <th data-options="field: 'group_member_company', title: '公司名称', width: $(this).width() * 0.2"></th>
+            <th data-options="field: 'group_member_name', title: '姓名', width: $(this).width() * 0.1"></th>
+            <th data-options="field: 'group_member_position', title: '职位', width: $(this).width() * 0.1"></th>
+            <th data-options="field: 'group_member_telphone', title: '手机', width: $(this).width() * 0.12"></th>
+            <th data-options="field: 'group_member_email', title: '邮箱', width: $(this).width() * 0.13"></th>
+            <th data-options="field: 'group_member_address', title: '地址', width: $(this).width() * 0.25"></th>
+            <th data-options="field: 'group_member_create_time', formatter:formatDatebox, title: '注册时间', width: $(this).width() * 0.1"></th>
+            <th data-options="field: 'group_member_update_time', formatter:formatDatebox, title: '更新时间', width: $(this).width() * 0.1"></th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+<!-- 参观团成员具体信息  -->
+<div id="modifyMemberDetailInfoDlg" data-options="iconCls:'icon-edit',modal:true">
+    <form id="modifyMemberDetailInfoForm" name="modifyMemberDetailInfoForm">
+        <table style="width: 320px;margin: 20px auto">
+            <tr>
+                <td style="width: 90px;text-align: right">公司名称：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_company" id="group_member_company"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">姓名：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_name" id="group_member_name"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">职位：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_position" id="group_member_position"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">手机：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_telphone" id="group_member_telphone"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">邮箱：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_email" id="group_member_email"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">地址：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_address" id="group_member_address"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">注册时间：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_create_time" id="group_member_create_time"/></td>
+            </tr>
+            <tr>
+                <td style="width: 90px;text-align: right">更新时间：</td>
+                <td><label class="easyui-validatebox" type="text" name="group_member_update_time" id="group_member_update_time"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script>
+    var checkedGroupMember = [];
+
+    //日期时间格式转换
+    function formatDatebox(value) {
+        if (value == null || value == '') {
+            return '';
+        }
+        var dt;
+        if (value instanceof Date) {
+            dt = value;
+        }
+        else {
+            dt = new Date(value);
+            if (isNaN(dt)) {
+                value = value.replace(/\/Date\((-?\d+)\)\//, '$1'); //标红的这段是关键代码，将那个长字符串的日期值转换成正常的JS日期格式
+                dt = new Date();
+                dt.setTime(value);
+            }
+        }
+
+        return dt.format("yyyy-MM-dd h:m");   //这里用到一个javascript的Date类型的拓展方法，这个是自己添加的拓展方法，在后面的步骤3定义
+    }
+
+    Date.prototype.format = function (format)
+    {
+        var o = {
+            "M+": this.getMonth() + 1, //month
+            "d+": this.getDate(),    //day
+            "h+": this.getHours(),   //hour
+            "m+": this.getMinutes(), //minute
+            "s+": this.getSeconds(), //second
+            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+            "S": this.getMilliseconds() //millisecond
+        }
+        if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+                (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o) if (new RegExp("(" + k + ")").test(format))
+            format = format.replace(RegExp.$1,
+                    RegExp.$1.length == 1 ? o[k] :
+                            ("00" + o[k]).substr(("" + o[k]).length));
+        return format;
+    }
+
+    // 产品列表渲染
+    $("#groupMember${id}").datagrid({
+        onSelect:function (rowIndex, rowData){
+            var row = $('#groupMember${id}').datagrid('getSelections');
+            for (var i = 0; i < row.length; i++) {
+                if (findCheckedGroupMember(row[i].id) == -1) {
+                    checkedGroupMember.push(row[i].id);
+                }
+            }
+        },
+        onUnselect:function (rowIndex, rowData){
+            var k = findCheckedGroupMember(rowData.id);
+            if (k != -1) {
+                checkedGroupMember.splice(k, 1);
+            }
+        },
+        onSelectAll:function (rows){
+            for (var i = 0; i < rows.length; i++) {
+                var k = findCheckedGroupMember(rows[i].id);
+                if (k == -1) {
+                    checkedGroupMember.push(rows[i].id);
+                }
+            }
+        },
+        onUnselectAll:function (rows){
+            for (var i = 0; i < rows.length; i++) {
+                var k = findCheckedGroupMember(rows[i].id);
+                if (k != -1) {
+                    checkedGroupMember.splice(k, 1);
+                }
+            }
+        },
+        onLoadSuccess:function(data){
+            if(data.rows.length==0){
+                var body = $(this).data().datagrid.dc.body2;
+                body.find('table tbody').append('<tr><td width="'+body.width()+'" style="height: 25px; text-align: center;" colspan="4">没有数据</td></tr>');
+            }
+        },
+        onDblClickRow: function (index, field, value) {
+            document.modifyMemberDetailInfoForm.id.innerHTML = field.id;
+            document.getElementById('group_member_company').innerHTML = field.group_member_company;
+            document.getElementById('group_member_name').innerHTML = field.group_member_name;
+            document.getElementById('group_member_position').innerHTML = field.group_member_position;
+            document.getElementById('group_member_telphone').innerHTML = field.group_member_telphone;
+            document.getElementById('group_member_email').innerHTML = field.group_member_email;
+            document.getElementById('group_member_address').innerHTML = field.group_member_address;
+            document.getElementById('group_member_create_time').innerHTML = field.group_member_create_time;
+            document.getElementById('group_member_update_time').innerHTML = field.group_member_update_time;
+            $("#modifyMemberDetailInfoDlg").dialog("open");
+        }
+    }).datagrid('getPager').pagination({
+        pageSize: 20,//每页显示的记录条数，默认为10
+        pageList: [10,20,30,40,50],//可以设置每页记录条数的列表
+        beforePageText: '第',//页数文本框前显示的汉字
+        afterPageText: '页    共 {pages} 页',
+        displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
+    });
+    function findCheckedGroupMember(id) {
+        for (var i = 0; i < checkedProducts.length; i++) {
+            if (checkedGroupMember[i] == id) return i;
+        }
+        return -1;
+    }
+
+    $('#modifyMemberDetailInfoDlg').dialog({
+        title: '成员具体信息',
+        left: 335,
+        top: 100,
+        width: 500,
+        height: 350,
+        closed: true,
+        cache: false,
+        modal: true,
+        buttons: [
+            {
+                text: '关闭',
+                handler: function () {
+                    document.getElementById("modifyMemberDetailInfoForm").reset();
+                    $("#modifyMemberDetailInfoDlg").dialog("close");
+                }
+            }
+        ]
+    });
+</script>
+</body>
+</html>

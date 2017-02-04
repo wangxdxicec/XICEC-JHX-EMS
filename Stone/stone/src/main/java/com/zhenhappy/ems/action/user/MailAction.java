@@ -7,6 +7,7 @@ import com.zhenhappy.ems.dto.Principle;
 import com.zhenhappy.ems.email.Email;
 import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.ems.entity.TExhibitorInfo;
+import com.zhenhappy.ems.service.EmailMailService;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.MailService;
 import com.zhenhappy.util.Page;
@@ -64,6 +65,7 @@ public class MailAction {
                         email.setCompany(companye);
                     }
                     mailService.sendMailByAsynchronousMode(email, principle.getExhibitor().getEid());
+                    //mailService1.sendMailByAsynchronousMode(email, principle.getExhibitor().getEid());
                 }
             } else {
                 baseResponse.setResultCode(1);
@@ -82,6 +84,7 @@ public class MailAction {
         try {
             Email email = new Email();
             TEmailSendDetail sendDetail = mailService.loadMailByMid(mid, principle.getExhibitor().getEid());
+            String booth = exhibitorService.loadBoothNum(principle.getExhibitor().getEid());
             if(sendDetail==null){
                 throw new Exception("Mail can not found");
             }
@@ -94,9 +97,11 @@ public class MailAction {
                 if (email.getFlag() == 1) {
                     email.setSubject(company + "邀请函");
                     email.setCompany(company);
+                    email.setBoothNumber(booth);
                 } else {
                     email.setSubject("The invitation Of " + companye);
                     email.setCompany(companye);
+                    email.setBoothNumber(booth);
                 }
                 email.setGender(sendDetail.getGender());
                 email.setName(sendDetail.getCompanyName());

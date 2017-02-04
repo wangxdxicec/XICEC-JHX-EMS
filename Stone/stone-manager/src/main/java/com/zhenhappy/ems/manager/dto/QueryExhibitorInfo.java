@@ -7,6 +7,8 @@ import java.util.Date;
  */
 public class QueryExhibitorInfo {
 	private Integer einfoid;
+	private String area;
+	private String exhibitor_area;
 	private Integer eid;
 	private String organizationCode;
 	private String company;
@@ -248,5 +250,21 @@ public class QueryExhibitorInfo {
 
 	public void setCompany_lighnts(String company_lighnts) {
 		this.company_lighnts = company_lighnts;
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
+	}
+
+	public String getExhibitor_area() {
+		return exhibitor_area;
+	}
+
+	public void setExhibitor_area(String exhibitor_area) {
+		this.exhibitor_area = exhibitor_area;
 	}
 }

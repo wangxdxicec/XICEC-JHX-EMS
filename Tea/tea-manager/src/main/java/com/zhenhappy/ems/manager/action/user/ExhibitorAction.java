@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.zhenhappy.ems.dao.ExhibitorDao;
 import com.zhenhappy.ems.dao.JoinerDao;
 import com.zhenhappy.ems.dao.TeaExhibitorDao;
 import com.zhenhappy.ems.entity.*;
@@ -17,6 +16,7 @@ import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.THistoryExhibitorInfo;
 import com.zhenhappy.ems.manager.service.HistoryExhibitorInfoService;
 import com.zhenhappy.ems.manager.service.JoinerManagerService;
+import com.zhenhappy.ems.service.InvoiceExtendService;
 import com.zhenhappy.util.Page;
 import net.sf.json.JSONArray;
 import org.apache.commons.io.FileUtils;
@@ -45,7 +45,6 @@ import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;
 import com.zhenhappy.ems.manager.service.TagManagerService;
 import com.zhenhappy.ems.service.CountryProvinceService;
-import com.zhenhappy.ems.service.InvoiceService;
 import com.zhenhappy.ems.service.MeipaiService;
 import com.zhenhappy.system.SystemConfig;
 
@@ -67,7 +66,7 @@ public class ExhibitorAction extends BaseAction {
     @Autowired
     private MeipaiService meipaiService;
     @Autowired
-    private InvoiceService invoiceService;
+    private InvoiceExtendService invoiceService;
     @Autowired
     private CountryProvinceService countryProvinceService;
     @Autowired
@@ -609,7 +608,7 @@ public class ExhibitorAction extends BaseAction {
                     tHistoryExhibitorInfo.setMain_product_zh(exhibitorInfo.getMainProduct());
                     tHistoryExhibitorInfo.setMain_product_en(exhibitorInfo.getMainProductEn());
                     tHistoryExhibitorInfo.setCompany_profile(exhibitorInfo.getMark());
-                    TInvoiceApply invoice = invoiceService.getByEid(exhibitorInfo.getEid());
+                    TInvoiceApplyExtend invoice = invoiceService.getByEid(exhibitorInfo.getEid());
                     if(invoice != null){
                         if(StringUtils.isNotEmpty(invoice.getInvoiceNo())) {
                             tHistoryExhibitorInfo.setLocal_tax(invoice.getInvoiceNo());
@@ -774,5 +773,29 @@ public class ExhibitorAction extends BaseAction {
         modelAndView.addObject("id", id);
         modelAndView.addObject("historyExhibitorDetailInfo", historyExhibitorInfoService.loadHistoryExhibitorInfoById(id));
         return modelAndView;
+    }
+
+    /**
+     * 显示发票图片
+     * @param response
+     * @param eid
+     */
+    @RequestMapping(value = "showInvoiceImage", method = RequestMethod.GET)
+    public void showInvoiceImage(HttpServletResponse response, @RequestParam("eid") Integer eid) {
+        try {
+            String logoFileName = invoiceService.getByEid(eid).getInvoice_image_address();
+            if (StringUtils.isNotEmpty(logoFileName)) {
+                OutputStream outputStream = response.getOutputStream();
+                File logo = new File(logoFileName);
+                if (!logo.exists()) {
+                    return;
+                }
+                FileUtils.copyFile(new File(logoFileName), outputStream);
+                outputStream.close();
+                outputStream.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

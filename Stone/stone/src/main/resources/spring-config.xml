@@ -102,7 +102,7 @@
                 <prop key="template_update_delay">10</prop>
                 <prop key="locale">zh_CN</prop>
                 <prop key="datetime_format">yyyy-MM-dd</prop>
-                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="date_format">yyyy-MM-dd HH:mm:ss</prop>
                 <prop key="number_format">#.##</prop>
             </props>
         </property>

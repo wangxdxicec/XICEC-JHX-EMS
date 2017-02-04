@@ -1,133 +1,257 @@
 <!DOCTYPE html>
 <#import "/common/spring.ftl" as spring />
-<html lang="zh-cn">
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
     <title><@spring.message "site"/></title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="${resource}/bootstrap/b2/css/bootstrap.css" rel="stylesheet">
-    <#include "../common/common-js.html" />
-    <!-- Custom styles for this template -->
-    <script src="${resource}/js/jquery.json-2.4.js"></script>
     <style>
-        #dLabel a {
-            color: #ffffff;
+        *{padding:0;margin:0;}
+        a{text-decoration:none;}
+        input{border:0;font-size:14px;line-height:38px;text-indent:5px;width:230px;float:left;font-family:"微软雅黑";}
+        img{border:0;display:block;}
+        .mainBox{
+            overflow:hidden;
+            position:relative;
+            height:485px;
+            margin-top:7%;
         }
+        .cblock{
+            float:left;
+            width:100%;
+            height:313px;
+            background:#f2f2f2;
+            position:absolute;
+            bottom:32px;
+            z-index:-10;
+        }
+        .logoC{
+            height:109px;
+            width:962px;
+            background:url(${resource}/images/login/logo_bg.png);
+            background-repeat:no-repeat;
+            overflow:hidden;
+            margin:0 auto;
+        }
+        .links{
+            margin-top:75px;
+            float:right;
+        }
+        .links a{
+            float:left;
+            font-size:12px;
+            color:#787878;
+            padding:0 18px;
+            border-right:1px solid #787878;
 
-        body {
-            padding-top: 0px;
-            background-image: url('${resource}/images/body_back.jpg');
-            background-repeat: repeat-x;
         }
-        .header_link a{
-            margin-right: 20px;
-            color: #61590e;
+        .links a:hover{
+            color:#715017;
         }
-        .header_link a:link{
-            color: #61590e;
+        .bottomBg{
+            height:375px;
+            width:962px;
+            margin:0 auto;
+        }
+        .loginC{
+            width:100%;
+            background:rgba(235,235,21335,0);
+            height:313px;
+            position:absolute;
+            bottom:32px;
+        }
+        .small{
+            width:962px;
+            margin:0 auto;
+            overflow:hidden;
+        }
+        .intro{
+            float:left;
+            width:560px;
+        }
+        .loginBox{
+            width:345px;
+            float:right;
+            margin-right: 60px;
+            background:#ffffff;
+            height:313px;
+            overflow:hidden;
+            font-family: "黑体";
+        }
+        .iptArea{
+            line-height:38px;
+            border:1px solid #bdbdbd;
+            width:306px;
+            margin:0 auto;
+            box-sizing:border-box;
+            padding-left:39px;
+            overflow:hidden;
+        }
+        .delete{
+            height:38px;
+            width:30px;
+            float:left;
+        }
+        .user{
+            background:url(${resource}/images/login/user.png);
+            background-repeat:no-repeat;
+            margin-top:34px;
+        }
+        .password{
+            background:url(${resource}/images/login/key.png);
+            background-repeat:no-repeat;
+            margin-top:20px;
+        }
+        .chek{
+            overflow:hidden;
+            width:306px;
+            margin:0 auto;
+            margin-top:30px;
+            font-family: "黑体";
+        }
+        .chek div{
+            float:left;
+            font-size:12px;
+            color:#999999;
+            margin-right:36px;
+        }
+        .chek div input{
+            float:left;
+            width:18px;
+            margin-top:1px;
+        }
+        .chek .forgot{
+            float:right;
+            margin-right:0;
+
+        }
+        .chek .forgot a{
+            color:#999999;
+        }
+        .loginBtn{
+            width:146px;
+            height:35px;
+            margin:0 auto;
+            margin-top:27px;
+        }
+        .lill{
+            color:#999999;
+            width:306px;
+            text-align:center;
+            margin:0 auto;
+            margin-top:20px;
+            font-size:12px;
         }
     </style>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <script src="${base}/resource/common/jquery.min.js"></script>
+    <script src="${resource}/js/jquery.json-2.4.js"></script>
+    <link rel="shortcut icon" href="http://www.buddhafair.com/favicon.ico"/>
+    <script src="${base}/resource/language/cn.js"></script>
 </head>
 
 <body>
-<div style="height: 217px;width: 100%;background-image: url('${resource}/images/banner_back.jpg');background-repeat: repeat-x">
-    <div style="margin: 0px auto;width: 982px;position: relative">
-        <div class="header_link" style="color:#61590e;position: absolute;right: 0px;top: 5px;">
-            <a href="http://www.buddhafair.com/" target="view_window"><@spring.message "guanwang"/></a>
+<div class="mainBox">
+    <div class="cblock"></div>
+    <div class="logoC">
+        <div class="links">
+            <a href="http://www.buddhafair.com/" target="view_window">展会官网</a>
+            <a href="#" id="contactUs" style="border:0;"> 联系我们</a>
         </div>
-        <img src="${resource}/images/banner.jpg">
-        <div style="position: absolute;top: 80px;left: 300px;color: #61590e">
-            <p style="font-size: 24px;font-weight: bold"><@spring.message "site"/></p>
-            <p style="font-size: 14px"><@spring.message "site.desc"/></p>
+    </div>
+    <div class="bottomBg"><img src="${resource}/images/login/mainbg.jpg"></div>
+    <div class="loginC">
+        <div class="small">
+            <div class="intro"></div>
+            <div class="loginBox">
+                <div class="lill">
+                    <#if rc.locale == "zh_CN" >
+                        该平台仅对参展商开放，账号密码由组委会提供。
+                    <#else>
+                        <div style="text-align: center;">Exclusive for Exhibitors. Username and Original Password will be provided by the Organizer.</div>
+                    </#if>
+                </div>
+                <div class="user iptArea">
+                    <input id="username" name="username" type="text" placeholder='<@spring.message "login.username"/>'>
+                    <div class="delete"><a href="#" id="deleteusername"><img src="${resource}/images/login/delete.png"></a></div>
+                </div>
+                <div class="password iptArea">
+                    <input id="password" name="password" type="password" placeholder='<@spring.message "login.password"/>'>
+                    <div class="delete"><a href="#" id="deletepassword"><img src="${resource}/images/login/delete.png"></a></div>
+                </div>
+                <div class="chek">
+                    <div class="rememberU"><input type="checkbox"><@spring.message "login.rememberAccount"/></div>
+                    <div class="rememberP"><input type="checkbox"><@spring.message "login.rememberPassword"/></div>
+                    <div class="forgot"><a href="#" id="findpassword"><@spring.message "login.forgotPassword"/></a></div>
+                </div>
+                <div class="loginBtn">
+                    <a href="#" id="loginButton"><img src="${resource}/images/login/login_btn_cn.png"></a>
+                </div>
+            </div>
         </div>
-        <font style="color:#666666;position: absolute;right: 3px;bottom: 10px;"><@spring.message "banner.time"/></font>
-        <font id="baiwei" style="color:#666666;position: absolute;right: 70px;bottom: 10px;">0</font>
-        <font id="shiwei" style="color:#666666;position: absolute;right: 47px;bottom: 10px;">0</font>
-        <font id="gewei" style="color:#666666;position: absolute;right: 25px;bottom: 10px;">0</font>
     </div>
 </div>
-<div class="navbar navbar-inverse navbar-fixed-top" style="position: inherit;margin-bottom: 20px">
-</div>
+
+</body>
 <script>
-    $(document).ready(function(){
-        var kaishi = new Date("2016-10-20");
-        var now = new Date();
-        var day = ((kaishi.getTime()-now.getTime())/1000/60/60/24);
-        var dayString = Math.ceil(day)+"";
-        var p = 0;
-        if(dayString.length>2){
-            $("#baiwei").text(dayString.charAt(p++))
+    $(function () {
+        if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE6.0") {
+            $(".iptArea").css("width", "270px");
         }
-        if(dayString.length>1){
-            $("#shiwei").text(dayString.charAt(p++))
+        else if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE7.0") {
+            $(".iptArea").css("width", "270px");
+            $("#username").css("margin-top", "12px");
+            $("#key").css("margin-top", "12px");
+            $("input").css("line-height", "14px");
         }
-        if(dayString.length>0){
-            $("#gewei").text(dayString.charAt(p++))
+        else if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE8.0") {
+            $("#username").css("margin-top", "12px");
+            $("#key").css("margin-top", "12px");
+            $("input").css("line-height", "14px");
+        }
+        else if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE9.0") {
+            $("#username").css("margin-top", "12px");
+            $("#key").css("margin-top", "12px");
+            $("input").css("line-height", "14px");
         }
     })
 </script>
-<div class="container">
-    <div style="margin: 0px auto;margin-top: 50px;width: 400px">
-        <form role="form" class="form-horizontal">
-            <div class="control-group">
-                <label class="control-label" for="username"><@spring.message "login.username"/></label>
-
-                <div class="controls">
-                    <input type="text" class="form-control" id="username" placeholder='<@spring.message "login.username"/>'>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="password"><@spring.message "login.password"/></label>
-
-                <div class="controls">
-                    <input type="password" class="form-control" id="password" placeholder='<@spring.message "login.password"/>'>
-                </div>
-            </div>
-            <div class="control-group">
-                <div class="controls">
-                    <button type="button" id="loginButton" class="btn btn-lg btn-danger"><@spring.message "login.login"/></button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <!--[if lt IE 8]>
-    <div style="margin: 0px auto;margin-top: 10px;width: 400px">
-        <@spring.message "login.browser"/>
-    </div>
-    <![endif]-->
-</div>
-
-<hr>
-<#include "/footer.html" />
-
 <script>
+    var english = false;
     $(document).ready(function () {
-        $("[name='language']").click(function(){
-             window.location.href = "${base}/?locale="+$(this).attr("id");
+        $("#deleteusername").click(function () {
+            $("#username").val('');
         });
-        if(window.location.href.indexOf("=le")!=-1){
-            $("#le").attr("checked","checked");
-        }else{
-            $("#lc").attr("checked","checked");
-        }
+        $("#deletepassword").click(function () {
+            $("#password").val('');
+        });
+        $("#contactUs").click(function () {
+            location.href = "${resource}/contact.html";
+        });
+        $("#findpassword").click(function () {
+            location.href = "${resource}/findPassword.html";
+        });
         $("#loginButton").click(function () {
-            if($("#username").val()==''||$("#password").val()==''){
+            if ($("#username").val() == '' || $("#password").val() == '') {
                 alert("用户名或密码不能为空");
                 return;
             }
-            $(this).addClass("disabled");
+            var zone = 1;
+            $("[name='zone']").each(function () {
+                if (this.checked) {
+                    zone = $(this).val();
+                }
+            });
             $.ajax({
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
-                data: $.toJSON({"username": $("#username").val(), "password": $("#password").val()}),
+                data: $.toJSON({
+                    "username": $("#username").val(),
+                    "password": $("#password").val(),
+                    "english": english,
+                    "area": zone
+                }),
                 url: "${base}/login",
                 success: function (result) {
-                    $("#loginButton").removeClass("disabled");
+                    $("#loginButton").removeClass("disabled")
                     if (result.resultCode == 1) {
                         alert("用户密码错误。")
                     } else if (result.resultCode > 1) {
@@ -135,13 +259,10 @@
                     } else {
                         window.location.href = "${base}/user/main.html"
                     }
-                    $(this).removeClass("disabled");
                 },
                 dataType: "json"
             });
         });
     })
 </script>
-<script src="${resource}/bootstrap/b2/js/bootstrap.js"></script>
-</body>
 </html>

@@ -1,5 +1,7 @@
 package com.zhenhappy.ems.manager.dto.companyinfo;
 
+import java.util.Date;
+
 /**
  * Created by wangxd on 2016-05-24.
  */
@@ -19,8 +21,8 @@ public class QueryHistoryCustomer {
     private String backupaddress;
     private String remark;
     private Integer owner;
-    private String createtime;
-    private String updatetime;
+    private Date createtime;
+    private Date updatetime;
     private String updateowner;
     private Integer isDelete;
 
@@ -31,7 +33,7 @@ public class QueryHistoryCustomer {
     public QueryHistoryCustomer(Integer id, String cateory, String company, Integer country, String address,
                                 String contact, String position, String telphone, String email,
                                 String fixtelphone, String fax, String website, String backupaddress,
-                                String remark, Integer owner, String createtime, String updatetime, String updateowner, Integer isDelete) {
+                                String remark, Integer owner, Date createtime, Date updatetime, String updateowner, Integer isDelete) {
         this.id = id;
         this.cateory = cateory;
         this.company = company;
@@ -173,19 +175,19 @@ public class QueryHistoryCustomer {
         this.owner = owner;
     }
 
-    public String getCreatetime() {
+    public Date getCreatetime() {
         return createtime;
     }
 
-    public void setCreatetime(String createtime) {
+    public void setCreatetime(Date createtime) {
         this.createtime = createtime;
     }
 
-    public String getUpdatetime() {
+    public Date getUpdatetime() {
         return updatetime;
     }
 
-    public void setUpdatetime(String updatetime) {
+    public void setUpdatetime(Date updatetime) {
         this.updatetime = updatetime;
     }
 

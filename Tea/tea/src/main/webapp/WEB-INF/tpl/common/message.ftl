@@ -1,7 +1,9 @@
 <#if alert?exists>
 <script>
     alert("${alert}");
-        <#if redirect?exists>
+        <#if redirectweixin?exists>
+        window.location.href = "${redirectweixin}";
+        <#elseif redirect?exists>
         window.location.href = "${redirect}";
         <#else>
         window.location.href = window.location.href;

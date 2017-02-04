@@ -2,6 +2,7 @@ package com.zhenhappy.ems.manager.service;
 
 import com.zhenhappy.ems.dao.SendMailDetailDao;
 import com.zhenhappy.ems.entity.Email;
+import com.zhenhappy.ems.entity.ExhibitorInvisitorEmail;
 import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.ems.entity.TVisitorMailLog;
 import com.zhenhappy.ems.service.EmailMailService;
@@ -308,4 +309,6 @@ public class EmailMailServiceImpl implements EmailMailService {
     public void sendAsync() {
         System.out.println("###### 或者直接采用 spring 3.0 的异步任务注解, 这里的代码直接会用异步线程来运行 #######");
     }
+
+    public void sendInvisitorMailByAsynchronousMode(ExhibitorInvisitorEmail exhibitorInvisitorEmail) throws Exception {}
 }

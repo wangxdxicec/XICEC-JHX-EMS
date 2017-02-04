@@ -48,10 +48,20 @@ public class ManagerMenuAction extends BaseAction {
         return "/user/customer/inlandCustomer";
     }
 
+    //参观团菜单
+    @RequestMapping(value="visitorGroupIndex")
+    public String visitorGroupIndex(){return "user/customer/visitorGroupPage";}
+
     //国外客商菜单
     @RequestMapping(value = "foreignCustomerIndex")
     public String foreignCustomerIndex(){
         return "/user/customer/foreignCustomer";
+    }
+
+    //邮件发送失败列表菜单
+    @RequestMapping(value = "emailSendFailurePageIndex")
+    public String emailSendFailurePageIndex(){
+        return "/user/customer/emailSendFailureOfCustomer";
     }
 
     //邮件申请列表菜单
@@ -131,4 +141,20 @@ public class ManagerMenuAction extends BaseAction {
     public String userIndex(){
         return "user/managerrole/userinfo";
     }
+
+    //数据备分
+    @RequestMapping(value="dataBackupIndex")
+    public String dataBackupIndex(){return "user/databackup/data_backuppage";}
+
+    //展商数据备分
+    @RequestMapping(value="exhibitorBackupIndex")
+    public String exhibitorBackupIndex(){return "user/databackup/exhibitor_backup";}
+
+    //VISA数据备分
+    @RequestMapping(value="visaBackupIndex")
+    public String visaBackupIndex(){return "user/databackup/visa_backup";}
+
+    //客商数据备分
+    @RequestMapping(value="customerBackupIndex")
+    public String customerBackupIndex(){return "user/databackup/customer_backup";}
 }

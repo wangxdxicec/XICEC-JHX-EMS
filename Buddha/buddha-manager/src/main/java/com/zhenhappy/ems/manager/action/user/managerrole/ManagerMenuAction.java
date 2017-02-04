@@ -13,6 +13,18 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @RequestMapping(value = "user")
 @SessionAttributes(value = ManagerPrinciple.MANAGERPRINCIPLE)
 public class ManagerMenuAction extends BaseAction {
+    //境内客商历史资料
+    @RequestMapping(value = "inlandHistoryVisitorInfo")
+    public String inlandHistoryVisitorInfo(){
+        return "user/managerreset/inlandHistoryVisitorInfo";
+    }
+
+    //境外客商历史资料
+    @RequestMapping(value = "outlandHistoryVisitorInfo")
+    public String outlandHistoryVisitorInfo(){
+        return "user/managerreset/outlandHistoryVisitorInfo";
+    }
+
     //展会相关时间参数设置
     @RequestMapping(value = "resetExhibitorBuddhaTime")
     public String resetExhibitorBuddhaTime(){

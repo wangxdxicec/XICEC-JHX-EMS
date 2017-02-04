@@ -72,15 +72,21 @@ public class JoinerService {
      */
     public List<TExhibitorJoiner> queryAllJoinersByEid(Integer eid, Integer flag){
         String isDeleteStr = "";
+        List<TExhibitorJoiner> joiners;
         if(flag == 1){
+            joiners = hibernateTemplate.find("from TExhibitorJoiner where eid = ? and isDelete = 1 ", new Object[]{eid});
             isDeleteStr = " and isDelete = 1";
         }else if(flag == 2){
+            joiners = hibernateTemplate.find("from TExhibitorJoiner where eid = ? and isDelete = 0 ", new Object[]{eid});
             isDeleteStr = " and isDelete = 0";
         }else{
+            joiners = hibernateTemplate.find("from TExhibitorJoiner where eid = ? ", new Object[]{eid});
             isDeleteStr = "";
         }
-        String hql = "from TExhibitorJoiner where eid = " + eid  + isDeleteStr + " order by isDelete";
-        List<TExhibitorJoiner> joiners = hibernateTemplate.find(hql,new Object[]{});
+        /*String hql = "from TExhibitorJoiner where eid = " + eid  + isDeleteStr + " order by isDelete";
+        List<TExhibitorJoiner> joiners = hibernateTemplate.find("from TExhibitorJoiner where eid = ? and isDelete = ? ",
+                new Object[]{eid, flag});*/
+        //List<TExhibitorJoiner> joiners = hibernateTemplate.find(hql,new Object[]{});
         return joiners;
     }
 

@@ -113,6 +113,10 @@
 <!-- /.navbar -->
 <#include "/user/header.html" />
 <#assign exhibitor_data_end_html = "${tExhibitorTime.company_Info_Data_End_Html}">
+<#assign participant_data_end_html_zh = "${tExhibitorTime.participant_List_Submit_Deadline_Zh}">
+<#assign invoice_data_end_html_zh = "${tExhibitorTime.invoice_Information_Submit_Deadline_Zh}">
+<#assign visa_data_end_html_zh = "${tExhibitorTime.visa_Info_Submit_Deadline_Zh}">
+<#assign advertisement_data_end_html_zh = "${tExhibitorTime.advertisement_Submit_Deadline_Zh}">
 <div style="width: 100%;padding-bottom: 20px;border-bottom: 1px #d3d3d3 solid;margin-bottom: 40px">
     <div style="width: 973px;margin: 0px auto;">
         <div>
@@ -131,12 +135,12 @@
                     </div>
                 </div>
                 <#else>
-                    <div class="boxOff">
-                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                            <h4><a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a></h4>
-                            <h6><a href="${base}/user/info.html">${tExhibitorTime.company_Info_Submit_Deadline_Zh}<@spring.message "module.exhibitor.desc"/></a></h6>
-                        </div>
+                <div class="boxOff">
+                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                        <h4><a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a></h4>
+                        <h6><a href="${base}/user/info.html">${exhibitor_data_end_html_show}&nbsp;<@spring.message "module.exhibitor.desc"/></a></h6>
                     </div>
+                </div>
                 </#if>
             <#else>
                 <#if .now?date gt exhibitor_data_end_html?date>
@@ -150,13 +154,123 @@
                     <div class="boxOff">
                         <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                             <h4><a href="${base}/user/info.html"><@spring.message "module.exhibitor"/></a></h4>
-                            <h6><a href="${base}/user/info.html">${tExhibitorTime.company_Info_Submit_Deadline_En}<@spring.message "module.exhibitor.desc"/></a></h6>
+                            <h6><a href="${base}/user/info.html"><@spring.message "module.exhibitor.desc"/></br>Submitting Deadline:</br>${tExhibitorTime.company_Info_Submit_Deadline_En}</a></h6>
                         </div>
                     </div>
                 </#if>
             </#if>
 
-            <div class="boxClose" style="margin-left: 14px">
+            <#if rc.locale=="zh_CN">
+                <#if .now?date gt participant_data_end_html_zh?date>
+                    <div class="boxClose" style="margin-left: 14px">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="#"><@spring.message "module.joiner"/></a></h4>
+                            <h6><a href="#"><@spring.message "module.joiner.descNo"/></a></h6>
+                        </div>
+                    </div>
+                <#else>
+                    <div class="boxOff" style="margin-left: 14px">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner"/></a></h4>
+                            <h6><a href="${base}/user/queryJoiners.html">${participant_data_end_html_zh_show}<@spring.message "module.joiner.desc"/></a></h6>
+                        </div>
+                    </div>
+                </#if>
+            <#else>
+                <#if .now?date gt participant_data_end_html_zh?date>
+                    <div class="boxClose" style="margin-left: 14px">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="#"><@spring.message "module.joiner"/></a></h4>
+                            <h6><a href="#"><@spring.message "module.joiner.descNo"/></a></h6>
+                        </div>
+                    </div>
+                <#else>
+                    <div class="boxOff" style="margin-left: 14px">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner"/></a></h4>
+                            <h6><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner.desc"/>${tExhibitorTime.participant_List_Submit_Deadline_En}</a></h6>
+                        </div>
+                    </div>
+                </#if>
+            </#if>
+
+            <#if zone==1>
+                <#if rc.locale=="zh_CN">
+                    <#if .now?date gt invoice_data_end_html_zh?date>
+                        <div class="boxClose" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="#"><@spring.message "module.invoice"/></a>
+                                </h4>
+                                <h6><a href="#"><@spring.message "module.invoice.descNo"/></a></h6>
+                            </div>
+                        </div>
+                    <#else>
+                        <div class="boxOff" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice"/></a></h4>
+                                <h6><a href="${base}/user/invoice/index.html">${invoice_data_end_html_zh_show}<@spring.message "module.invoice.desc"/></a></h6>
+                            </div>
+                        </div>
+                    </#if>
+                <#else>
+                    <#if .now?date gt invoice_data_end_html_zh?date>
+                        <div class="boxClose" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="#"><@spring.message "module.invoice"/></a></h4>
+                                <h6><a href="#"><@spring.message "module.invoice.descNo"/></a>
+                                </h6>
+                            </div>
+                        </div>
+                     <#else>
+                         <div class="boxOff" style="margin-left: 14px">
+                             <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                 <h4><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice"/></a></h4>
+                                 <h6><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice.desc"/>${tExhibitorTime.invoice_Information_Submit_Deadline_En}</a>
+                                 </h6>
+                             </div>
+                         </div>
+                    </#if>
+                </#if>
+            <#else>
+                <#if rc.locale=="zh_CN">
+                    <#if .now?date gt visa_data_end_html_zh?date>
+                        <div class="boxClose" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="#"><@spring.message "module.visa"/></a></h4>
+                                <h6><a href="#"><@spring.message "module.invoice.descNo"/></a></h6>
+                            </div>
+                        </div>
+                    <#else>
+                        <div class="boxOff" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="${base}/user/visa/index.html"><@spring.message "module.visa"/></a></h4>
+                                <h6><a href="${base}/user/visa/index.html">${visa_data_end_html_zh_show}<@spring.message "module.visa.desc"/></a></h6>
+                            </div>
+                        </div>
+                    </#if>
+                <#else>
+                    <#if .now?date gt visa_data_end_html_zh?date>
+                        <div class="boxClose" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="#"><@spring.message "module.visa"/></a></h4>
+                                <h6><a href="#"><@spring.message "module.invoice.descNo"/></a></h6>
+                            </div>
+                        </div>
+                    <#else>
+                        <div class="boxOff" style="margin-left: 14px">
+                            <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                                <h4><a href="${base}/user/visa/index.html"><@spring.message "module.visa"/></a></h4>
+                                <h6><a href="${base}/user/visa/index.html"><@spring.message "module.visa.desc"/>${tExhibitorTime.visa_Info_Submit_Deadline_En}</a></h6>
+                            </div>
+                        </div>
+                    </#if>
+                </#if>
+            </#if>
+            <div style="clear:both;"></div>
+        </div>
+
+        <div style="margin-top: 5px">
+            <div class="boxOff">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <!--<h4><a href="${base}/user/products.html"><@spring.message "module.product"/></a></h4>
                     <#if rc.locale=="zh_CN">
@@ -164,57 +278,43 @@
                     <#else>
                         <h6><a href="${base}/user/products.html">${tExhibitorTime.participant_List_Submit_Deadline_En}<@spring.message "module.product.desc"/></a></h6>
                     </#if>-->
-                    <h4><a href="#"><@spring.message "module.product"/></a></h4>
-                    <h6><a href="#"><@spring.message "module.product.desc"/></a></h6>
-                </div>
-            </div>
-            <div class="boxOff" style="margin-left: 14px">
-                <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                    <h4><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner"/></a></h4>
+                    <!--<h4><a href="#"><@spring.message "module.product"/></a></h4>
+                    <h6><a href="#"><@spring.message "module.product.desc"/></a></h6>-->
                     <#if rc.locale=="zh_CN">
-                        <h6><a href="${base}/user/queryJoiners.html">${tExhibitorTime.participant_List_Submit_Deadline_Zh}<@spring.message "module.joiner.desc"/></a></h6>
+                        <h4><a href="${base}/user/highlight.html">${tExhibitorTime.stone_fair_end_year}-${tExhibitorTime.stone_fair_begin_year}&nbsp;<@spring.message "info.user.main.company_hignlight"/></a></h4>
                     <#else>
-                        <h6><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner.desc"/>${tExhibitorTime.participant_List_Submit_Deadline_En}</a></h6>
+                        <a href="${base}/user/highlight.html" style="font-size: 16px;font-weight:bold;">${tExhibitorTime.stone_fair_end_year}-${tExhibitorTime.stone_fair_begin_year}&nbsp;<@spring.message "info.user.main.company_hignlight"/></a>
                     </#if>
+                        <h6><a href="${base}/user/highlight.html"><@spring.message "info.user.main.company_hignlight_info"/></a></h6>
                 </div>
             </div>
-            <div style="clear:both;"></div>
-        </div>
-        <div style="margin-top: 5px">
-            <#if zone==1>
-                <div class="boxOff">
+
+           <!-- <div class="adviseboxOff" style="margin-left: 14px">-->
+            <#if .now?date gt advertisement_data_end_html_zh?date>
+                <div class="boxClose" style="margin-left: 14px">
                     <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice"/></a></h4>
                         <#if rc.locale=="zh_CN">
-                            <h6><a href="${base}/user/invoice/index.html">${tExhibitorTime.invoice_Information_Submit_Deadline_Zh}<@spring.message "module.invoice.desc"/></a></h6>
+                            <h4><a href="#"><@spring.message "module.advise"/></a></h4>
+                            <h6><a href="#">${advertisement_data_end_html_zh_show}截止</a></h6>
                         <#else>
-                            <h6><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice.desc"/>${tExhibitorTime.invoice_Information_Submit_Deadline_En}</a></h6>
+                            <h4><a href="#"><@spring.message "module.advise"/></a></h4>
+                            <h6><a href="#"><@spring.message "module.advise.desc"/></a></h6>
                         </#if>
                     </div>
                 </div>
-                <#else>
-                    <div class="boxOff">
-                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                            <h4><a href="${base}/user/visa/index.html"><@spring.message "module.visa"/></a></h4>
-                            <#if rc.locale=="zh_CN">
-                                <h6><a href="${base}/user/visa/index.html">${tExhibitorTime.visa_Info_Submit_Deadline_Zh}<@spring.message "module.visa.desc"/></a></h6>
-                            <#else>
-                                <h6><a href="${base}/user/visa/index.html"><@spring.message "module.visa.desc"/>${tExhibitorTime.visa_Info_Submit_Deadline_En}</a></h6>
-                            </#if>
-                        </div>
+            <#else>
+                <div class="boxOff" style="margin-left: 14px">
+                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                        <#if rc.locale=="zh_CN">
+                            <h4><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a></h4>
+                            <h6><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf">${advertisement_data_end_html_zh_show}截止</a></h6>
+                        <#else>
+                            <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank"><@spring.message "module.advise"/></a></h4>
+                            <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank"><@spring.message "module.advise.desc"/></a></h6>
+                        </#if>
                     </div>
-            </#if>
-            <div class="adviseboxOff" style="margin-left: 14px">
-                <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                    <#if rc.locale=="zh_CN">
-                        <h4><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf"><@spring.message "module.advise"/></a></h4>
-                        <h6><a target="_blank" href="${base}/resource/2017厦门石材展广告招租函.pdf">${tExhibitorTime.advertisement_Submit_Deadline_Zh}截止</a></h6>
-                    <#else>
-                        <h4><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank"><@spring.message "module.advise"/></a></h4>
-                        <h6><a href="${base}/resource/Advertise Here-Xiamen Stone Fair 2017.pdf" target="_blank">Submitting Deadline: ${tExhibitorTime.advertisement_Submit_Deadline_En}</a></h6>
-                    </#if>
                 </div>
-            </div>
+            </#if>
             <!--<div class="boxOff" style="margin-left: 14px">-->
             <!--<div style="width: 200px;margin: 0px auto;margin-top: 40px;">-->
             <!--<#if rc.locale=="zh_CN">-->
@@ -226,7 +326,7 @@
             <!--</#if>-->
             <!--</div>-->
             <!--</div>-->
-            <div class="boxOff" style="margin-left: 14px">
+            <div class="boxOff"  style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <h4><a href="${base}/user/sendMail"><@spring.message "module.email"/></a></h4>
                     <h6><a href="${base}/user/sendMail"><@spring.message "module.email.desc"/></a></h6>
@@ -234,6 +334,7 @@
             </div>
             <div style="clear:both;"></div>
         </div>
+
         <div style="margin-top: 5px">
             <div class="boxOff">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
@@ -241,7 +342,7 @@
                     <h6><a href="${base}/user/banners.html"><@spring.message "module.banner.desc"/></a></h6>
                 </div>
             </div>
-            <div class="boxOff" style="margin-left: 14px">
+            <div class="boxOff"  style="margin-left: 14px">
                 <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                     <h4><a href="${base}/user/contact/index.html"><@spring.message "module.contact"/></a></h4>
                     <h6><a href="${base}/user/contact/index.html"><@spring.message "module.contact.desc"/></a></h6>
@@ -307,20 +408,20 @@
             $(this).addClass("boxOn").removeClass("boxOff");
             $(".adviseboxOn").removeClass("adviseboxOn").addClass("adviseboxOff");
             $(this).addClass("adviseboxOn").removeClass("adviseboxOff");
-        })
+        });
         $(".boxOn,.boxOff").click(function(){
             window.location.href = $(this).find("a").attr("href");
-        })
+        });
 
         $(".adviseboxOn,.adviseboxOff").mouseover(function () {
             $(".boxOn").removeClass("boxOn").addClass("boxOff");
             $(this).addClass("boxOn").removeClass("boxOff");
             $(".adviseboxOn").removeClass("adviseboxOn").addClass("adviseboxOff");
             $(this).addClass("adviseboxOn").removeClass("adviseboxOff");
-        })
+        });
         $(".adviseboxOn,.adviseboxOff").click(function(){
             //window.location.href = $(this).find("a").attr("href");
-        })
+        });
     });
 </script>
 </body>

@@ -4,6 +4,7 @@
 package com.zhenhappy.ems.service;
 
 import com.zhenhappy.ems.entity.Email;
+import com.zhenhappy.ems.entity.ExhibitorInvisitorEmail;
 import com.zhenhappy.ems.entity.TEmailSendDetail;
 import com.zhenhappy.util.Page;
 
@@ -25,6 +26,7 @@ public interface EmailMailService {
 	 * @param email
 	 */
 	public abstract void sendMailByAsynchronousMode(Email email, Integer eid);
+	public abstract void sendInvisitorMailByAsynchronousMode(ExhibitorInvisitorEmail exhibitorInvisitorEmail) throws Exception;
 
     /**
      * 异步发送邮件

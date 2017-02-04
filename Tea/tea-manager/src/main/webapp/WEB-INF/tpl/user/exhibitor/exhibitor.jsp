@@ -1012,8 +1012,8 @@
         // 添加展商账号弹出框
         $('#addExhibitorDlg').dialog({
             title: '添加展商账号',
-            width: 350,
-            height: 390,
+            width: 360,
+            height: 420,
             closed: true,
             cache: false,
             modal: true,

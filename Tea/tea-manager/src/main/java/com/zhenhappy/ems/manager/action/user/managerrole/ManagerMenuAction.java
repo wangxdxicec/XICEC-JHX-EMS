@@ -70,4 +70,40 @@ public class ManagerMenuAction extends BaseAction {
     public String userIndex(){
         return "user/managerrole/userinfo";
     }
+
+    //境内客商菜单
+    @RequestMapping(value = "inlandCustomerIndex")
+    public String inlandCustomerIndex(){
+        return "/user/customer/inlandCustomer";
+    }
+
+    //境外客商菜单
+    @RequestMapping(value = "foreignCustomerIndex")
+    public String foreignCustomerIndex(){
+        return "/user/customer/foreignCustomer";
+    }
+
+    //展商VISA菜单
+    @RequestMapping(value = "exhibitorVisaIndex")
+    public String exhibitorVisaIndex(){
+        return "/user/visa/tvisa";
+    }
+
+    //客商VISA菜单
+    @RequestMapping(value = "wcustomerVisaIndex")
+    public String wcustomerVisaIndex(){
+        return "/user/visa/wvisa";
+    }
+
+    //邮件模板管理菜单
+    @RequestMapping(value = "emailTemplateIndex")
+    public String emailTemplateIndex(){
+        return "/user/email/emailTemplate";
+    }
+
+    //短信模板管理菜单
+    @RequestMapping(value = "msgTemplateIndex")
+    public String msgTemplateIndex(){
+        return "/user/email/messageTemplate";
+    }
 }

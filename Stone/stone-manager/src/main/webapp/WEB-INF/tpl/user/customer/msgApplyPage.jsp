@@ -72,7 +72,7 @@
 	</div>
 </div>
 <!-- 工具栏 -->
-<div id="customerbar">
+<%--<div id="customerbar">
 	<div style="display:inline-block;">
 		<div class="easyui-menubutton" menu="#msg" iconCls="icon-redo">短信</div>
 	</div>
@@ -80,7 +80,7 @@
 		<div id="msgAllCustomers" iconCls="icon-redo">群发所有短信</div>
 		<div id="msgSelectedCustomers" iconCls="icon-redo">群发所选短信</div>
 	</div>
-</div>
+</div>--%>
 
 <script>
 	var checkedItems = [];
@@ -93,7 +93,7 @@
 				$.ajax({
 					url: "${base}/user/msgAllInlandStoneCustomers",
 					type: "post",
-					data: {"cids": "-2"},
+					data: {"cids": "-2","type":"1"},
 					dataType: "json",
 					beforeSend:function(XMLHttpRequest){
 						$.messager.show({
@@ -128,7 +128,7 @@
 					$.ajax({
 						url: "${base}/user/msgAllInlandStoneCustomers",
 						type: "post",
-						data: {"cids": checkedItems},
+						data: {"cids": checkedItems,"type":"1"},
 						dataType: "json",
 						traditional: true,
 						beforeSend:function(XMLHttpRequest){

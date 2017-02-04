@@ -2,8 +2,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%@ include file="/WEB-INF/tpl/user/managerrole/head.jsp" %>
 
+
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>金泓信展商管理后台</title>
 	<style>
@@ -25,6 +26,9 @@
 		.exhibitors{
 			padding:8px;
 		}
+
+		#bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=50);}
+		.loading{display: none; position: absolute; top: 50%; left: 50%; z-index:1002; }
 	</style>
 </head>
 
@@ -43,63 +47,67 @@
 									         rownumbers: true,
 									         pagination:'true',
 									         pageSize:'20'">
-            <thead>
-                <tr>
-                    <th data-options="field:'ck',checkbox:true"></th>
-                    <th data-options="field: 'tag', formatter: formatTag, width: $(this).width() * 0.07">
-                        <span id="stag" class="sortable">所属人</span><br/>
-                        <select id="exhibitorsTag" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
-                        </select>
-                    </th>
-                    <th data-options="field: 'group', formatter: formatGroup, width: $(this).width() * 0.07">
-                        <span id="sgroup" class="sortable">展团</span><br/>
-                        <select id="exhibitorsGroup" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
-                        </select>
-                    </th>
-                    <th data-options="field: 'boothNumber', width: $(this).width() * 0.07">
-                        <span id="sboothNumber" class="sortable">展位号</span><br/>
-                        <input id="exhibitorsBoothNumber" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-                    </th>
-                    <th data-options="field: 'company', width: $(this).width() * 0.25">
-                        <span id="scompany" class="sortable">公司中文名</span><br/>
-                        <input id="exhibitorsCompany" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-                    </th>
-                    <th data-options="field: 'companye', width: $(this).width() * 0.26">
-                        <span id="scompanye" class="sortable">公司英文名</span><br/>
-                        <input id="exhibitorsCompanye" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-                    </th>
-					<th data-options="field: 'contractId', width: $(this).width() * 0.07">
-						<span id="scontractId" class="sortable">合同编号</span><br/>
-						<input id="exhibitorsContractId" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
-					</th>
-                    <th data-options="field: 'area', formatter: formatArea, width: $(this).width() * 0.03">
-                        <span id="sarea" class="sortable">展区</span><br/>
-                        <select id="exhibitorsArea" style="width:100%;height:21px;" onchange="filter();">
-                            <option selected value="">全部</option>
-                            <option value="1">国内</option>
-                            <option value="2">国外</option>
-                        </select>
-                    </th>
-                    <th data-options="field: 'country', formatter: formatCountry, width: $(this).width() * 0.03">
-                        <span id="scountry" class="sortable">国家</span><br/>
-						<select id="exhibitorsCountry" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
-						</select>
-                    </th>
-                    <th data-options="field: 'province', formatter: formatProvince, width: $(this).width() * 0.07">
-                        <span id="sprovince" class="sortable">省份</span><br/>
-                        <select id="exhibitorsProvince" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
-                        </select>
-                    </th>
-                    <th data-options="field: 'isLogout', formatter: formatStatus, width: $(this).width() * 0.07">
-                        <span id="sisLogout" class="sortable">状态</span><br/>
-                        <select id="exhibitorsIsLogout" style="width:104%;height:21px;" onchange="filter();">
-                            <option selected value="">全部</option>
-                            <option value="0">正常</option>
-                            <option value="1">注销</option>
-                        </select>
-                    </th>
-                </tr>
-            </thead>
+			<thead>
+			<tr>
+				<th data-options="field:'ck',checkbox:true"></th>
+				<th data-options="field: 'tag', formatter: formatTag, width: $(this).width() * 0.07">
+					<span id="stag" class="sortable">所属人</span><br/>
+					<select id="exhibitorsTag" style="width:100%;height:21px;"
+							onchange="filter(this.options[this.options.selectedIndex].value);">
+					</select>
+				</th>
+				<th data-options="field: 'group', formatter: formatGroup, width: $(this).width() * 0.07">
+					<span id="sgroup" class="sortable">展团</span><br/>
+					<select id="exhibitorsGroup" style="width:100%;height:21px;"
+							onchange="filter(this.options[this.options.selectedIndex].value);">
+					</select>
+				</th>
+				<th data-options="field: 'boothNumber', width: $(this).width() * 0.07">
+					<span id="sboothNumber" class="sortable">展位号</span><br/>
+					<input id="exhibitorsBoothNumber" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'company', width: $(this).width() * 0.25">
+					<span id="scompany" class="sortable">公司中文名</span><br/>
+					<input id="exhibitorsCompany" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'companye', width: $(this).width() * 0.26">
+					<span id="scompanye" class="sortable">公司英文名</span><br/>
+					<input id="exhibitorsCompanye" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'contractId', width: $(this).width() * 0.07">
+					<span id="scontractId" class="sortable">合同编号</span><br/>
+					<input id="exhibitorsContractId" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
+				</th>
+				<th data-options="field: 'area', formatter: formatArea, width: $(this).width() * 0.03">
+					<span id="sarea" class="sortable">展区</span><br/>
+					<select id="exhibitorsArea" style="width:100%;height:21px;" onchange="filter();">
+						<option selected value="">全部</option>
+						<option value="1">国内</option>
+						<option value="2">国外</option>
+					</select>
+				</th>
+				<th data-options="field: 'country', formatter: formatCountry, width: $(this).width() * 0.03">
+					<span id="scountry" class="sortable">国家</span><br/>
+					<select id="exhibitorsCountry" style="width:100%;height:21px;"
+							onchange="filter(this.options[this.options.selectedIndex].value);">
+					</select>
+				</th>
+				<th data-options="field: 'province', formatter: formatProvince, width: $(this).width() * 0.07">
+					<span id="sprovince" class="sortable">省份</span><br/>
+					<select id="exhibitorsProvince" style="width:100%;height:21px;"
+							onchange="filter(this.options[this.options.selectedIndex].value);">
+					</select>
+				</th>
+				<th data-options="field: 'isLogout', formatter: formatStatus, width: $(this).width() * 0.07">
+					<span id="sisLogout" class="sortable">状态</span><br/>
+					<select id="exhibitorsIsLogout" style="width:104%;height:21px;" onchange="filter();">
+						<option selected value="">全部</option>
+						<option value="0">正常</option>
+						<option value="1">注销</option>
+					</select>
+				</th>
+			</tr>
+			</thead>
         </table>
         <!-- 导出会刊 -->
         <form id="exportTransactionsToZip" action="${base}/user/exportTransactionsToZip" method="post">
@@ -121,59 +129,83 @@
         <form id="exportExhibitorJoinersToExcel" action="${base}/user/exportExhibitorJoinersToExcel" method="post">
             <div id="eidParm5"></div>
         </form>
-        <!-- 导出展商邀请涵邮件到Excel -->
+        <!-- 导出展商邀请涵邮箱到Excel -->
         <form id="exportAllExhibitorInvitationsToExcel" action="${base}/user/exportAllExhibitorInvitationsToExcel" method="post">
             <div id="eidParm6"></div>
         </form>
+		<!-- 导出所有展商增值税专用发票 -->
+		<form id="exportExhibitorInvitationToZip" action="${base}/user/exportExhibitorInvitationToZip" method="post">
+			<div id="eidParm7"></div>
+		</form>
+		<!-- 导出所有展商展位确认涵 -->
+		<form id="exportExhibitorBoothConfirmToZip" action="${base}/user/exportExhibitorBoothConfirmToZip" method="post">
+			<div id="eidParm8"></div>
+		</form>
 	</div>
 </div>
+
+<!-- 发送展商邀请涵 -->
+<div id="sendExhibitorInvitationDlg" data-options="iconCls:'icon-add',modal:true">
+	<form id="sendExhibitorInvitationForm" name="sendExhibitorInvitationForm">
+		<table style="width: 470px;margin: 20px auto">
+			<tr>
+				<td style="width: 140px;text-align: right">选择发送者账号：</td>
+				<td>
+					<select id="sendAccount" name="sendAccount" style="width:210px;height:25px;">
+					</select>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
 <!-- 添加展商账号表单 -->
 <div id="addExhibitorDlg" data-options="iconCls:'icon-add',modal:true">
     <form id="addExhibitorForm" name="addExhibitorForm">
-        <table style="width: 320px;margin: 20px auto">
+        <table style="width: 430px;margin: 15px auto">
             <tr>
-                <td style="width: 90px;text-align: right">展商中文名称：</td>
+                <td style="width: 120px;text-align: right">展商中文名称：</td>
                 <td><input class="easyui-validatebox" type="text" name="companyName"></td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">展商英文名称：</td>
+                <td style="width: 120px;text-align: right">展商英文名称：</td>
                 <td><input class="easyui-validatebox" type="text" name="companyNameE"></td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">用户名：</td>
+                <td style="width: 120px;text-align: right">用户名：</td>
                 <td><input class="easyui-validatebox" type="text" name="username" required="true" missingMessage="用户名不能为空"></td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">密码：</td>
+                <td style="width: 120px;text-align: right">密码：</td>
                 <td><input class="easyui-validatebox" type="password" name="password" required="true" missingMessage="密码不能为空"></td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">展位号：</td>
+                <td style="width: 120px;text-align: right">展位号：</td>
                 <td><input class="easyui-validatebox" type="text" name="boothNumber" required="true" missingMessage="展位号不能为空"></td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">国家：</td>
+                <td style="width: 120px;text-align: right">国家：</td>
                 <td>
 					<select id="country" name="country" style="width:204px;height:25px;" onchange="country_change(this.options[this.options.selectedIndex].value)">
 					</select>
 				</td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">省份：</td>
+                <td style="width: 120px;text-align: right">省份：</td>
                 <td>
                 	<select id="province" name="province" style="width:204px;height:25px;">
 					</select>
 				</td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">所属人：</td>
+                <td style="width: 120px;text-align: right">所属人：</td>
                 <td>
 					<select id="tag" name="tag" style="width:204px;height:25px;">
 					</select>
 				</td>
             </tr>
             <tr>
-                <td style="width: 90px;text-align: right">展区：</td>
+                <td style="width: 120px;text-align: right">展区：</td>
                 <td>
 					<select id="area" name="area" style="width:204px;height:25px;">
 						<option selected value="">请选择</option>
@@ -182,12 +214,16 @@
 					</select>
 				</td>
             </tr>
+			<tr>
+				<td style="width: 120px;text-align: right">展厅：</td>
+				<td><input class="easyui-validatebox" type="text" name="exhibitionPosition"></td>
+			</tr>
             <tr>
-                <td style="width: 90px;text-align: right">展位面积：</td>
+                <td style="width: 120px;text-align: right">展位面积：</td>
                 <td><input class="easyui-validatebox" type="text" name="exhibitionArea"></td>
             </tr>
 			<tr>
-				<td style="width: 90px;text-align: right">合同编号：</td>
+				<td style="width: 120px;text-align: right">合同编号：</td>
 				<td><input class="easyui-validatebox" type="text" name="contractId" required="true" missingMessage="合同编号不能为空"></td>
 			</tr>
         </table>
@@ -295,6 +331,59 @@
 	</form>
 </div>
 
+<!-- 下载展位确认涵或布展委托函 -->
+<div id="downloadExhibitorInvitationDlg" data-options="iconCls:'icon-add',modal:true">
+	<form id="downloadExhibitorInvitationForm" name="downloadExhibitorInvitationForm">
+		<table style="width: 180px;margin: 20px auto">
+			<tr>
+				<td style="text-align: center"><a id="downloadBoothConfirmation" href="#" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">下载展位确认涵</a></td>
+			</tr>
+			<tr><td style="text-align: center"></td></tr>
+			<tr>
+				<td style="text-align: center"><a id="#" href="${base}/resource/Booth Setup Authorization of Xiamen Stone Fair 2017.pdf" class="easyui-linkbutton" style="margin-left: 10px" data-options="iconCls:'icon-save'">下载布展委托函</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div id="previewExhibitorInvisationDlg" title="展商邀请涵预览" class="section-focus-pic" id="section-focus-pic">
+	<div class="pages" data-scro="list">
+		<p>
+			<li class="item" style="left:0px;">
+				<div style="width:600px;height:600px;">
+					<div style="width:600px;height:500px;font-family:Times New Roman,Georgia,Serif; font-size:10px;font-color:#000000;">
+						<p style="font-family:Calibri,Arial,Verdana; font-size:10px;">Dear &nbsp;<a href="#" id="contatctName"></a>,</p>
+						<p>Thank you for choosing Xiamen Stone Fair on March 6-9, 2017. Well received your full payment and thank you!</p>
+						<p>Please kindly find the Booth Confirmation and Booth Setup Authorization in attachment. The instructions are as follows.</p>
+						<p>◇&nbsp;&nbsp;Booth Confirmation is the sole certificate for your participation in the 17th China Xiamen International Stone Fair. By presenting it along with your business card, you can claim Exhibitor Pass, Booth Set-up Pass and catalogue at Exhibitor Registration Counter on March 3-5, 2017.</p>
+						<p>◇&nbsp;&nbsp;Booth Setup Authorization will take effect only with your company stamp. It is used for claiming Booth Set-up Pass by your assigned contractor in case of your late arrival.</p>
+						<p>Exhibitor Area should be completed on time to guarantee your publicity on all promotional materials. Account and Password could be found on Booth Confirmation.</p>
+						<p>Please click the link below to download Exhibitor Manual & Shipping Manual: <a href="http://www.stonefair.org.cn/about.asp?ID=92" target="_blank">http://www.stonefair.org.cn/about.asp?ID=92</a></p>
+						<p>Any questions, please feel free to contact us.</p>
+						<p>We are looking forward to your presence at Xiamen Stone Fair 2017!</p>
+						<p>Yours,</p>
+						<p>Best Regards,</p>
+						<p>Organizing Committee of Xiamen Stone Fair</p>
+					</div>
+					<div style="font-family:Times New Roman,Georgia,Serif; font-size:12px;font-color:#000000;">
+						<p><a href="#" id="boothConfirm" target="_blank"></a></p>
+						<p><a href="${base}/resource/Booth Setup Authorization of Xiamen Stone Fair 2017.pdf" target="_blank">Booth Setup Authorization of Xiamen Stone Fair 2017.pdf</a></p>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="controler" data-scro="controler">
+		<b class="down">1</b>
+		<b>2</b>
+		<b>3</b>
+	</div>
+	<div class="controler2" data-scro="controler2">
+		<a href="javascript:prevExhibitorInvitation();" class="prev"><i></i></a>
+		<a href="javascript:nextExhibitorInvitation();" class="next"><i></i></a>
+	</div>
+</div>
+
 <!-- 工具栏 -->
 <div id="toolbar">
     <div>
@@ -307,6 +396,7 @@
         <!--<div id="deleteExhibitor" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除展商账号</div>-->
         <div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
 		<div class="easyui-menubutton" menu="#import" iconCls="icon-undo">导入</div>
+		<div class="easyui-menubutton" menu="#exhibitorInvitation" iconCls="icon-redo">展商邀请涵</div>
     </div>
     <div id="export" style="width:180px;">
     	<div id="exportAllTransactions" iconCls="icon-redo">所有会刊</div>
@@ -322,13 +412,22 @@
 		<div id="exportAllExhibitorJoiners" iconCls="icon-redo">所有参展人员列表到Excel</div>
 		<div id="exportSelectedExhibitorJoiners" iconCls="icon-redo">所选参展人员列表到Excel</div>
 		<div class="menu-sep"></div>
-		<div id="exportAllExhibitorInvitations" iconCls="icon-redo">所有展商邀请涵邮件</div>
+		<div id="exportAllExhibitorInvitations" iconCls="icon-redo">所有展商邀请涵邮箱</div>
+		<div class="menu-sep"></div>
+		<div id="exportAllExhibitorInvitationInfo" iconCls="icon-redo">所有展商增值税专用发票</div>
+		<div id="exportSelectedExhibitorInvitationInfo" iconCls="icon-redo">所选展商增值税专用发票</div>
+	</div>
+	<div id="exhibitorInvitation" style="width:200px;">
+		<div id="sendExhibitorInvitation" iconCls="icon-redo">发送展位确认涵</div>
+		<div id="priviewExhibitorInvitation" target="_blank" method="post" iconCls="icon-redo">预览展位确认涵</div>
+		<div id="downloadExhibitorInvitation" iconCls="icon-redo">下载展位确认涵或布展委托函</div>
 	</div>
 	<div id="import" style="width:100px;">
 		<div id="importExhibitor" iconCls="icon-undo">导入展商账号</div>
 	</div>
 </div>
 
+<div class="loading"><img src="${base}/resource/load.gif"></div>
 <script>
 	var checkedItems = [];
 	var country = [];
@@ -342,7 +441,75 @@
 	var eidParm3 = document.getElementById("eidParm3");
 	var classify = document.getElementById("classify");
 	var order = "asc";
+	var previewExhibitorList = [];
+	var previewExhibitorIndex = 0;
 //----------------------------------------------------------工具栏按钮开始------------------------------------------------------------//
+	//发送展商邀请涵
+	$('#sendExhibitorInvitation').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认发送','你确定要发送展位确认涵吗?',function(r){
+				if(r){
+					$("#bg,.loading").show();
+					$.ajax({
+						url: "${base}/user/sendExhibitorInvisitor",
+						type: "post",
+						dataType: "json",
+						data: {"eids": checkedItems},
+						traditional: true,
+						success: function (data) {
+							$("#bg,.loading").hide();
+							if (data.resultCode == 0) {
+								checkedItems = [];
+								alert("发送展位确认涵成功");
+								window.location.href = window.location.href;
+							} else if (data.resultCode == 2) {
+								$.messager.alert('错误', data.description);
+							} else {
+								$.messager.alert('错误', '系统错误');
+							}
+						}
+					});
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项再操作');
+		}
+	});
+
+	$('#priviewExhibitorInvitation').click(function(){
+		if(checkedItems.length > 0){
+			$("#bg,.loading").show();
+			$.ajax({
+				url: "${base}/user/previewExhibitorInvisitor",
+				type: "post",
+				dataType: "json",
+				data: {"eids": checkedItems},
+				traditional: true,
+				success: function (data) {
+					$("#bg,.loading").hide();
+					if (data.resultCode == 0) {
+						previewExhibitorIndex = 0;
+						previewExhibitorList = data.previewExhibitorInvitationList;
+						var previewExhibitor = previewExhibitorList[previewExhibitorIndex];
+						$("#contatctName").html(previewExhibitor.contactName);
+
+						//$("#boothConfirm").html(previewExhibitor.boothConfirm);
+						$("#boothConfirm").html("Booth Confirmation of Xiamen Stone Fair 2017.pdf");
+						var boothConfirmHref = "${base}/user/showExhibitorInvitation?eid=" + previewExhibitor.eid;
+						document.getElementById('boothConfirm').href = boothConfirmHref;
+						$("#previewExhibitorInvisationDlg").dialog("open");
+					} else if (data.resultCode == 2) {
+						$.messager.alert('错误', data.description);
+					} else {
+						$.messager.alert('错误', '系统错误');
+					}
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项再操作');
+		}
+	});
+
 	//添加展商账号
 	$('#addExhibitor').click(function(){
 		document.getElementById("addExhibitorForm").reset();
@@ -512,6 +679,7 @@
 			$.messager.alert('提示', '请至少选择一项展商再删除');
 		}
 	});
+
 	//导出所有会刊
 	$('#exportAllTransactions').click(function(){
         eidParm1.innerHTML = "";
@@ -643,8 +811,31 @@
         var node = "<input type='hidden' name='eids' value='-1'/>";
         eidParm6.innerHTML += node;
         document.getElementById("exportAllExhibitorInvitationsToExcel").submit();
-        $.messager.alert('提示', '导出所有展商邀请涵邮件成功');
+        $.messager.alert('提示', '导出所有展商邀请涵邮箱成功');
     });
+	//导出所有展商增值税专用发票
+	$('#exportAllExhibitorInvitationInfo').click(function(){
+		eidParm7.innerHTML = "";
+		var node = "<input type='hidden' name='eids' value='-1'/>";
+		eidParm7.innerHTML += node;
+		document.getElementById("exportExhibitorInvitationToZip").submit();
+		$.messager.alert('提示', '请勿关闭窗口,耐心等待1~2分钟后会提示下载');
+	});
+	//导出所选展商增值税专用发票
+	$('#exportSelectedExhibitorInvitationInfo').click(function(){
+		eidParm7.innerHTML = "";
+		if(checkedItems.length > 0){
+			for (var i = 0; i < checkedItems.length; i++) {
+				var node = "<input type='hidden' name='eids' value='"+checkedItems[i]+"'/>";
+				eidParm7.innerHTML += node;
+			}
+			document.getElementById("exportExhibitorInvitationToZip").submit();
+			$.messager.alert('提示', '导出所选展商增值税专用发票成功');
+		}else{
+			$.messager.alert('提示', '请至少选择一项展商再导出');
+		}
+	});
+
 	//导入展商账号
 	$('#importExhibitor').click(function(){
 		$("#countryImport").html('');
@@ -687,8 +878,42 @@
        	});
 		$("#importExhibitorsDlg").dialog("open");
 	});
+	//打开展位确认涵和布展委托涵提示框
+	$('#downloadExhibitorInvitation').click(function(){
+		$("#downloadExhibitorInvitationDlg").dialog("open");
+	});
 //----------------------------------------------------------工具栏按钮结束------------------------------------------------------------//
 //----------------------------------------------------------自定义函数开始------------------------------------------------------------//
+	function prevExhibitorInvitation() {
+		previewExhibitorIndex = previewExhibitorIndex - 1;
+		if(previewExhibitorIndex < 0){
+			alert("已经到头了。。");
+			return;
+		}else{
+			var previewExhibitor = previewExhibitorList[previewExhibitorIndex];
+			$("#contatctName").html(previewExhibitor.contactName);
+			//$("#boothConfirm").html(previewExhibitor.boothConfirm);
+			$("#boothConfirm").html("Booth Confirmation of Xiamen Stone Fair 2017.pdf");
+			var boothConfirmHref = "${base}/user/showExhibitorInvitation?eid=" + previewExhibitor.eid;
+			document.getElementById('boothConfirm').href = boothConfirmHref;
+		}
+	}
+
+	function nextExhibitorInvitation() {
+		previewExhibitorIndex = previewExhibitorIndex + 1;
+		if(previewExhibitorIndex >= previewExhibitorList.length){
+			alert("已经到尾了。。");
+			return;
+		}else{
+			var previewExhibitor = previewExhibitorList[previewExhibitorIndex];
+			$("#contatctName").html(previewExhibitor.contactName);
+			//$("#boothConfirm").html(previewExhibitor.boothConfirm);
+			$("#boothConfirm").html("Booth Confirmation of Xiamen Stone Fair 2017.pdf");
+			var boothConfirmHref = "${base}/user/showExhibitorInvitation?eid=" + previewExhibitor.eid;
+			document.getElementById('boothConfirm').href = boothConfirmHref;
+		}
+	}
+
 	function formatTag(val, row) {
         if (val != null) {
 			return tags[val];
@@ -863,8 +1088,19 @@
         $('#exhibitors').datagrid('reload');
     }
 //----------------------------------------------------------自定义函数结束------------------------------------------------------------//
-
     $(document).ready(function () {
+		$("#previewExhibitorInvisationDlg").dialog({
+			autoOpen: false,
+			show: {
+				effect: "blind",
+				duration: 1000
+			},
+			hide: {
+				effect: "explode",
+				duration: 1000
+			}
+		});
+		$("#previewExhibitorInvisationDlg").dialog("close");
     	//加载国家列表
     	$.ajax({
     		type:"POST",
@@ -968,14 +1204,12 @@
 						checkedItems.push(row[i].eid);
 					}
 				}
-// 				alert(checkedItems);
             },
             onUnselect:function (rowIndex, rowData){
 				var k = findCheckedItem(rowData.eid);
 				if (k != -1) {
 					checkedItems.splice(k, 1);
 				}
-// 				alert(checkedItems);
             },
             onSelectAll:function (rows){
             	for (var i = 0; i < rows.length; i++) {
@@ -984,7 +1218,6 @@
 						checkedItems.push(rows[i].eid);
 					}
 				}
-// 				alert(checkedItems);
             },
             onUnselectAll:function (rows){
             	for (var i = 0; i < rows.length; i++) {
@@ -993,7 +1226,6 @@
 						checkedItems.splice(k, 1);
 					}
 				}
-// 				alert(checkedItems);
             },
             rowStyler:function(index,row){
 				if (row.infoFlag == 4){
@@ -1070,11 +1302,68 @@
 			}
 		});
 
+		// 发送展商邀请涵弹出框
+		$('#sendExhibitorInvitationDlg').dialog({
+			title: '发送展商邀请涵',
+			width: 520,
+			height: 200,
+			closed: true,
+			cache: false,
+			modal: true,
+			buttons: [
+				{
+					text: '确认发送',
+					iconCls: 'icon-ok',
+					handler: function () {
+						var sendAccountTag = document.getElementById("sendAccount").value;
+						if(checkedItems.length > 0){
+							$.messager.confirm('确认发送','你确定要用【' + tags[sendAccountTag] + '】账号发送展商邀请涵吗?',function(r){
+								$.ajax({
+									url: "${base}/user/sendExhibitorInvisitor",
+									type: "post",
+									dataType: "json",
+									data: {"eids": checkedItems, "sendAccountTag": sendAccountTag},
+									traditional: true,
+									success: function (data) {
+										if (data.resultCode == 0) {
+											$("#sendExhibitorInvitationDlg").dialog("close");
+											checkedItems = [];
+											$.messager.show({
+												title: '成功',
+												msg: '发送展商邀请涵成功',
+												timeout: 3000,
+												showType: 'slide'
+											});
+											$("#sendExhibitorInvitationForm").clearForm();
+											window.location.href = window.location.href;
+										} else if (data.resultCode == 2) {
+											$.messager.alert('错误', data.description);
+										} else {
+											$.messager.alert('错误', '系统错误');
+										}
+									}
+								});
+							});
+						}else{
+							$.messager.alert('提示', '请至少选择一项再操作');
+						}
+					}
+				},
+				{
+					text: '取消',
+					handler: function () {
+						document.getElementById("sendExhibitorInvitationForm").reset();
+						$("#sendExhibitorInvitationDlg").dialog("close");
+					}
+				}
+			]
+		});
+
         // 添加展商账号弹出框
         $('#addExhibitorDlg').dialog({
             title: '添加展商账号',
-            width: 350,
-            height: 390,
+            width: 445,
+            height: 480,
             closed: true,
             cache: false,
             modal: true,
@@ -1126,8 +1415,8 @@
 		// 批量修改所属人弹出框
         $('#modifyExhibitorsTagDlg').dialog({
             title: '批量修改所属人',
-            width: 350,
-            height: 140,
+            width: 360,
+            height: 150,
             closed: true,
             cache: false,
             modal: true,
@@ -1176,7 +1465,7 @@
         });
      	// 批量修改展团弹出框
         $('#modifyExhibitorsGroupDlg').dialog({
-            title: '批量修改所属人',
+            title: '批量修改展团',
             width: 360,
             height: 150,
             closed: true,
@@ -1228,8 +1517,8 @@
 		// 批量修改展区弹出框
         $('#modifyExhibitorsAreaDlg').dialog({
             title: '批量修改展区',
-            width: 350,
-            height: 140,
+            width: 360,
+            height: 150,
             closed: true,
             cache: false,
             modal: true,
@@ -1337,5 +1626,43 @@
                 }
             ]
         });
+
+		// 展位确认涵和布展委托涵弹出框
+		$('#downloadExhibitorInvitationDlg').dialog({
+			title: '下载展位确认涵和布展委托涵',
+			width: 222,
+			height: 200,
+			closed: true,
+			cache: false,
+			modal: true,
+			buttons: [
+				{
+					text: '取消',
+					handler: function () {
+						$("#downloadExhibitorInvitationDlg").dialog("close");
+					}
+				}
+			]
+		});
+
+		//下载展位确认涵
+		$('#downloadBoothConfirmation').click(function(){
+			eidParm8.innerHTML = "";
+			if(checkedItems.length > 0){
+				$.messager.confirm('确认下载','你确定要下载展位确认涵吗?',function(r){
+					if(r){
+						for (var i = 0; i < checkedItems.length; i++) {
+							var node = "<input type='hidden' name='eids' value='"+checkedItems[i]+"'/>";
+							eidParm8.innerHTML += node;
+						}
+						document.getElementById("exportExhibitorBoothConfirmToZip").submit();
+						$.messager.alert('提示', '所选展商展位确认涵下载成功');
+						$("#downloadExhibitorInvitationDlg").dialog("close");
+					}
+				});
+			}else{
+				$.messager.alert('提示', '请至少选择一项展商');
+			}
+		});
     });
 </script>

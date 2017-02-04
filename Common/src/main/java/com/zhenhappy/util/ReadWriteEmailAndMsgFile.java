@@ -12,6 +12,9 @@ public class ReadWriteEmailAndMsgFile {
     //指定文件路径和名称
     private static String readStr ="";
 
+    public final static File teaEmailFileName = new File("C:/Program Files/Apache Software Foundation/appendix/stone/EmailContent.txt");
+    public final static File teaMsgFileName = new File("C:/Program Files/Apache Software Foundation/appendix/stone/MsgContent.txt");
+
     public final static File foshiEmailFileName = new File("C:/Program Files/Apache Software Foundation/appendix/foshi/EmailContent.txt");
     public final static File foshiMsgFileName = new File("C:/Program Files/Apache Software Foundation/appendix/foshi/MsgContent.txt");
 

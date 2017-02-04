@@ -11,9 +11,6 @@
         </webroots>
       </configuration>
     </facet>
-    <facet type="Spring" name="Spring">
-      <configuration />
-    </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
@@ -99,5 +96,15 @@
     <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.03" level="project" />
     <orderEntry type="library" name="Maven: org.apache.ant:ant:1.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.ant:ant-launcher:1.8.2" level="project" />
+    <orderEntry type="library" name="Maven: org.xhtmlrenderer:core-renderer:R8" level="project" />
+    <orderEntry type="library" name="Maven: com.lowagie:itext:2.0.7" level="project" />
+    <orderEntry type="library" name="Maven: bouncycastle:bcmail-jdk14:138" level="project" />
+    <orderEntry type="library" name="Maven: bouncycastle:bcprov-jdk14:138" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:pdfbox:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:fontbox:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:jempbox:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.xuwei-k:html2image:0.1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.aliyun:aliyun-java-sdk-core:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: com.aliyun:aliyun-java-sdk-sms:3.0.0-rc1" level="project" />
   </component>
 </module>

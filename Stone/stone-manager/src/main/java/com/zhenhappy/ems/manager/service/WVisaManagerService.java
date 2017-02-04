@@ -62,7 +62,7 @@ public class WVisaManagerService extends WVisaService {
 	 */
 	@Transactional
 	public List<WVisa> loadAllWVisas() {
-		List<WVisa> wVisas = wVisaDao.queryByHql("from WVisa order by createTime DESC, id DESC", new Object[]{ });
+		List<WVisa> wVisas = wVisaDao.queryByHql("from WVisa order by updateTime DESC, id DESC", new Object[]{ });
 		return wVisas;
 	}
 
@@ -85,5 +85,15 @@ public class WVisaManagerService extends WVisaService {
 	public WVisa getWVisaById(Integer id) {
 		WVisa visa = wVisaDao.query(id);
 		return visa;
+	}
+
+	/**
+	 * 根据vids查询展商列表
+	 * @return
+	 */
+	@Transactional
+	public WVisa getWVisaByCustomerId(Integer customerId) {
+		List<WVisa> wVisaList = wVisaDao.queryByHql("from WVisa where WCustomerInfo=? ", new Object[]{customerId});
+		return wVisaList.size() > 0 ? wVisaList.get(0) : null;
 	}
 }

@@ -34,7 +34,7 @@ public class CustomerTemplateServiceImp implements CustomerTemplateService {
     @Transactional
     public QueryEmailTemplateResponse queryEmailManagerTemplate(QueryEmailTemplateRequest request){
         Page page = new Page();
-        request.setRows(30);
+        request.setRows(50);
         page.setPageSize(request.getRows());
         page.setPageIndex(request.getPage());
         List<TVisitorTemplate> customerTemplates = customerTemplateDao.queryPageByHQL("select count(*) from TVisitorTemplate",
@@ -68,7 +68,9 @@ public class CustomerTemplateServiceImp implements CustomerTemplateService {
 
     @Transactional
     public void modifyMessageManagerTemplate(String value1, String value2, String value3, String value4, String value5,
-                                           String value6, String value7, String value8) throws Exception{
+                                           String value6, String value7, String value8, String value9,
+                                             String value10, String value11, String value12, String value13, String value14,
+                                             String value15, String value16, String value17) throws Exception{
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_register_subject_cn'", new Object[]{value1});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_register_subject_en'", new Object[]{value2});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_register_content_cn'", new Object[]{value3});
@@ -77,5 +79,14 @@ public class CustomerTemplateServiceImp implements CustomerTemplateService {
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_invite_subject_en'", new Object[]{value6});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_invite_content_cn'", new Object[]{value7});
         jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_invite_content_en'", new Object[]{value8});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unregister_subject_cn'", new Object[]{value9});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unregister_content_cn'", new Object[]{value10});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unregister_subject_en'", new Object[]{value11});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unregister_content_en'", new Object[]{value12});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unactive_subject_cn'", new Object[]{value13});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unactive_content_cn'", new Object[]{value14});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unactive_subject_en'", new Object[]{value15});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_unactive_content_en'", new Object[]{value16});
+        jdbcTemplate.update("update visitor_Template set tpl_value=? where tpl_key = 'msg_new_year_content'", new Object[]{value17});
     }
 }

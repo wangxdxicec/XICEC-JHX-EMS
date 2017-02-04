@@ -11,6 +11,7 @@ public class SaveVisaInfoRequest extends TVisa {
     private String fromDate;
     private String toDate;
 	private Integer joinerId;
+    private String hotelAddress;
 
     public String getBirthDay() {
         return birthDay;
@@ -53,4 +54,12 @@ public class SaveVisaInfoRequest extends TVisa {
 	public void setJoinerId(Integer joinerId) {
 		this.joinerId = joinerId;
 	}
+
+    public String getHotelAddress() {
+        return hotelAddress;
+    }
+
+    public void setHotelAddress(String hotelAddress) {
+        this.hotelAddress = hotelAddress;
+    }
 }

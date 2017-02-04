@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="${base}/resource/jquery-easyui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="${base}/resource/jquery-easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="${base}/resource/style/main.css">
-    <script type="text/javascript" src="${base}/resource/jquery-easyui/treegrid-dnd.js"></script>
     <script type="text/javascript" src="${base}/resource/jquery-easyui/jquery.min.js"></script>
     <script type="text/javascript" src="${base}/resource/jquery-easyui/jquery.easyui.min.js"></script>
     <script type="text/javascript" src="${base}/resource/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
@@ -86,7 +85,7 @@
                             if ($("#tabs").tabs("exists", node.text)) {
                                 $("#tabs").tabs("select", node.text);
                             } else {
-                                var content = "<iframe frameborder=0 scrolling='auto' style='width:100%;height:100%' src=" + node.attributes.menuUrl + "></iframe>"
+                                var content = "<iframe frameborder=0 scrolling='auto' style='width:100%;height:100%' name='" + node.text + "' src=" + node.attributes.menuUrl + "></iframe>"
                                 $("#tabs").tabs("add", {
                                     title: node.text,
                                     iconCls: node.iconCls,
@@ -136,7 +135,7 @@
             $('#mm-tabclose').click(function () {
                 var currtab_title = $('#mm').data("currtab");
                 $('#tabs').tabs('close', currtab_title);
-            })
+            });
             //全部关闭
             $('#mm-tabcloseall').click(function () {
                 $('.tabs-inner span').each(function (i, n) {

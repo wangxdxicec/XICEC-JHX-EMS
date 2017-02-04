@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>金泓信展商管理后台</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="${base}/resource/ckeditor/samples/sample.css">
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
+    <link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
+    <script type="text/javascript" src="${base}/resource/jquery.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="${base}/resource/common.js"></script>
+
+    <style>
+        .links{
+            margin-top:350px;
+            margin-left:450px;
+        }
+
+        #dialogVisitorPass .overlayCon
+        {
+            text-align:center;
+        }
+        .credentialsPreview
+        {
+            width: 400px;
+            height: 255px;
+            display: block;
+            border: 1px solid #CCCCCC;
+            overflow: hidden;
+            margin:0 auto;
+        }
+        .credentialsPreview .prevHeader
+        {
+            height:80px;
+            /*background:url(/images/logo_stonefair_reg.jpg) 15px center no-repeat;*/
+            /*padding-left:115px;*/
+            font-size:16px;
+            font-weight:bold;
+            line-height:80px;
+            cursor:default;
+        }
+        .credentialsPreview h4
+        {
+            padding: 3px 0;
+            margin: 0;
+            text-align: center;
+            font-weight: normal;
+            font-size: 22px;
+            line-height: 40px;
+            width: 100%;
+        }
+        .credentialsPreview h5
+        {
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 150%;
+            width: 100%;
+        }
+        .overlayTit {
+            margin: 0 0 15px 0;
+            padding: 0 5px 10px 5px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #417fcc;
+            border-bottom: 2px solid #417fcc;
+        }
+    </style>
+</head>
+<body>
+<div class="links" >
+    <a href="${base}/changeLanguage?locale=cn">中文</a>
+    <a href="${base}/changeLanguage?locale=us" style="font-family: Arial; border: 0;">English</a>
+</div>
+
+<#if rc.locale=="zh_CN">
+    <div id="scancode" align="center" style="height: 140px;padding-left: 110px;padding-top: 80px;">
+        登记号：<input type="text" style="width:50%;height:50%;font-size:40px;" name="scancodeText" id="scancodeText"
+                   onkeypress="keyPress()"  oninput="handScanCode()"/>
+        <button type="button" style="font-size:20px;" onclick="handScanCode()">查询</button>
+    </div>
+    <div id="scancount" align="center" style="height: 200px;padding-left: 110px;padding-top: 20px;">
+        <label style="width:50%;height:50%;font-size:82px;" name="scancountText" id="scancountText" />
+    </div>
+<#else>
+    <div id="scancode" align="center" style="height: 140px;padding-left: 110px;padding-top: 150px;">
+        CheckingNo：<input type="text" style="width:50%;height:50%;font-size:40px;" name="scancodeText" id="scancodeText"
+                    onkeypress="keyPress()" oninput="handScanCode()"/>
+        <button type="button" style="font-size:20px;" onclick="handScanCode()">Query</button>
+    </div>
+    <div id="scancount" align="center" style="height: 200px;padding-left: 110px;padding-top: 20px;">
+        <label style="width:50%;height:50%;font-size:82px;" name="scancountText" id="scancountText"/>
+    </div>
+</#if>
+
+<div id="dialogVisitorPass" data-options="iconCls:'icon-add',modal:true">
+    <form id="dialogVisitorForm" name="dialogVisitorForm">
+        <h4 class="overlayTit">专业观众证打印预览</h4>
+        <!--startprint-->
+        <div class="overlayCon">
+            <div class="credentialsPreview">
+                <div class="prevHeader">
+                    <img src="http://www.stonefair.org.cn/images/replay_cn_t.jpg" style="width: 400px;">
+                </div>
+                <div id="printcontent">
+                    <div style="font-size: 28px" id="CompanyPreivew"></div>
+                    <div style="font-size: 28px" id="NamePreview"></div>
+                    <div style="font-size: 28px" id="PositionPreview"></div>
+                </div>
+            </div>
+        </div>
+        <!--endprint-->
+    </form>
+</div>
+</body>
+<script type="text/javascript">
+    var flag = false;
+
+    window.onload = function(){
+        var oInput = document.getElementById("scancodeText");
+        oInput.focus();
+    }
+
+    function  refreshText() {
+        document.getElementById("scancodeText").value = "";
+    }
+
+    function keyPress() {
+        var keyCode = event.keyCode;
+        if ((keyCode >= 48 && keyCode <= 57))
+        {
+            event.returnValue = true;
+        } else {
+            event.returnValue = false;
+        }
+    }
+
+    function myprint(company, name, position) {
+        //var newstr = document.getElementById("printcontent").innerHTML;
+        document.body.innerHTML = '<div style="font-size: 32px; text-align:center; margin-left: 500px;padding-top: 100px;">';
+        document.body.innerHTML += '<div style="font-size: 32px">';
+        document.body.innerHTML += company;
+        document.body.innerHTML += '</div>';
+        document.body.innerHTML += '<div style="font-size: 32px">';
+        document.body.innerHTML += name;
+        document.body.innerHTML += '</div>';
+        document.body.innerHTML += '<div style="font-size: 32px">';
+        document.body.innerHTML += position;
+        document.body.innerHTML += '</div>';
+        //document.body.innerHTML += newstr;
+        document.body.innerHTML += '</div>';
+        window.print();
+        $("#dialogVisitorPass").dialog("close");
+        window.location.href = window.location.href;
+    }
+
+    window.onafterprint = function(){
+        $("#dialogVisitorPass").dialog("close");
+        window.location.href = window.location.href;
+    }
+
+    $('#dialogVisitorPass').dialog({
+        title: '',
+        width: 742,
+        height: 388,
+        closed: true,
+        cache: false,
+        modal: true,
+        buttons: [
+            {
+                text: '打印/Print',
+                iconCls: 'icon-ok',
+                handler: function () {
+                    var company = document.getElementById("CompanyPreivew").innerText;
+                    var name = document.getElementById("NamePreview").innerText;
+                    var position = document.getElementById("PositionPreview").innerText;
+                    myprint(company, name, position);
+                }
+            },
+            {
+                text: '取消/Cancel',
+                handler: function () {
+                    document.getElementById("CompanyPreivew").innerText = "";
+                    document.getElementById("NamePreview").innerText = "";
+                    document.getElementById("PositionPreview").innerText = "";
+                    $("#dialogVisitorPass").dialog("close");
+                }
+            }
+        ]
+    });
+
+    function handScanCode() {
+        var checkNo = document.getElementById("scancodeText").value;
+        if(checkNo.length >= 10) {
+            $.ajax({
+                url: "${base}/user/queryVisitorInfoByCheckNo",
+                type: "post",
+                data: {"checkNo": checkNo},
+                dataType: "json",
+                success: function (result) {
+                    if (result) {
+                        setTimeout("refreshText()",2000);
+                        document.getElementById("CompanyPreivew").innerText = result.company;
+                        document.getElementById("NamePreview").innerText = result.firstName;
+                        document.getElementById("PositionPreview").innerText = result.position;
+                        $("#dialogVisitorPass").dialog("open");
+                    } else {
+                        setTimeout("refreshText()",2000);
+                        document.getElementById("scancountText").innerText = '无效的预约登记号';
+                        /*<#if rc.locale=="zh_CN">
+                         document.getElementById("scancountText").innerText = '无效的预约登记号';
+                         <#else>
+                         document.getElementById("scancountText").innerText = 'Invalid CheckingNo';
+                         </#if>*/
+                    }
+                }
+            });
+        }
+    }
+</script>
+</html>

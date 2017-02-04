@@ -48,7 +48,11 @@ public class TVisa {
 	public TVisa() {
 	}
 
-	public TVisa(Integer id, Integer eid, String passportName, Integer gender, String nationality, String jobTitle, String companyName, String boothNo, String detailedAddress, String tel, String fax, String email, String companyWebsite, String passportNo, Date expDate, Date birth, String applyFor, Date from, Date to, String passportPage, String businessLicense, Integer joinerId, Integer status, Date createTime, Date updateTime) {
+	public TVisa(Integer id, Integer eid, String passportName, Integer gender, String nationality,
+                 String jobTitle, String companyName, String boothNo, String detailedAddress, String tel,
+                 String fax, String email, String companyWebsite, String passportNo, Date expDate, Date birth,
+                 String applyFor, Date from, Date to, String passportPage, String businessLicense,
+                 Integer joinerId, Integer status, Date createTime, Date updateTime) {
 		this.id = id;
 		this.eid = eid;
 		this.passportName = passportName;

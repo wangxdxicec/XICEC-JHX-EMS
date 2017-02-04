@@ -315,7 +315,7 @@
                     url: "${base}/user/emailAllHistoryInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id}, "type":1},
                     beforeSend: function (XMLHttpRequest) {
                         $.messager.show({
                             title: '处理中...',
@@ -353,7 +353,7 @@
                     url: "${base}/user/emailAllHistoryInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id}, "type":2},
                     beforeSend: function (XMLHttpRequest) {
                         $.messager.show({
                             title: '处理中...',
@@ -385,20 +385,18 @@
 
     //发送邮件
     $("#sendEmail").click(function () {
-        return;
         $("#customerSelectEmailTypeDlg").dialog("open");
     });
 
     //发送短信
     $("#sendMsg").click(function () {
-        return;
         $.messager.confirm('确认发送', '你确定要给客商发短信吗?', function (r) {
             if (r) {
                 $.ajax({
                     url: "${base}/user/msgAllInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id},"type":"3"},
                     beforeSend: function (XMLHttpRequest) {
                         $.messager.show({
                             title: '处理中...',

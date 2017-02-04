@@ -20,71 +20,118 @@
 <body>
 <!-- /.navbar -->
 <#include "/user/header.html" />
+<#assign exhibitor_data_end_html = "${tExhibitorTime.exhibitor_Info_Submit_Deadline_Zh}">
+<#assign contact_data_end_html_zh = "${tExhibitorTime.tea_Fair_Contact_Submit_Deadline_Zh}">
+<#assign invoice_data_end_html_zh = "${tExhibitorTime.tea_Fair_Invoice_Submit_Deadline_Zh}">
 <style type="text/css">
-    .module {
-        margin-left: 20px;
-        width: 270px;
-        height: 150px;
-        float: left;
+    .boxOn {
         cursor: pointer;
-    }
-
-    .module a,.module a:hover,.module a:link {
-        color: #666666;
-    }
-
-    .moduleOn {
-        width: 270px;
-        height: 150px;
-        background-image: url('${resource}/images/tea_index_18.gif');
+        width: 310px;
+        height: 170px;
         float: left;
-        margin-left: 20px;
-        cursor: pointer;
+        background-image: url('${resource}/images/bak1.gif')
     }
 
-    .moduleOn a,.moduleOn a:hover,.moduleOn a:link {
+    .boxOn a, .boxOn a:hover, .boxOn a:visited {
         color: #ffffff;
+        text-decoration: none;
     }
 
-    .line {
-        width: 900px;
-        height: 1px;
-        background-image: url("${resource}/images/line.jpg");
-        margin-bottom: 20px;
-        margin-top: 13px;
-    }
-
-    .zline {
-        margin-left: 9px;
-        background-image: url('${resource}/images/zline.jpg');
+    .boxOff {
+        cursor: pointer;
+        width: 310px;
+        height: 170px;
         float: left;
-        height: 150px;
-        width: 1px;
+        background-image: url('${resource}/images/bak2.gif')
+    }
+
+    .boxClose {
+        cursor: pointer;
+        width: 310px;
+        height: 170px;
+        float: left;
+        background-image: url('${resource}/images/bak2.gif')
+    }
+
+    .boxClose a{
+        color: #888888;
+        text-decoration: none;
+    }
+
+    .boxOff a, .boxOff a:hover, .boxOff a:visited {
+        color: #888888;
+        text-decoration: none;
     }
 
 </style>
 <div style="width: 100%;background-color: #eeeeee;padding-bottom: 40px;">
-    <div style="width: 1150px;margin: 0px auto">
+    <div style="width: 1160px;margin: 0px auto">
         <!-- left -->
         <#include "/user/left.html" />
-        <div style="margin-left: 28px;width: 900px;min-height: 548px;float: right;background-color: #ffffff;padding: 20px 0px;border: #dcdcdc 1px solid">
+        <div style="margin-left: 25px;width: 950px;min-height: 548px;float: right;background-color: #ffffff;padding: 20px 0px;border: #dcdcdc 1px solid">
             <div>
-                <div class="module" style="position: relative">
-                    <span class="badge badge-important" style="position:absolute;right: 0px">${unReadMessageCount}</span>
+                <#if .now?date gt exhibitor_data_end_html?date>
+                    <div class="boxClose">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="#"><@spring.message "module.exhibitor"/></a></h4>
+                            <h6><a href="#"><@spring.message "module.exhibitor.expiredate.descNo"/></a></h6>
+                        </div>
+                    </div>
+                <#else>
+                    <div class="boxOff">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="${base}/user/info"><@spring.message "module.exhibitor"/></a></h4>
+                            <h6><a href="${base}/user/info"><@spring.message "module.exhibitor.desc"/></a></h6>
+                        </div>
+                    </div>
+                </#if>
+                <#if .now?date gt contact_data_end_html_zh?date>
+                    <div class="boxClose">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="#"><@spring.message "module.joiner"/></a></h4>
+                            <h6><a href="#"><@spring.message "module.exhibitor.expiredate.descNo"/></a></h6>
+                        </div>
+                    </div>
+                <#else>
+                    <div class="boxOff">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner"/></a></h4>
+                            <h6><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner.desc"/></a></h6>
+                        </div>
+                    </div>
+                </#if>
+                <#if .now?date gt invoice_data_end_html_zh?date>
+                    <div class="boxClose">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="#"><@spring.message "module.invoice"/></a></h4>
+                            <h6><a href="#"><@spring.message "module.exhibitor.expiredate.descNo"/></a></h6>
+                        </div>
+                    </div>
+                <#else>
+                    <div class="boxOff">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice"/></a></h4>
+                            <h6><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice.desc"/></a></h6>
+                        </div>
+                    </div>
+                </#if>
+                <div style="clear: both"></div>
+            </div>
+
+            <div>
+                <div class="boxOff">
                     <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/notice/1"><@spring.message "notification"/></a></h4>
-                        <h6><a href="${base}/user/notice/1"><@spring.message "notification_des"/></a></h6>
+                        <h4><a href="${base}/user/email/update.html"><@spring.message "email.info"/></a></h4>
+                        <h6><a href="${base}/user/email/update.html"><@spring.message "email.info.desc"/></a></h6>
                     </div>
                 </div>
-                <div class="zline"></div>
-                <div class="module">
+                <div class="boxOff">
                     <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/info"><@spring.message "module.exhibitor"/></a></h4>
-                        <h6><a href="${base}/user/info"><@spring.message "module.exhibitor.desc"/></a></h6>
+                        <h4><a href="${base}/user/addMeipai"><@spring.message "module.meipai"/></a></h4>
+                        <h6><a href="${base}/user/addMeipai"><@spring.message "module.meipai.desc"/></a></h6>
                     </div>
                 </div>
-                <div class="zline"></div>
-                <div class="module">
+                <div class="boxOff">
                     <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
                         <h4><a href="${base}/user/products.html"><@spring.message "module.product"/></a></h4>
                         <h6><a href="${base}/user/products.html"><@spring.message "module.product.desc"/></a></h6>
@@ -92,57 +139,33 @@
                 </div>
                 <div style="clear: both"></div>
             </div>
-            <div class="line"></div>
-            <div>
-                <div class="module">
-                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice"/></a></h4>
-                        <h6><a href="${base}/user/invoice/index.html"><@spring.message "module.invoice.desc"/></a></h6>
-                    </div>
-                </div>
-                <div class="zline"></div>
-                <div class="module">
-                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/addMeipai"><@spring.message "module.meipai"/></a></h4>
-                        <h6><a href="${base}/user/addMeipai"><@spring.message "module.meipai.desc"/></a></h6>
-                    </div>
-                </div>
-                <div class="zline"></div>
-                <div class="module">
-                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner"/></a></h4>
-                        <h6><a href="${base}/user/queryJoiners.html"><@spring.message "module.joiner.desc"/></a></h6>
-                    </div>
-                </div>
 
-
-                <div style="clear: both"></div>
+            <!--<#if zone==2>
+                <div>
+                    <div class="module">
+                        <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                            <h4><a href="${base}/user/visa/index.html"><@spring.message "module.visa"/></a></h4>
+                            <h6><a href="${base}/user/visa/index.html"><@spring.message "module.visa.desc"/></a></h6>
+                        </div>
+                    </div>
+                </div>
+            </#if>-->
+            <!--<div class="module">
+                <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                    <h4><a href="${base}/user/password"><@spring.message "module.account"/></a></h4>
+                    <h6><a href="${base}/user/password"><@spring.message "module.account.desc"/></a></h6>
+                </div>
             </div>
-            <div class="line"></div>
-            <div>
-                <div class="module">
-                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/visa/index.html"><@spring.message "module.visa"/></a></h4>
-                        <h6><a href="${base}/user/visa/index.html"><@spring.message "module.visa.desc"/></a></h6>
-                    </div>
+            <div class="zline"></div>
+            <div class="module">
+                <span class="badge badge-important" style="position:absolute;right: 0px">${unReadMessageCount}</span>
+                <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
+                    <h4><a href="${base}/user/notice/1"><@spring.message "notification"/></a></h4>
+                    <h6><a href="${base}/user/notice/1"><@spring.message "notification_des"/></a></h6>
                 </div>
-                <div class="zline"></div>
-                <div class="module">
-                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/visa/index.html"><@spring.message "module.advise"/></a></h4>
-                        <h6><a href="${base}/user/visa/index.html"><@spring.message "module.advise.desc"/></a></h6>
-                    </div>
-                </div>
-                <div class="zline"></div>
-                <div class="module">
-                    <div style="width: 200px;margin: 0px auto;margin-top: 40px;">
-                        <h4><a href="${base}/user/password"><@spring.message "module.account"/></a></h4>
-                        <h6><a href="${base}/user/password"><@spring.message "module.account.desc"/></a></h6>
-                    </div>
-                </div>
-                <div style="clear: both"></div>
+            </div>-->
+            <div style="clear: both"></div>
             </div>
-        </div>
         <div style="clear: both"></div>
     </div>
 </div>
@@ -153,13 +176,12 @@
     $(document).ready(function () {
         $("#leftInfo").parent().parent().parent().parent().prev().addClass("left_current");
         $("#leftInfo").parent().parent().parent().parent().show();
-        $(".module").mouseover(function () {
-            if ($(this).hasClass("module")) {
-                $(".moduleOn").each(function () {
-                    $(this).removeClass("moduleOn").addClass("module");
-                })
-                $(this).removeClass("module").addClass("moduleOn");
-            }
+        $(".boxOn,.boxOff").mouseover(function () {
+            $(".boxOn").removeClass("boxOn").addClass("boxOff");
+            $(this).addClass("boxOn").removeClass("boxOff");
+        });
+        $(".boxOn,.boxOff").click(function(){
+            window.location.href = $(this).find("a").attr("href");
         });
     })
 </script>

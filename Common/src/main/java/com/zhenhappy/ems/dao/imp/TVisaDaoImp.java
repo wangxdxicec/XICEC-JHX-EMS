@@ -17,7 +17,11 @@ public class TVisaDaoImp extends BaseDaoHibernateImp<TVisa> implements TVisaDao 
 
 	@Override
 	public List<TVisa> loadTVisasByVids(Integer[] vids) {
-		Query q = this.getSession().createQuery("select new TVisa(v.id, v.eid, v.passportName, v.gender, v.nationality, v.jobTitle, v.companyName, v.boothNo, v.detailedAddress, v.tel, v.fax, v.email, v.companyWebsite, v.passportNo, v.expDate, v.birth, v.applyFor, v.from, v.to, v.passportPage, v.businessLicense, v.joinerId, v.status, v.createTime, v.updateTime) from TVisa v where v.id in (:vids)");
+		Query q = this.getSession().createQuery("select new TVisa(v.id, v.eid, v.passportName, v.gender," +
+				" v.nationality, v.jobTitle, v.companyName, v.boothNo, v.detailedAddress, v.tel, " +
+				"v.fax, v.email, v.companyWebsite, v.passportNo, v.expDate, v.birth, v.applyFor, v.from," +
+				" v.to, v.passportPage, v.businessLicense, v.joinerId, v.status, v.createTime, v.updateTime) " +
+				"from TVisa v where v.id in (:vids) and v.passportNo != ''");
 		q.setParameterList("vids", vids);
 		return q.list();
 	}

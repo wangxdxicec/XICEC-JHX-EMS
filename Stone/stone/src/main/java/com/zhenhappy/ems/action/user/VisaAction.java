@@ -73,7 +73,7 @@ public class VisaAction extends BaseAction {
     public QueryVisaResponse queryVisa(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
         QueryVisaResponse response = null;
         try {
-            List<TVisa> visas = visaService.queryVisasByEid(principle.getExhibitor().getEid());
+            List<TVisa> visas = visaService.queryVisaListByEid(principle.getExhibitor().getEid());
             for(TVisa visa:visas){
                 eachProperties(visa);
             }
@@ -151,6 +151,83 @@ public class VisaAction extends BaseAction {
                 }
                 if(StringUtils.isNotEmpty(visa.getApplyFor())) {
                     temp.setApplyFor(visa.getApplyFor());
+                }
+                if(StringUtils.isNotEmpty(visa.getHotelAddress())) {
+                    temp.setDetailedAddress(visa.getHotelAddress());
+                }
+                if (passportPage != null) {
+                    String fileName = systemConfig.getVal(Constants.appendix_directory)+"/" + new Date().getTime() + "." + FilenameUtils.getExtension(passportPage.getOriginalFilename());
+                    if (passportPage != null && passportPage.getSize() != 0) {
+                        FileUtils.copyInputStreamToFile(passportPage.getInputStream(), new File(fileName));
+                        temp.setPassportPage(fileName);
+                    }
+                }
+                temp.setUpdateTime(new Date());
+                if(principle.getExhibitor() != null){
+                    temp.setEid(principle.getExhibitor().getEid());
+                    TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(principle.getExhibitor().getEid());
+                    if(principle.getExhibitor().getCountry() != 44){
+                        temp.setCompanyName(exhibitorInfo.getCompanyEn());
+                    }else{
+                        temp.setCompanyName(exhibitorInfo.getCompany());
+                    }
+                    temp.setCompanyWebsite(exhibitorInfo.getWebsite());
+                    temp.setAddress(exhibitorInfo.getAddress());
+                    temp.setEmail(exhibitorInfo.getEmail());
+                    temp.setTel(exhibitorInfo.getPhone());
+                }
+                temp.setStatus(1);
+                visaService.saveOrUpdate(temp);
+                //visaService.deleteByEidAndJoinerId(principle.getExhibitor().getEid(), visa.getJoinerId());
+                modelAndView.addObject("method", "addSuccess");
+            }
+        } catch (Exception e) {
+            log.error("add visa error",e);
+            modelAndView.addObject("method", "addFailure");
+        }
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/visa/saveVisa1", method = RequestMethod.POST)
+    public ModelAndView saveVisa1(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle,
+                                 @ModelAttribute SaveVisaInfoRequest visa,
+                                 @RequestParam(value = "license", required = false) MultipartFile license,
+                                 @RequestParam(value = "passportPageFile1", required = false) MultipartFile passportPage) {
+        ModelAndView modelAndView = new ModelAndView("/user/callback");
+        try {
+            if(visa.getJoinerId() != null){
+                TVisa temp = visaService.queryVisasByJoinerId(visa.getJoinerId());
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                if(StringUtils.isNotEmpty(visa.getBirthDay())){
+                    temp.setBirth(sdf.parse(visa.getBirthDay()));
+                }
+                if(StringUtils.isNotEmpty(visa.getExpireDate())){
+                    temp.setExpDate(sdf.parse(visa.getExpireDate()));
+                }
+                if(StringUtils.isNotEmpty(visa.getFromDate())) {
+                    temp.setFrom(sdf.parse(visa.getFromDate()));
+                }
+                if(StringUtils.isNotEmpty(visa.getToDate())) {
+                    temp.setTo(sdf.parse(visa.getToDate()));
+                }
+                if(StringUtils.isNotEmpty(visa.getPassportName())) {
+                    temp.setPassportName(visa.getPassportName());
+                }
+                if(visa.getGender() != null) {
+                    temp.setGender(visa.getGender());
+                }
+                if(StringUtils.isNotEmpty(visa.getNationality())) {
+                    temp.setNationality(visa.getNationality());
+                }
+                if(StringUtils.isNotEmpty(visa.getPassportNo())) {
+                    temp.setPassportNo(visa.getPassportNo());
+                }
+                if(StringUtils.isNotEmpty(visa.getApplyFor())) {
+                    temp.setApplyFor(visa.getApplyFor());
+                }
+                if(StringUtils.isNotEmpty(visa.getHotelAddress())) {
+                    temp.setDetailedAddress(visa.getHotelAddress());
                 }
                 if (passportPage != null) {
                     String fileName = systemConfig.getVal(Constants.appendix_directory)+"/" + new Date().getTime() + "." + FilenameUtils.getExtension(passportPage.getOriginalFilename());

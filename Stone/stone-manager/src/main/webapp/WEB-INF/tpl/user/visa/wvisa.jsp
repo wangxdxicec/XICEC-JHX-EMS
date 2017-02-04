@@ -100,15 +100,12 @@
 	});
 	//导出所选VISA信息到Excel
 	$('#exportSelectedVisas').click(function(){
-//     	alert(checkedItems);
 		vidParm1.innerHTML = "";
-//     	alert(vidParm1.innerHTML);
 		if(checkedItems.length > 0){
 			for (var i = 0; i < checkedItems.length; i++) {
 				var node = "<input type='hidden' name='vids' value='"+checkedItems[i]+"'/>";
 				vidParm1.innerHTML += node;
 			}
-//         	alert(vidParm1.innerHTML);
 			document.getElementById("exportWVisasToExcel").submit();
 			$.messager.alert('提示', '导出所选客商成功');
 		}else{
@@ -215,14 +212,12 @@
 						checkedItems.push(row[i].id);
 					}
 				}
-//					alert(checkedItems);
 	        },
 	        onUnselect:function (rowIndex, rowData){
 				var k = findCheckedItem(rowData.id);
 				if (k != -1) {
 					checkedItems.splice(k, 1);
 				}
-//					alert(checkedItems);
 	        },
 	        onSelectAll:function (rows){
 	        	for (var i = 0; i < rows.length; i++) {
@@ -231,7 +226,6 @@
 						checkedItems.push(rows[i].id);
 					}
 				}
-//					alert(checkedItems);
 	        },
 	        onUnselectAll:function (rows){
 	        	for (var i = 0; i < rows.length; i++) {
@@ -240,7 +234,6 @@
 						checkedItems.splice(k, 1);
 					}
 				}
-// 					alert(checkedItems);
 	        },
 			rowStyler:function(index,row){
 				if (row.isDisabled == 1){

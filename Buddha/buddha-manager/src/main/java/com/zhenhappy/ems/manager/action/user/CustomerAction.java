@@ -1,19 +1,27 @@
 package com.zhenhappy.ems.manager.action.user;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 import com.zhenhappy.ems.dao.VisitorInfoDao;
 import com.zhenhappy.ems.entity.TVisitorInfo;
+import com.zhenhappy.ems.entity.managerrole.TUserInfo;
+import com.zhenhappy.ems.manager.dao.THistoryVisitorInfoDao;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.entity.THistoryVisitorInfo;
 import com.zhenhappy.ems.manager.entity.TVisitorType;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.manager.service.TVisitorTypeService;
+import com.zhenhappy.ems.manager.sys.Constants;
 import com.zhenhappy.ems.manager.tag.StringUtil;
-import com.zhenhappy.util.Page;
+import com.zhenhappy.ems.manager.util.JXLExcelView;
+import com.zhenhappy.ems.service.managerrole.TUserInfoService;
+import com.zhenhappy.system.SystemConfig;
+import com.zhenhappy.util.EmailPattern;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.zhenhappy.ems.dto.BaseResponse;
@@ -44,7 +53,13 @@ public class CustomerAction extends BaseAction {
     @Autowired
     private VisitorInfoDao visitorInfoDao;
     @Autowired
+    private SystemConfig systemConfig;
+    @Autowired
+    private THistoryVisitorInfoDao tHistoryVisitorInfoDao;
+    @Autowired
     private TVisitorTypeService tVisitorTypeService;
+    @Autowired
+    private TUserInfoService userInfoService;
 
     /**
      * 分页查询客商
@@ -103,6 +118,44 @@ public class CustomerAction extends BaseAction {
         try {
         } catch (Exception e) {
             log.error("modify article error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 修改客商账号
+     * @param request
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerInfo", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerAccount(@ModelAttribute ModifyCustomerInfo request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            EmailPattern pattern = new EmailPattern();
+            if(pattern.isEmailPattern(request.getEmail())) {
+                List<TVisitorInfo> wCustomers = customerInfoManagerService.loadCustomerByEmail(request.getEmail());
+                if(wCustomers == null){
+                    customerInfoManagerService.modifyCustomerAccount(request, principle.getAdmin().getId());
+                } else {
+                    response.setDescription("邮箱不能重复");
+                    response.setResultCode(3);
+                }
+            } else {
+                response.setResultCode(2);
+                response.setDescription("请输入有效的邮箱格式");
+            }
+            if(!pattern.isMobileNO(request.getMobilePhone())) {
+                response.setResultCode(2);
+                response.setDescription("请输入有效的手机号码");
+            }
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
             response.setResultCode(1);
         }
         return response;
@@ -181,16 +234,16 @@ public class CustomerAction extends BaseAction {
         BaseResponse response = new BaseResponse();
         try {
             List<TVisitorType> tVisitorTypeList = tVisitorTypeService.loadVisitorType();
-            List<TVisitorInfo> customers = visitorInfoDao.queryByHql("from TVisitorInfo e where country = 44 and (rabbi = 0  or rabbi is null) ", new Object[]{});
+            List<THistoryVisitorInfo> customers = tHistoryVisitorInfoDao.queryByHql("from THistoryVisitorInfo ", new Object[]{});
 
-            for(TVisitorInfo visitorInfo:customers){
+            for(THistoryVisitorInfo visitorInfo:customers){
                 if(StringUtil.isNotEmpty(visitorInfo.getCompany())){
                     for(TVisitorType tVisitorType:tVisitorTypeList){
                         if(StringUtil.isNotEmpty(tVisitorType.getTypevalue()) && tVisitorType.getTypevalue() != null){
                             String[] visitorTypeArray = tVisitorType.getTypevalue().trim().split(",");
                             for(int i=0;i<visitorTypeArray.length;i++){
                                 if(visitorInfo.getCompany().indexOf(visitorTypeArray[i])>=0){
-                                    visitorInfo.setCustomer_type(tVisitorType.getId());
+                                    visitorInfo.setType(tVisitorType.getId());
                                 }
                             }
                         }
@@ -199,24 +252,24 @@ public class CustomerAction extends BaseAction {
                     //如果对应的公司名为空，则属于“未分类”，未分类对应的类别值是空
                     for(TVisitorType tVisitorType:tVisitorTypeList){
                         if(StringUtil.isEmpty(tVisitorType.getTypevalue())){
-                            visitorInfo.setCustomer_type(tVisitorType.getId());
+                            visitorInfo.setType(tVisitorType.getId());
                             break;
                         }
                     }
                 }
-                if(visitorInfo.getCustomer_type() == null){
+                if(visitorInfo.getType() == null){
                     for(TVisitorType tVisitorType:tVisitorTypeList){
                         if(StringUtil.isEmpty(tVisitorType.getTypevalue())){
-                            visitorInfo.setCustomer_type(tVisitorType.getId());
+                            visitorInfo.setType(tVisitorType.getId());
                             break;
                         }
                     }
                 }
-                visitorInfoDao.update(visitorInfo);
+                tHistoryVisitorInfoDao.update(visitorInfo);
             }
             response.setResultCode(0);
         } catch (Exception e) {
-            log.error("modify buddha exhibitor time error.", e);
+            log.error("class visitor by one key error.", e);
             response.setResultCode(1);
         }
         return response;
@@ -335,5 +388,67 @@ public class CustomerAction extends BaseAction {
             response.setResultCode(1);
         }
         return response;
+    }
+
+    /**
+     * 分页查询归档资料
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryHistoryVisitorInfosByPage")
+    public QueryHistoryVisitorResponse queryHistoryExhibitorInfosByPage(@ModelAttribute QueryHistoryInfoRequest request) {
+        QueryHistoryVisitorResponse response = new QueryHistoryVisitorResponse();
+        try {
+            response = customerInfoManagerService.queryHistoryExhibitorInfosByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 导入客商信息
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value="importHistoryVisitoryInfos", method={RequestMethod.POST,RequestMethod.GET})
+    public List<String> importHistoryVisitoryInfos(@RequestParam MultipartFile file,
+                                                   @RequestParam Integer inlandOrOutland,
+                                                   @ModelAttribute ImportHistoryVisitoryRequest request) throws IOException{
+        BaseResponse response = new BaseResponse();
+        File importFile = callCenterUpload(file, "\\import", FilenameUtils.getBaseName(file.getOriginalFilename()) + new Date().getTime() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+        List<String> report = customerInfoManagerService.importHistoryVisitoryInfos(importFile, request, inlandOrOutland);
+        return report;
+    }
+
+    @RequestMapping("callcenter/upload")
+    public File callCenterUpload(@RequestParam MultipartFile file, String destDir, String fileName){
+        String appendix_directory = systemConfig.getVal(Constants.appendix_directory).replaceAll("\\\\\\\\", "\\\\");
+        if(StringUtils.isEmpty(fileName)) fileName = new Date().getTime() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
+        if(StringUtils.isNotEmpty(destDir)) destDir = appendix_directory + destDir;
+        else destDir = appendix_directory;
+        File targetFile = new File(destDir, fileName);
+        if(!targetFile.exists()) {
+            targetFile.mkdirs();
+        }
+        try {
+            file.transferTo(targetFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return targetFile;
+    }
+
+    @RequestMapping(value = "historyVisitorDetailInfo")
+    public ModelAndView directToHistoryExhibitorDetailInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/managerreset/historyVisitorDetailInfo");
+        modelAndView.addObject("id", id);
+        modelAndView.addObject("historyVisitorDetailInfo", customerInfoManagerService.loadHistoryVisitorInfoById(id));
+        return modelAndView;
     }
 }

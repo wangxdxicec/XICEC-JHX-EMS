@@ -5,6 +5,7 @@ import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
+import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.ems.service.ExhibitorService;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +86,14 @@ public class ImportExportService extends ExhibitorService {
 					queryExhibitorInfo.setMainProductEn(exhibitorInfo.getMainProductEn());
 					queryExhibitorInfo.setMark(exhibitorInfo.getMark());
 					queryExhibitorInfo.setCompany_lighnts(exhibitorInfo.getCompany_hignlight());
+					queryExhibitorInfo.setExhibitor_area(exhibitor.getExhibitionArea());
+					TExhibitorBooth booth = exhibitorManagerService.queryBoothByEid(exhibitor.getEid());
+					if(booth != null){
+						queryExhibitorInfo.setArea(booth.getExhibitionArea());
+					}else{
+						queryExhibitorInfo.setArea("");
+					}
+
 					TInvoiceApply invoice = invoiceService.getByEid(exhibitorInfo.getEid());
 					if(invoice != null){
 						if(StringUtils.isNotEmpty(invoice.getInvoiceNo())) {
@@ -124,7 +134,7 @@ public class ImportExportService extends ExhibitorService {
 			for(WCustomer customer:customers){
 				ExportCustomerInfo exportCustomerInfo = new ExportCustomerInfo();
 				exportCustomerInfo.setName((customer.getFirstName() == null ? "":customer.getFirstName()) + " " + (customer.getLastName() == null ? "":customer.getLastName()));
-				exportCustomerInfo.setPhone((customer.getMobilePhoneCode() == null ? "":customer.getMobilePhoneCode()) + (customer.getMobilePhone() == null ? "":customer.getMobilePhone()));
+				exportCustomerInfo.setPhone(/*(customer.getMobilePhoneCode() == null ? "":customer.getMobilePhoneCode()) + */(customer.getMobilePhone() == null ? "":customer.getMobilePhone()));
 				if(StringUtils.isNotEmpty(customer.getTelephone())){
 					if(StringUtils.isNotEmpty(customer.getTelephoneCode2())){
 						exportCustomerInfo.setTel((customer.getTelephoneCode() == null ? "":customer.getTelephoneCode()) + (customer.getTelephone() == null ? "":customer.getTelephone()) + "," + (customer.getTelephoneCode2() == null ? "":customer.getTelephoneCode2()));
@@ -159,9 +169,11 @@ public class ImportExportService extends ExhibitorService {
 					}
 				}else {
 					if("Male".equalsIgnoreCase(customer.getSex())){
-						exportCustomerInfo.setName("ATTN: Mr. " + customer.getFirstName() + ", " + customer.getPosition());
+						exportCustomerInfo.setName(customer.getFirstName());
+						//exportCustomerInfo.setName("ATTN: Mr. " + customer.getFirstName() + ", " + customer.getPosition());
 					}else{
-						exportCustomerInfo.setName("ATTN: Ms. " + customer.getFirstName() + ", " + customer.getPosition());
+						exportCustomerInfo.setName(customer.getFirstName());
+						//exportCustomerInfo.setName("ATTN: Ms. " + customer.getFirstName() + ", " + customer.getPosition());
 					}
 				}
 				exportCustomerInfos.add(exportCustomerInfo);
@@ -251,7 +263,7 @@ public class ImportExportService extends ExhibitorService {
 	}
 
 	/**
-	 * 导出国外展商VISA数据
+	 * 导出展商VISA数据
 	 * @param tVisas
 	 * @return
 	 */
@@ -272,23 +284,35 @@ public class ImportExportService extends ExhibitorService {
 					queryExportTVisa.setPassportName(tVisa.getPassportName());
 					queryExportTVisa.setPassportNo(tVisa.getPassportNo());
 					queryExportTVisa.setNationality(tVisa.getNationality());
-					if(tVisa.getBirth() != null) queryExportTVisa.setBirth(sdf.format(tVisa.getBirth()));
-					else queryExportTVisa.setBirth("");
-					if (tVisa.getGender() == 1) queryExportTVisa.setGender("Mr.");
-					else if (tVisa.getGender() == 2) queryExportTVisa.setGender("Miss");
-					queryExportTVisa.setAddress(tVisa.getAddress());
+					queryExportTVisa.setHotelAddress(tVisa.getDetailedAddress());
+					if(tVisa.getBirth() != null)
+						queryExportTVisa.setBirth(sdf.format(tVisa.getBirth()));
+					else
+						queryExportTVisa.setBirth("");
+					if (tVisa.getGender() != null && tVisa.getGender() == 1)
+						queryExportTVisa.setGender("Mr.");
+					else if (tVisa.getGender() != null && tVisa.getGender() == 2)
+						queryExportTVisa.setGender("Miss");
+					//queryExportTVisa.setAddress(tVisa.getAddress());
 					queryExportTVisa.setApplyFor(tVisa.getApplyFor());
-					if(tVisa.getFrom() != null) queryExportTVisa.setFrom(sdf.format(tVisa.getFrom()));
-					else queryExportTVisa.setFrom("");
-					if(tVisa.getTo() != null) queryExportTVisa.setTo(sdf.format(tVisa.getTo()));
-					else queryExportTVisa.setTo("");
+					if(tVisa.getFrom() != null)
+						queryExportTVisa.setFrom(sdf.format(tVisa.getFrom()));
+					else
+						queryExportTVisa.setFrom("");
+					if(tVisa.getTo() != null)
+						queryExportTVisa.setTo(sdf.format(tVisa.getTo()));
+					else
+						queryExportTVisa.setTo("");
 					queryExportTVisa.setNeedPost("");
 					queryExportTVisa.setExpressTp("");
 					queryExportTVisa.setExpressNo("");
-					if(tVisa.getExpDate() != null) queryExportTVisa.setExpDate(sdf.format(tVisa.getExpDate()));
+					if(tVisa.getExpDate() != null)
+						queryExportTVisa.setExpDate(sdf.format(tVisa.getExpDate()));
 					else queryExportTVisa.setExpDate("");
-					if(tVisa.getCreateTime() != null) queryExportTVisa.setCreateTime(sdf.format(tVisa.getCreateTime()));
-					else queryExportTVisa.setCreateTime("");
+					if(tVisa.getCreateTime() != null)
+						queryExportTVisa.setCreateTime(sdf.format(tVisa.getCreateTime()));
+					else
+						queryExportTVisa.setCreateTime("");
 					if(tVisa.getJoinerId() != null){
 						TExhibitorJoiner joiner = joinerManagerService.loadExhibitorJoinerById(tVisa.getJoinerId());
 						if(joiner != null){
@@ -317,6 +341,12 @@ public class ImportExportService extends ExhibitorService {
 						tVisa.setCompanyWebsite(exhibitorInfo.getWebsite());
 						queryExportTVisa.setFax(exhibitorInfo.getFax());
 						tVisa.setFax(exhibitorInfo.getFax());
+
+						if(StringUtils.isNotEmpty(exhibitorInfo.getAddressEn())){
+							queryExportTVisa.setAddress(exhibitorInfo.getAddressEn().trim());
+						}else{
+							queryExportTVisa.setAddress("");
+						}
 					}else{
 						queryExportTVisa.setCompanyName("");
 						queryExportTVisa.setCompanyWebsite("");
@@ -329,28 +359,46 @@ public class ImportExportService extends ExhibitorService {
 					}else{
 						queryExportTVisa.setBoothNo("");
 					}
+					if(StringUtils.isNotEmpty(queryExportTVisa.getEmail())){
+						if(StringUtils.isNotEmpty(queryExportTVisa.getEmailCompany())){
+							queryExportTVisa.setEmailInfo(queryExportTVisa.getEmail() + "," + queryExportTVisa.getEmailCompany());
+						}else{
+							queryExportTVisa.setEmailInfo(queryExportTVisa.getEmailCompany());
+						}
+					}else{
+						queryExportTVisa.setEmailInfo(queryExportTVisa.getEmailCompany());
+					}
 					queryExportTVisas.add(queryExportTVisa);
-					tVisaManagerService.saveOrUpdate(tVisa);
 				}else{
-					System.out.println("此Id没有对应展商:" + tVisa.getEid());
+					//System.out.println("此Id没有对应展商:" + tVisa.getEid());
 					ExportTVisa queryExportTVisa = new ExportTVisa();
 					queryExportTVisa.setExhibitor("找不到对应展商");
 					queryExportTVisa.setPassportName(tVisa.getPassportName());
 					queryExportTVisa.setPassportNo(tVisa.getPassportNo());
 					queryExportTVisa.setNationality(tVisa.getNationality());
-					if(tVisa.getBirth() != null) queryExportTVisa.setBirth(sdf.format(tVisa.getBirth()));
-					else queryExportTVisa.setBirth("");
-					if (tVisa.getGender() == 1) queryExportTVisa.setGender("Mr.");
-					else if (tVisa.getGender() == 2) queryExportTVisa.setGender("Miss");
+					queryExportTVisa.setHotelAddress(tVisa.getDetailedAddress());
+					if(tVisa.getBirth() != null)
+						queryExportTVisa.setBirth(sdf.format(tVisa.getBirth()));
+					else
+						queryExportTVisa.setBirth("");
+					if (tVisa.getGender() == 1)
+						queryExportTVisa.setGender("Mr.");
+					else if (tVisa.getGender() == 2)
+						queryExportTVisa.setGender("Miss");
 					queryExportTVisa.setJobTitle("");
 					queryExportTVisa.setCompanyName("");
 					queryExportTVisa.setBoothNo("");
-					queryExportTVisa.setAddress(tVisa.getAddress());
+					//queryExportTVisa.setAddress(tVisa.getAddress());
+					queryExportTVisa.setAddress("");
 					queryExportTVisa.setApplyFor(tVisa.getApplyFor());
-					if(tVisa.getFrom() != null) queryExportTVisa.setFrom(sdf.format(tVisa.getFrom()));
-					else queryExportTVisa.setFrom("");
-					if(tVisa.getTo() != null) queryExportTVisa.setTo(sdf.format(tVisa.getTo()));
-					else queryExportTVisa.setTo("");
+					if(tVisa.getFrom() != null)
+						queryExportTVisa.setFrom(sdf.format(tVisa.getFrom()));
+					else
+						queryExportTVisa.setFrom("");
+					if(tVisa.getTo() != null)
+						queryExportTVisa.setTo(sdf.format(tVisa.getTo()));
+					else
+						queryExportTVisa.setTo("");
 					queryExportTVisa.setEmail("");
 					queryExportTVisa.setEmailCompany("");
 					queryExportTVisa.setCompanyWebsite("");
@@ -359,10 +407,15 @@ public class ImportExportService extends ExhibitorService {
 					queryExportTVisa.setNeedPost("");
 					queryExportTVisa.setExpressTp("");
 					queryExportTVisa.setExpressNo("");
-					if(tVisa.getExpDate() != null) queryExportTVisa.setExpDate(sdf.format(tVisa.getExpDate()));
-					else queryExportTVisa.setExpDate("");
-					if(tVisa.getCreateTime() != null) queryExportTVisa.setCreateTime(sdf.format(tVisa.getCreateTime()));
-					else queryExportTVisa.setCreateTime("");
+					if(tVisa.getExpDate() != null)
+						queryExportTVisa.setExpDate(sdf.format(tVisa.getExpDate()));
+					else
+						queryExportTVisa.setExpDate("");
+					if(tVisa.getCreateTime() != null)
+						queryExportTVisa.setCreateTime(sdf.format(tVisa.getCreateTime()));
+					else
+						queryExportTVisa.setCreateTime("");
+					queryExportTVisa.setEmailInfo("");
 					queryExportTVisas.add(queryExportTVisa);
 				}
 			}
@@ -371,7 +424,7 @@ public class ImportExportService extends ExhibitorService {
 	}
 
 	/**
-	 * 导出国外客商VISA数据
+	 * 导出客商VISA数据
 	 * @param wVisas
 	 * @return
 	 */
@@ -386,53 +439,116 @@ public class ImportExportService extends ExhibitorService {
 					queryExportWVisa.setCustomer("客商");
 					queryExportWVisa.setPassportName(wVisa.getFullPassportName());
 					queryExportWVisa.setPassportNo(wVisa.getPassportNo());
-					queryExportWVisa.setDateOfBirth(sdf.format(wVisa.getDateOfBirth()));
+					if(wVisa.getDateOfBirth() != null){
+						queryExportWVisa.setDateOfBirth(sdf.format(wVisa.getDateOfBirth()));
+					}
 					queryExportWVisa.setNationality(wVisa.getNationality());
-					if ("male".equalsIgnoreCase(wVisa.getGender())) queryExportWVisa.setGender("Mr.");
-					else if ("female".equalsIgnoreCase(wVisa.getGender())) queryExportWVisa.setGender("Miss");
+					queryExportWVisa.setHotelAddress(wVisa.getHotel());
+					if ("male".equalsIgnoreCase(wVisa.getGender()))
+						queryExportWVisa.setGender("Mr.");
+					else if ("female".equalsIgnoreCase(wVisa.getGender()))
+						queryExportWVisa.setGender("Miss");
 					queryExportWVisa.setPosition(customerInfo.getPosition());
 					queryExportWVisa.setCompany(customerInfo.getCompany());
 					queryExportWVisa.setAddress(customerInfo.getAddress());
 					queryExportWVisa.setChineseEmbassy(wVisa.getChineseEmbassy());
-					queryExportWVisa.setDurationBeginTime(sdf.format(wVisa.getDurationBeginTime()));
-					queryExportWVisa.setDurationEndTime(sdf.format(wVisa.getDurationEndTime()));
+					if(wVisa.getDurationBeginTime() != null) {
+						queryExportWVisa.setDurationBeginTime(sdf.format(wVisa.getDurationBeginTime()));
+					}
+					if(wVisa.getDurationEndTime() != null) {
+						queryExportWVisa.setDurationEndTime(sdf.format(wVisa.getDurationEndTime()));
+					}
 					queryExportWVisa.setEmail(customerInfo.getEmail());
 					queryExportWVisa.setWebsite(customerInfo.getWebsite());
-					queryExportWVisa.setTelephone(customerInfo.getTelephone());
+					StringBuffer telbuffer = new StringBuffer();
+					if(customerInfo.getTelephoneCode() != null && StringUtils.isNotEmpty(customerInfo.getTelephoneCode())
+							&& !"".equals(customerInfo.getTelephoneCode().trim())) {
+						telbuffer.append(customerInfo.getTelephoneCode());
+						if(customerInfo.getTelephoneCode2() != null && StringUtils.isNotEmpty(customerInfo.getTelephoneCode2())
+								&& !"".equals(customerInfo.getTelephoneCode2().trim())){
+							telbuffer.append("-" + customerInfo.getTelephoneCode2());
+							if(customerInfo.getTelephone() != null && StringUtils.isNotEmpty(customerInfo.getTelephone())
+									&& !"".equals(customerInfo.getTelephone().trim())){
+								telbuffer.append("-" + customerInfo.getTelephone());
+							}
+						}else{
+							if(customerInfo.getTelephone() != null && StringUtils.isNotEmpty(customerInfo.getTelephone())
+									&& !"".equals(customerInfo.getTelephone().trim())){
+								telbuffer.append(customerInfo.getTelephone());
+							}
+						}
+					} else{
+						if(customerInfo.getTelephoneCode2() != null && StringUtils.isNotEmpty(customerInfo.getTelephoneCode2())
+								&& !"".equals(customerInfo.getTelephoneCode2().trim())){
+							telbuffer.append(customerInfo.getTelephoneCode2());
+							if(customerInfo.getTelephone() != null && StringUtils.isNotEmpty(customerInfo.getTelephone())
+									&& !"".equals(customerInfo.getTelephone().trim())){
+								telbuffer.append("-" + customerInfo.getTelephone());
+							}
+						}else{
+							if(customerInfo.getTelephone() != null && StringUtils.isNotEmpty(customerInfo.getTelephone())
+									&& !"".equals(customerInfo.getTelephone().trim())){
+								telbuffer.append(customerInfo.getTelephone());
+							}
+						}
+					}
+					//queryExportWVisa.setTelephone(customerInfo.getTelephone());
+					queryExportWVisa.setTelephone(telbuffer.toString());
 					queryExportWVisa.setFax(customerInfo.getFax());
-					if(wVisa.getNeedPost()) queryExportWVisa.setNeedPost("Yes");
-					else if (!wVisa.getNeedPost()) queryExportWVisa.setNeedPost("No");
+					if(wVisa.getNeedPost())
+						queryExportWVisa.setNeedPost("Yes");
+					else if (!wVisa.getNeedPost())
+						queryExportWVisa.setNeedPost("No");
 					queryExportWVisa.setExpressTp(wVisa.getExpressTp());
 					queryExportWVisa.setExpressNo(wVisa.getExpressNo());
-					queryExportWVisa.setExpDate(sdf.format(wVisa.getExpDate()));
-					queryExportWVisa.setCreateTime(sdf.format(wVisa.getCreateTime()));
+					if(wVisa.getExpDate() != null) {
+						queryExportWVisa.setExpDate(sdf.format(wVisa.getExpDate()));
+					}
+					if(wVisa.getCreateTime() != null) {
+						queryExportWVisa.setCreateTime(sdf.format(wVisa.getCreateTime()));
+					}
 					queryExportWVisas.add(queryExportWVisa);
 				}else{
-					System.out.println("此Id没有对应客商:" + wVisa.getWCustomerInfo());
+					//System.out.println("此Id没有对应客商:" + wVisa.getWCustomerInfo());
 					ExportWVisa queryExportWVisa = new ExportWVisa();
 					queryExportWVisa.setCustomer("找不到对应客商");
 					queryExportWVisa.setPassportName(wVisa.getFullPassportName());
 					queryExportWVisa.setPassportNo(wVisa.getPassportNo());
-					queryExportWVisa.setDateOfBirth(sdf.format(wVisa.getDateOfBirth()));
+					if(wVisa.getDateOfBirth() != null){
+						queryExportWVisa.setDateOfBirth(sdf.format(wVisa.getDateOfBirth()));
+					}
 					queryExportWVisa.setNationality(wVisa.getNationality());
-					if ("male".equalsIgnoreCase(wVisa.getGender())) queryExportWVisa.setGender("Mr.");
-					else if ("female".equalsIgnoreCase(wVisa.getGender())) queryExportWVisa.setGender("Miss");
+					queryExportWVisa.setHotelAddress(wVisa.getHotel());
+					if ("male".equalsIgnoreCase(wVisa.getGender()))
+						queryExportWVisa.setGender("Mr.");
+					else if ("female".equalsIgnoreCase(wVisa.getGender()))
+						queryExportWVisa.setGender("Miss");
 					queryExportWVisa.setPosition("");
 					queryExportWVisa.setCompany("");
 					queryExportWVisa.setAddress("");
 					queryExportWVisa.setChineseEmbassy(wVisa.getChineseEmbassy());
-					queryExportWVisa.setDurationBeginTime(sdf.format(wVisa.getDurationBeginTime()));
-					queryExportWVisa.setDurationEndTime(sdf.format(wVisa.getDurationEndTime()));
+					if(wVisa.getDurationBeginTime() != null) {
+						queryExportWVisa.setDurationBeginTime(sdf.format(wVisa.getDurationBeginTime()));
+					}
+					if(wVisa.getDurationEndTime() != null) {
+						queryExportWVisa.setDurationEndTime(sdf.format(wVisa.getDurationEndTime()));
+					}
 					queryExportWVisa.setEmail("");
 					queryExportWVisa.setWebsite("");
 					queryExportWVisa.setTelephone("");
 					queryExportWVisa.setFax("");
-					if(wVisa.getNeedPost()) queryExportWVisa.setNeedPost("Yes");
-					else if (!wVisa.getNeedPost()) queryExportWVisa.setNeedPost("No");
+					if(wVisa.getNeedPost())
+						queryExportWVisa.setNeedPost("Yes");
+					else if
+							(!wVisa.getNeedPost()) queryExportWVisa.setNeedPost("No");
 					queryExportWVisa.setExpressTp(wVisa.getExpressTp());
 					queryExportWVisa.setExpressNo(wVisa.getExpressNo());
-					queryExportWVisa.setExpDate(sdf.format(wVisa.getExpDate()));
-					queryExportWVisa.setCreateTime(sdf.format(wVisa.getCreateTime()));
+					if(wVisa.getExpDate() != null) {
+						queryExportWVisa.setExpDate(sdf.format(wVisa.getExpDate()));
+					}
+					if(wVisa.getCreateTime() != null) {
+						queryExportWVisa.setCreateTime(sdf.format(wVisa.getCreateTime()));
+					}
 					queryExportWVisas.add(queryExportWVisa);
 				}
 			}
@@ -614,7 +730,6 @@ public class ImportExportService extends ExhibitorService {
 			report.add("共导入:" + count + "条数据");
 			book.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return report;
@@ -646,13 +761,59 @@ public class ImportExportService extends ExhibitorService {
 		}
 	}
 
+	public void copyExhibitorInvoiceApplyImage(Integer[] eids, String destDir) throws IOException {
+		List<TInvoiceApplyExtend> invoiceApplyExtendArrayList = new ArrayList<TInvoiceApplyExtend>();
+		//查询开具增值发票对应的展商
+		if(eids == null){
+			invoiceApplyExtendArrayList = exhibitorManagerService.loadAllInvoiceApplyByInvoiceFlag();
+		}else{
+			invoiceApplyExtendArrayList = exhibitorManagerService.loadSelectedInvoiceApplyByInvoiceFlag(eids);
+		}
+		if(invoiceApplyExtendArrayList != null && invoiceApplyExtendArrayList.size() > 0){
+			for(TInvoiceApplyExtend invoiceApplyExtend:invoiceApplyExtendArrayList){
+				TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(invoiceApplyExtend.getEid());
+				if(exhibitorInfo != null){
+					if(StringUtils.isNotEmpty(invoiceApplyExtend.getInvoice_image_address())){
+						String boothNumber = loadBoothNum(invoiceApplyExtend.getEid());
+						File srcFile = new File(invoiceApplyExtend.getInvoice_image_address().replaceAll("\\\\\\\\", "\\\\").replaceAll("/", "\\\\"));
+						if (srcFile.exists() == false) continue;
+						File destFile = null;
+
+						String dirPathValue = "";
+						if(StringUtils.isNotEmpty(exhibitorInfo.getCompany())){
+							dirPathValue = destDir + exhibitorInfo.getCompany();
+						}else{
+							dirPathValue = destDir + exhibitorInfo.getCompanyEn();
+						}
+						//判断目录是否存在，如果不存在，就先创建
+						File fileTemp = new File(dirPathValue);
+						if(!fileTemp.exists()  && !fileTemp.isDirectory()) {
+							fileTemp.mkdir();
+						}
+
+						if(StringUtils.isNotEmpty(exhibitorInfo.getCompany())){
+							destFile = new File(dirPathValue + "\\" + exhibitorInfo.getCompany().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(invoiceApplyExtend.getInvoice_image_address().replaceAll("/", "\\\\\\\\")));
+						}else{
+							destFile = new File(dirPathValue + "\\" + exhibitorInfo.getCompanyEn().replaceAll("/", "") + boothNumber.replaceAll("/", "") + "." + FilenameUtils.getExtension(invoiceApplyExtend.getInvoice_image_address().replaceAll("/", "\\\\\\\\")));
+						}
+						//destFile = new File(dirPathValue + "\\" + "." + FilenameUtils.getExtension(invoiceApplyExtend.getInvoice_image_address().replaceAll("/", "\\\\\\\\")));
+						//destFile = new File(dirPathValue + "\\" + );
+						FileUtils.copyFile(srcFile, destFile);
+					}
+				}
+			}
+		}
+	}
+
 	public void WriteStringToFile(String str, String filePath) {
 		try {
-			FileOutputStream fos = new FileOutputStream(filePath);
+			/*FileOutputStream fos = new FileOutputStream(filePath);
 			fos.write(str.getBytes());
-			fos.close();
+			fos.close();*/
+			OutputStreamWriter oStreamWriter = new OutputStreamWriter(new FileOutputStream(filePath), "utf-8");
+			oStreamWriter.append(str);
+			oStreamWriter.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

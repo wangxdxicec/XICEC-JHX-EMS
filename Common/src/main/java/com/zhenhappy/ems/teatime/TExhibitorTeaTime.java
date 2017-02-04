@@ -19,6 +19,10 @@ public class TExhibitorTeaTime {
     private String tea_Fair_Show_Year;
     private String tea_Fair_Show_Begin_Date;
     private String tea_Fair_Data_End_Html;
+    private String tea_Fair_Contact_Submit_Deadline_Zh;
+    private String tea_Fair_Contact_Submit_Deadline_En;
+    private String tea_Fair_Invoice_Submit_Deadline_Zh;
+    private String tea_Fair_Invoice_Submit_Deadline_En;
 
     @Id
     @Column(name = "id")
@@ -99,5 +103,45 @@ public class TExhibitorTeaTime {
 
     public void setTea_Fair_Data_End_Html(String tea_Fair_Data_End_Html) {
         this.tea_Fair_Data_End_Html = tea_Fair_Data_End_Html;
+    }
+
+    @Basic
+    @Column(name = "tea_Fair_Contact_Submit_Deadline_Zh")
+    public String getTea_Fair_Contact_Submit_Deadline_Zh() {
+        return tea_Fair_Contact_Submit_Deadline_Zh;
+    }
+
+    public void setTea_Fair_Contact_Submit_Deadline_Zh(String tea_Fair_Contact_Submit_Deadline_Zh) {
+        this.tea_Fair_Contact_Submit_Deadline_Zh = tea_Fair_Contact_Submit_Deadline_Zh;
+    }
+
+    @Basic
+    @Column(name = "tea_Fair_Contact_Submit_Deadline_En")
+    public String getTea_Fair_Contact_Submit_Deadline_En() {
+        return tea_Fair_Contact_Submit_Deadline_En;
+    }
+
+    public void setTea_Fair_Contact_Submit_Deadline_En(String tea_Fair_Contact_Submit_Deadline_En) {
+        this.tea_Fair_Contact_Submit_Deadline_En = tea_Fair_Contact_Submit_Deadline_En;
+    }
+
+    @Basic
+    @Column(name = "tea_Fair_Invoice_Submit_Deadline_En")
+    public String getTea_Fair_Invoice_Submit_Deadline_En() {
+        return tea_Fair_Invoice_Submit_Deadline_En;
+    }
+
+    public void setTea_Fair_Invoice_Submit_Deadline_En(String tea_Fair_Invoice_Submit_Deadline_En) {
+        this.tea_Fair_Invoice_Submit_Deadline_En = tea_Fair_Invoice_Submit_Deadline_En;
+    }
+
+    @Basic
+    @Column(name = "tea_Fair_Invoice_Submit_Deadline_Zh")
+    public String getTea_Fair_Invoice_Submit_Deadline_Zh() {
+        return tea_Fair_Invoice_Submit_Deadline_Zh;
+    }
+
+    public void setTea_Fair_Invoice_Submit_Deadline_Zh(String tea_Fair_Invoice_Submit_Deadline_Zh) {
+        this.tea_Fair_Invoice_Submit_Deadline_Zh = tea_Fair_Invoice_Submit_Deadline_Zh;
     }
 }

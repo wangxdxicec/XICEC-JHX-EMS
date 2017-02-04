@@ -86,7 +86,7 @@
 						<select id="exhibitorsProvince" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
 						</select>
 					</th>
-					<th data-options="field: 'isLogout', sortable:true, formatter: formatStatus, width: $(this).width() * 0.07">
+					<th data-options="field: 'isLogout', formatter: formatStatus, width: $(this).width() * 0.07">
 						状态<br/>
 						<select id="exhibitorsIsLogout" style="width:104%;height:21px;" onchange="filter();">
 							<option selected value="">全部</option>
@@ -1022,8 +1022,8 @@
         // 添加展商账号弹出框
         $('#addExhibitorDlg').dialog({
             title: '添加展商账号',
-            width: 350,
-            height: 390,
+            width: 380,
+            height: 450,
             closed: true,
             cache: false,
             modal: true,

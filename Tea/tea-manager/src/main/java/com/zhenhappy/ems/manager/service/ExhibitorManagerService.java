@@ -2,17 +2,13 @@ package com.zhenhappy.ems.manager.service;
 
 import com.zhenhappy.ems.dao.ExhibitorClassDao;
 import com.zhenhappy.ems.dao.ExhibitorInfoDao;
+import com.zhenhappy.ems.dao.TInvoiceApplyDao;
 import com.zhenhappy.ems.dao.TeaExhibitorDao;
-import com.zhenhappy.ems.entity.TExhibitorClass;
-import com.zhenhappy.ems.entity.TExhibitorInfo;
-import com.zhenhappy.ems.entity.TExhibitorMeipai;
-import com.zhenhappy.ems.entity.TInvoiceApply;
-import com.zhenhappy.ems.entity.TProductType;
+import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.manager.dao.ExhibitorBoothDao;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
 import com.zhenhappy.ems.manager.entity.TExhibitorTerm;
-import com.zhenhappy.ems.entity.TeaExhibitor;
 import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.manager.util.JChineseConvertor;
 import com.zhenhappy.ems.service.ExhibitorService;
@@ -59,6 +55,8 @@ public class ExhibitorManagerService extends ExhibitorService {
     private ProductManagerService productManagerService;
     @Autowired
     private ExhibitorBoothDao exhibitorBoothDao;
+    @Autowired
+    private TInvoiceApplyDao invoiceApplyDao;
 
     /**
      * 分页获取展商列表
@@ -283,7 +281,7 @@ public class ExhibitorManagerService extends ExhibitorService {
     @Transactional
     public TExhibitorInfo loadAllExhibitorByCompanye(String companye) {
     	if(StringUtils.isNotEmpty(companye)){
-			List<TExhibitorInfo> exhibitors = getHibernateTemplate().find("from TExhibitorInfo where companye = ?", new Object[]{companye});
+			List<TExhibitorInfo> exhibitors = getHibernateTemplate().find("from TExhibitorInfo where companyEn = ?", new Object[]{companye});
     		return exhibitors.size() > 0 ? exhibitors.get(0) : null;
     	}else return null;
     }
@@ -917,11 +915,15 @@ public class ExhibitorManagerService extends ExhibitorService {
     		invoice = invoiceService.getByEid(eid);
     		invoice.setTitle(invoiceTitle);
     		invoice.setInvoiceNo(invoiceNo);
-    		if(queryBoothByEid(eid) != null) invoice.setExhibitorNo(queryBoothByEid(eid).getBoothNumber());
-    		else invoice.setExhibitorNo("");
+    		if(queryBoothByEid(eid) != null)
+                invoice.setExhibitorNo(queryBoothByEid(eid).getBoothNumber());
+    		else
+                invoice.setExhibitorNo("");
     	}else{
-    		if(queryBoothByEid(eid) != null) invoice = new TInvoiceApply(queryBoothByEid(eid).getBoothNumber(), invoiceNo, invoiceTitle, eid, new Date());
-    		else invoice = new TInvoiceApply("", invoiceNo, invoiceTitle, eid, new Date());
+    		if(queryBoothByEid(eid) != null)
+                invoice = new TInvoiceApply(queryBoothByEid(eid).getBoothNumber(), invoiceNo, invoiceTitle, eid, new Date());
+    		else
+                invoice = new TInvoiceApply("", invoiceNo, invoiceTitle, eid, new Date());
     	}
     	invoiceService.create(invoice);
 	}
@@ -1054,5 +1056,51 @@ public class ExhibitorManagerService extends ExhibitorService {
         response.setRows(exhibitors);
         response.setTotal(page.getTotalCount());
         return response;
+    }
+
+    /**
+     * 查询增值税专用发票
+     * @return
+     */
+    @Transactional
+    public List<TInvoiceApplyExtend> loadAllInvoiceApplyByInvoiceFlag() {
+        List<TInvoiceApplyExtend> invoiceApplyList = invoiceApplyDao.queryByHql("from TInvoiceApplyExtend where invoice_flag = 3", new Object[]{});
+        return invoiceApplyList.size() > 0 ? invoiceApplyList : null;
+    }
+
+    /**
+     * 根据eids查询增值税专用发票
+     * @return
+     */
+    @Transactional
+    public List<TInvoiceApplyExtend> loadSelectedInvoiceApplyByInvoiceFlag(Integer[] eids) {
+        List<TInvoiceApplyExtend> invoiceApplyExtendArrayList = new ArrayList<TInvoiceApplyExtend>();
+        for (Integer eid:eids){
+            TInvoiceApplyExtend invoiceApplyExtend = loadInvoiceApplyExtendByEid(eid);
+            if (invoiceApplyExtend != null) invoiceApplyExtendArrayList.add(invoiceApplyExtend);
+        }
+        return invoiceApplyExtendArrayList.size() > 0 ? invoiceApplyExtendArrayList : null;
+    }
+
+    /**
+     * 根据eid查询增值税专用发票
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public TInvoiceApplyExtend loadInvoiceApplyExtendByEid(Integer eid) {
+        List<TInvoiceApplyExtend> invoiceApplyList = invoiceApplyDao.queryByHql("from TInvoiceApplyExtend where invoice_flag = 3 and eid=?", new Object[]{eid});
+        return invoiceApplyList.size() > 0 ? invoiceApplyList.get(0) : null;
+    }
+
+    /**
+     * 根据eid查询增值税专用发票
+     * @param eid
+     * @return
+     */
+    @Transactional
+    public TInvoiceApplyExtend getInvoiceApplyExtendByEid(Integer eid) {
+        List<TInvoiceApplyExtend> invoiceApplyList = invoiceApplyDao.queryByHql("from TInvoiceApplyExtend where eid=?", new Object[]{eid});
+        return invoiceApplyList.size() > 0 ? invoiceApplyList.get(0) : null;
     }
 }

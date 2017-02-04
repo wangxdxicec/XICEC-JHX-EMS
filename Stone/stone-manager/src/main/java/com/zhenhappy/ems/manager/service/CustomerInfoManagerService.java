@@ -10,9 +10,19 @@ import com.zhenhappy.ems.dto.QueryEmailOrMsgRequest;
 import com.zhenhappy.ems.dto.QueryExhibitorDataReport;
 import com.zhenhappy.ems.dto.QueryDataReportEx;
 import com.zhenhappy.ems.entity.*;
+import com.zhenhappy.ems.manager.action.user.ExhibitorInvisitorMailUtil;
 import com.zhenhappy.ems.manager.dao.CustomerSurveyDao;
+import com.zhenhappy.ems.manager.dao.TVisitorInfoYearDao;
+import com.zhenhappy.ems.manager.dao.backupinfo.CustomerBackupInfoDao;
+import com.zhenhappy.ems.manager.dao.visitorgroup.VisitorGroupDao;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.dto.visitorgroup.QueryVisitorGroupRequest;
 import com.zhenhappy.ems.manager.entity.TVisitor_Info_Survey;
+import com.zhenhappy.ems.manager.entity.TVisitor_Info_Year;
+import com.zhenhappy.ems.manager.entity.backupinfo.TProductBackupInfo;
+import com.zhenhappy.ems.manager.entity.backupinfo.TVisitorBackupInfo;
+import com.zhenhappy.ems.manager.entity.visitorgroup.TVisitorGroupInfo;
+import com.zhenhappy.ems.manager.service.lookmailinfo.showEmail;
 import com.zhenhappy.ems.manager.util.DiffListOperate;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.util.EmailPattern;
@@ -22,7 +32,7 @@ import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.deser.std.StdDeserializer;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -33,6 +43,9 @@ import com.zhenhappy.ems.dao.CustomerInfoDao;
 import com.zhenhappy.ems.manager.exception.DuplicateCustomerException;
 import com.zhenhappy.util.Page;
 import org.springframework.web.bind.annotation.ModelAttribute;
+
+import javax.mail.*;
+import javax.mail.internet.MimeMessage;
 
 /**
  * Created by wujianbin on 2014-08-11.
@@ -46,6 +59,8 @@ public class CustomerInfoManagerService {
 	@Autowired
 	private CustomerSurveyDao customerSurveyDao;
 	@Autowired
+	private TVisitorInfoYearDao tVisitorInfoYearDao;
+	@Autowired
 	private HibernateTemplate hibernateTemplate;
 	@Autowired
 	private CountryProvinceService countryProvinceService;
@@ -53,6 +68,12 @@ public class CustomerInfoManagerService {
 	private TagDao tagDao;
 	@Autowired
 	private TagManagerService tagManagerService;
+	@Autowired
+	private CustomerBackupInfoDao customerBackupInfoDao;
+	@Autowired
+	private WVisaManagerService wVisaManagerService;
+	@Autowired
+	private VisitorGroupDao visitorGroupDao;
 
 	public HibernateTemplate getHibernateTemplate() {
 		return hibernateTemplate;
@@ -62,6 +83,7 @@ public class CustomerInfoManagerService {
 		this.hibernateTemplate = hibernateTemplate;
 	}
 
+	private HashMap<String, Integer> sendEmailFailureMap = new HashMap<String, Integer>();
 	/**
 	 * 分页获取客商列表
 	 * @param request
@@ -105,19 +127,17 @@ public class CustomerInfoManagerService {
 				}
 			}
 			if(request.getIsActivated() != null){
-				if (request.getIsActivated() == 1) {
-					conditions.add(" e.isActivated=1 ");
-				} else if(request.getIsActivated() == 0) {
-					conditions.add(" e.isActivated=0 ");
-				}
+				conditions.add(" e.isActivated = " + request.getIsActivated() + " ");
 			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		if(request.getInlandOrForeign() == 1) {
-			conditions.add("e.country=44 ");
-		} else {
-			conditions.add("e.country<>44 ");
+		if(request.getInlandOrForeign() != null) {
+			if(request.getInlandOrForeign() == 1) {
+				conditions.add("e.country=44 ");
+			} else {
+				conditions.add("e.country<>44 ");
+			}
 		}
 		String conditionsSql = StringUtils.join(conditions, " and ");
 		String conditionsSqlNoOrder = "";
@@ -203,6 +223,74 @@ public class CustomerInfoManagerService {
 			response.setTotal(page.getTotalCount());
 			return response;
 		}
+	}
+
+	public HashMap<String, Integer> getSendEmailFailureMap() {
+		return sendEmailFailureMap;
+	}
+
+	/**
+	 * 分页查询国内客商邮件发送失败
+	 * @param request
+	 * @return
+	 */
+	public QueryCustomerResponse queryCustomersBySendEmailFailurePage(QueryCustomerRequest request) throws Exception {
+		sendEmailFailureMap = new HashMap<String, Integer>();
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+
+		String host = ExhibitorInvisitorMailUtil.emailCustomerHost;
+		String username = ExhibitorInvisitorMailUtil.emailCustomerUserName;
+		String password = ExhibitorInvisitorMailUtil.emailCustomerPassword;
+		Properties props = new Properties();
+		Session session = Session.getDefaultInstance(props, null);
+
+		Store store = session.getStore("imap");
+		store.connect(host, username, password);
+		Folder folder = store.getFolder("INBOX");
+		folder.open(Folder.READ_ONLY);
+
+		Message[] messages = folder.getMessages(folder.getMessageCount() - folder.getUnreadMessageCount() + 1,folder.getMessageCount());
+		List<WCustomer> customerList = new ArrayList<WCustomer>();
+
+		for (int i = 0; i < messages.length; i++) {
+			showEmail re = new showEmail((MimeMessage) messages[i]);
+			String toContact = re.getMailAddress("to");
+			if(toContact.indexOf("do-not-reply") >= 0/* && !re.isNew()*/){
+				re.getMailContent(messages[i]);
+				String bodyContent = re.getBodyText();
+				if(/*isToday && */re.getSubject().indexOf("stonefair.org.cn的退信") >=0){
+					int emailBegin = bodyContent.indexOf("无法发送到");
+					if(emailBegin >= 0){
+						String emailTo = bodyContent.substring(emailBegin + 5);
+						int emailEndIndex = emailTo.indexOf("</td>");
+						if(emailEndIndex >= 0) {
+							String emailValue = emailTo.substring(0, emailEndIndex);
+							//System.out.println("emailValue: " + emailValue.trim());
+							List<WCustomer> customers = customerInfoDao.queryPageByHQL("select count(*) from WCustomer where email=?", "from WCustomer where email = ? order by updateTime DESC", new Object[]{emailValue.trim()}, page);
+							if(customers != null && customers.size() > 0){
+								for(WCustomer customer:customers){
+									sendEmailFailureMap.put(emailValue, customer.getId());
+									customerList.addAll(customers);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (folder != null)
+			folder.close(true);
+		if (store != null)
+			store.close();
+
+		//List<WCustomer> customers = customerInfoDao.queryPageByHQL("select count(*) from WCustomer where country = 44", "from WCustomer where country = 44 order by updateTime DESC", new Object[]{}, page);
+		QueryCustomerResponse response = new QueryCustomerResponse();
+		response.setResultCode(0);
+		response.setRows(customerList);
+		response.setTotal(page.getTotalCount());
+		return response;
 	}
 
 	/**
@@ -660,7 +748,7 @@ public class CustomerInfoManagerService {
 		QueryCustomerResponse response = new QueryCustomerResponse();
 		response.setResultCode(0);
 		response.setRows(customerList);
-		response.setTotal(page.getTotalCount());
+		response.setTotal(customerList.size());
 		return response;
 	}
 
@@ -739,6 +827,17 @@ public class CustomerInfoManagerService {
 	}
 
 	/**
+	 * 根据状态查询国内客商基本信息
+	 * type字段：1：已预登记(已激活)；2：表示已预登记(未激活)；3：表示未预登记
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadAllInlandCustomerByType(int type) {
+		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country = 44 and isActivated = ? order by updateTime desc", new Object[]{type});
+		return customers.size() > 0 ? customers : null;
+	}
+
+	/**
 	 * 根据日期范围查询客商列表
 	 * @return
 	 */
@@ -754,7 +853,19 @@ public class CustomerInfoManagerService {
 	 */
 	@Transactional
 	public List<WCustomer> loadAllForeignCustomer() {
-		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country <> 44 order by createdTime desc", new Object[]{});
+		//List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country <> 44 and updateTime >= '2016-03-10' order by updateTime desc", new Object[]{});
+		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country <> 44 order by updateTime desc", new Object[]{});
+		return customers.size() > 0 ? customers : null;
+	}
+
+	/**
+	 * 查询国外已激活的客商基本信息
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadAllForeignActiveCustomer(int isActived) {
+		//List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country <> 44 and updateTime >= '2016-03-10' order by updateTime desc", new Object[]{});
+		List<WCustomer> customers = customerInfoDao.queryByHql("from WCustomer where country <> 44 and isActivated = ? order by updateTime desc", new Object[]{isActived});
 		return customers.size() > 0 ? customers : null;
 	}
 
@@ -857,6 +968,17 @@ public class CustomerInfoManagerService {
 	}
 
 	/**
+	 * 根据手机号查询客商
+	 * @param phone
+	 * @return
+	 */
+	@Transactional
+	public List<WCustomer> loadCustomerByPhone(String phone) {
+		List<WCustomer> wCustomers = customerInfoDao.queryByHql("from WCustomer where mobilePhone=?", new Object[]{phone});
+		return wCustomers.size() > 0 ? wCustomers : null;
+	}
+
+	/**
 	 * 修改客商是否专业
 	 * @param request
 	 * @throws Exception
@@ -888,6 +1010,7 @@ public class CustomerInfoManagerService {
 			} else {
 				customer.setIsActivated(0);
 			}
+			customer.setUpdateTime(new Date());
 			customerInfoDao.update(customer);
 		}
 	}
@@ -901,6 +1024,8 @@ public class CustomerInfoManagerService {
 		WCustomer customer = customerInfoDao.query(id);
 		int oldMsgNum = customer.getSendMsgNum();
 		if(customer != null){
+			customer.setUpdateTime(new Date());
+			customer.setSendMsgDate(new Date());
 			customer.setSendMsgNum(oldMsgNum+1);
 			customerInfoDao.update(customer);
 		}
@@ -922,14 +1047,25 @@ public class CustomerInfoManagerService {
 	}
 
 	/**
-	 * 根据id查询客商问卷调查
-	 * @param id
+	 * 根据customerId查询客商问卷调查
+	 * @param customerId
 	 * @return
 	 */
 	@Transactional
-	public TVisitor_Info_Survey loadCustomerSurveyInfoById(Integer id) {
-		List<TVisitor_Info_Survey> customerSurvey = customerSurveyDao.queryByHql("from TVisitor_Info_Survey where CustomerID=? order by UpdateTime desc", new Object[]{id});
+	public TVisitor_Info_Survey loadCustomerSurveyInfoByCustomerId(Integer customerId) {
+		List<TVisitor_Info_Survey> customerSurvey = customerSurveyDao.queryByHql("from TVisitor_Info_Survey where CustomerID=? order by UpdateTime desc", new Object[]{customerId});
 		return customerSurvey.size() > 0 ? customerSurvey.get(0) : null;
+	}
+
+	/**
+	 * 根据customerId查询世界石材大会
+	 * @param customerId
+	 * @return
+	 */
+	@Transactional
+	public TVisitor_Info_Year loadVisitorInfoYearByCustomerId(Integer customerId) {
+		List<TVisitor_Info_Year> tVisitor_info_yearList = tVisitorInfoYearDao.queryByHql("from TVisitor_Info_Year where CustomerID=? order by UpdateTime desc", new Object[]{customerId});
+		return tVisitor_info_yearList.size() > 0 ? tVisitor_info_yearList.get(0) : null;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -1020,5 +1156,298 @@ public class CustomerInfoManagerService {
 		String sql = "from WCustomer w " + conditionsSqlNoOrder + "order by " + (Integer.parseInt(fieldTime) == 0 ?"w.createdTime": "w.updateTime") + " desc";
 		List<WCustomer> customers = customerInfoDao.queryByHql(sql, new Object[]{});
 		return customers.size() > 0 ? customers : null;
+	}
+
+	/**
+	 * 备份客商数据
+	 * @return
+	 */
+	@Transactional
+	public void backupCustomerData() {
+		List<WCustomer> customerList = customerInfoDao.queryByHql("from WCustomer order by updateTime desc", new Object[]{});
+		for(WCustomer customer:customerList) {
+			TVisitorBackupInfo tVisitorBackupInfo = new TVisitorBackupInfo();
+			tVisitorBackupInfo.setEmail(customer.getEmail());
+			tVisitorBackupInfo.setCheckingNo(customer.getCheckingNo());
+			tVisitorBackupInfo.setPassword(customer.getPassword());
+			tVisitorBackupInfo.setFirstName(customer.getFirstName());
+			tVisitorBackupInfo.setLastName(customer.getLastName());
+			tVisitorBackupInfo.setSex(customer.getSex());
+			tVisitorBackupInfo.setCompany(customer.getCompany());
+			tVisitorBackupInfo.setPosition(customer.getPosition());
+			WCountry country = countryProvinceService.loadCountryById(customer.getCountry());
+			if(country != null){
+				tVisitorBackupInfo.setCountry(country.getChineseName());
+			}
+			tVisitorBackupInfo.setProvince(customer.getProvince());
+			tVisitorBackupInfo.setCity(customer.getCity());
+			tVisitorBackupInfo.setAddress(customer.getAddress());
+			tVisitorBackupInfo.setBackupEmail(customer.getBackupEmail());
+			tVisitorBackupInfo.setMobilePhoneCode(customer.getMobilePhoneCode());
+			tVisitorBackupInfo.setMobilePhone(customer.getMobilePhone());
+			tVisitorBackupInfo.setTelephoneCode(customer.getTelephoneCode());
+			tVisitorBackupInfo.setTelephone(customer.getTelephone());
+			tVisitorBackupInfo.setTelephoneCode2(customer.getTelephoneCode2());
+			tVisitorBackupInfo.setFaxCode(customer.getFaxCode());
+			tVisitorBackupInfo.setFax(customer.getFax());
+			tVisitorBackupInfo.setFaxCode2(customer.getFaxCode2());
+			tVisitorBackupInfo.setWebsite(customer.getWebsite());
+			tVisitorBackupInfo.setRemark(customer.getRemark());
+			tVisitorBackupInfo.setCreatedIp(customer.getCreatedIp());
+			tVisitorBackupInfo.setCreatedTime(customer.getCreatedTime());
+			tVisitorBackupInfo.setUpdatedIp(customer.getUpdatedIp());
+			tVisitorBackupInfo.setUpdateTime(customer.getUpdateTime());
+			tVisitorBackupInfo.setSendEmailNum(customer.getSendEmailNum());
+			tVisitorBackupInfo.setSendMsgNum(customer.getSendMsgNum());
+			tVisitorBackupInfo.setSendEmailDate(customer.getSendEmailDate());
+			tVisitorBackupInfo.setSendMsgDate(customer.getSendMsgDate());
+			tVisitorBackupInfo.setIsDisabled(customer.getIsDisabled());
+			tVisitorBackupInfo.setGuid(customer.getGuid());
+			tVisitorBackupInfo.setIsProfessional(customer.getIsProfessional()==1?true:false);
+			tVisitorBackupInfo.setIsjudged(customer.getIsjudged());
+			tVisitorBackupInfo.setIsMobile(customer.getIsMobile());
+			tVisitorBackupInfo.setIsActivated(customer.getIsActivated());
+
+			WVisa wVisa = wVisaManagerService.getWVisaByCustomerId(customer.getId());
+			if(wVisa != null) {
+				tVisitorBackupInfo.setVisa_FullPassportName(wVisa.getFullPassportName());
+				tVisitorBackupInfo.setVisa_Gender(wVisa.getGender());
+				tVisitorBackupInfo.setVisa_Nationality(wVisa.getNationality());
+				tVisitorBackupInfo.setVisa_PassportNo(wVisa.getPassportNo());
+				tVisitorBackupInfo.setVisa_ExpDate(wVisa.getExpDate());
+				tVisitorBackupInfo.setVisa_DateOfBirth(wVisa.getDateOfBirth());
+				tVisitorBackupInfo.setVisa_ChineseEmbassy(wVisa.getChineseEmbassy());
+				tVisitorBackupInfo.setVisa_ConsulateOfCity(wVisa.getConsulateOfCity());
+				tVisitorBackupInfo.setVisa_DurationBeginTime(wVisa.getDurationBeginTime());
+				tVisitorBackupInfo.setVisa_DurationEndTime(wVisa.getDurationEndTime());
+				tVisitorBackupInfo.setVisa_PassportPage(wVisa.getPassportPage());
+				tVisitorBackupInfo.setVisa_BusinessLicense(wVisa.getBusinessLicense());
+				tVisitorBackupInfo.setVisa_WthInfoId(wVisa.getWthInfoId());
+				tVisitorBackupInfo.setVisa_CreateTime(wVisa.getCreateTime());
+				tVisitorBackupInfo.setVisa_UpdateTime(wVisa.getUpdateTime());
+				tVisitorBackupInfo.setVisa_NeedPost(wVisa.getNeedPost());
+				tVisitorBackupInfo.setVisa_ExpressTp(wVisa.getExpressTp());
+				tVisitorBackupInfo.setVisa_ExpressNo(wVisa.getExpressNo());
+				tVisitorBackupInfo.setVisa_IsDisabled(wVisa.getIsDisabled());
+				tVisitorBackupInfo.setVisa_Hotel(wVisa.getHotel());
+			}
+
+			TVisitor_Info_Survey tVisitor_info_survey = loadCustomerSurveyInfoByCustomerId(customer.getId());
+			if(tVisitor_info_survey != null){
+				tVisitorBackupInfo.setSurvey_Q1(tVisitor_info_survey.getQ1());
+				tVisitorBackupInfo.setSurvey_Q2(tVisitor_info_survey.getQ2());
+				tVisitorBackupInfo.setSurvey_Q3(tVisitor_info_survey.getQ3());
+				tVisitorBackupInfo.setSurvey_Q4(tVisitor_info_survey.getQ4());
+				tVisitorBackupInfo.setSurvey_Q5(tVisitor_info_survey.getQ5());
+				tVisitorBackupInfo.setSurvey_Q6(tVisitor_info_survey.getQ6());
+				tVisitorBackupInfo.setSurvey_Q7(tVisitor_info_survey.getQ7());
+				tVisitorBackupInfo.setSurvey_Q8(tVisitor_info_survey.getQ8());
+				tVisitorBackupInfo.setSurvey_Q9(tVisitor_info_survey.getQ9());
+				tVisitorBackupInfo.setSurvey_Q10(tVisitor_info_survey.getQ10());
+				tVisitorBackupInfo.setSurvey_Remark1(tVisitor_info_survey.getRemark1());
+				tVisitorBackupInfo.setSurvey_Remark2(tVisitor_info_survey.getRemark2());
+				tVisitorBackupInfo.setSurvey_InviterEmail(tVisitor_info_survey.getInviterEmail());
+				tVisitorBackupInfo.setSurvey_InviterName(tVisitor_info_survey.getInviterName());
+				tVisitorBackupInfo.setSurvey_EmailSubject(tVisitor_info_survey.getEmailSubject());
+				tVisitorBackupInfo.setSurvey_CreateIP(tVisitor_info_survey.getCreatedIP());
+				tVisitorBackupInfo.setSurvey_CreateTime(tVisitor_info_survey.getCreatedTime());
+				tVisitorBackupInfo.setSurvey_UpdateIP(tVisitor_info_survey.getUpdatedIP());
+				tVisitorBackupInfo.setSurvey_UpdateTime(tVisitor_info_survey.getUpdateTime());
+				tVisitorBackupInfo.setSurvey_IsDisabled(tVisitor_info_survey.getDisabledFlag());
+				tVisitorBackupInfo.setSurvey_WSC(tVisitor_info_survey.getWsc());
+			}
+			TVisitor_Info_Year tVisitor_info_year = loadVisitorInfoYearByCustomerId(customer.getId());
+			if(tVisitor_info_year != null){
+				tVisitorBackupInfo.setYear_WThInfoID(tVisitor_info_year.getWThInfoID());
+				tVisitorBackupInfo.setSurvey_WSC(tVisitor_info_year.getWSC());
+				tVisitorBackupInfo.setYear_CreateTime(tVisitor_info_year.getCreateTime());
+				tVisitorBackupInfo.setYear_CreateIP(tVisitor_info_year.getCreateIP());
+				tVisitorBackupInfo.setYear_UpdateTime(tVisitor_info_year.getUpdateTime());
+				tVisitorBackupInfo.setYear_UpdateIP(tVisitor_info_year.getUpdateIP());
+			}
+			tVisitorBackupInfo.setBackup_date(new Date());
+			customerBackupInfoDao.create(tVisitorBackupInfo);
+		}
+	}
+
+	/**
+	 * 分页获取备份客商数据列表
+	 * @param request
+	 * @return
+	 */
+	public QueryCustomerResponse queryAllCustomerBackupInfosByPage(QueryCustomerBackupInfoRequest request) {
+		List<String> conditions = new ArrayList<String>();
+		try {
+			if (StringUtils.isNotEmpty(request.getFirstName())) {
+				conditions.add(" (e.firstName like '%" + request.getFirstName() + "%' OR e.firstName like '%" + new String(request.getFirstName().getBytes("ISO-8859-1"),"GBK") + "%' OR e.firstName like '%" + new String(request.getFirstName().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+			}
+			if (StringUtils.isNotEmpty(request.getCompany())) {
+				conditions.add(" (e.company like '%" + request.getCompany() + "%' OR e.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"GBK") + "%' OR e.company like '%" + new String(request.getCompany().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+			}
+			if (StringUtils.isNotEmpty(request.getCity())) {
+				conditions.add(" (e.city like '%" + request.getCity() + "%' OR e.city like '%" + new String(request.getCity().getBytes("ISO-8859-1"),"GBK") + "%' OR e.city like '%" + new String(request.getCity().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+			}
+			if (request.getCountry() != null) {
+				conditions.add(" e.country = " + request.getCountry().intValue() + " ");
+			}
+			if (StringUtils.isNotEmpty(request.getAddress())) {
+				conditions.add(" (e.address like '%" + request.getAddress() + "%' OR e.address like '%" + new String(request.getAddress().getBytes("ISO-8859-1"),"GBK") + "%' OR e.address like '%" + new String(request.getAddress().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+			}
+			if (StringUtils.isNotEmpty(request.getMobilePhone())) {
+				conditions.add(" e.mobilePhone like '%" + new String(request.getMobilePhone().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (request.getTelephone() != null) {
+				conditions.add(" e.telephone like '%" + new String(request.getTelephone().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (request.getCreateTime() != null) {
+				conditions.add(" e.createdTime like '%" + new String(request.getCreateTime().getBytes("ISO-8859-1"),"utf-8") + "%'");
+			}
+			if (StringUtils.isNotEmpty(request.getEmail())) {
+				conditions.add(" (e.email like '%" + request.getEmail() + "%' OR e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"GBK") + "%' OR e.email like '%" + new String(request.getEmail().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+			}
+			if(request.getIsProfessional() != null){
+				if (request.getIsProfessional() == 1) {
+					conditions.add(" e.isProfessional=1 ");
+				} else if(request.getIsProfessional() == 0) {
+					conditions.add(" e.isProfessional=0 ");
+				}
+			}
+			if(request.getIsActivated() != null){
+				if (request.getIsActivated() == 1) {
+					conditions.add(" e.isActivated=1 ");
+				} else if(request.getIsActivated() == 0) {
+					conditions.add(" e.isActivated=0 ");
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		if(request.getInlandOrForeign() != null) {
+			if(request.getInlandOrForeign() == 1) {
+				conditions.add("e.country=44 ");
+			} else {
+				conditions.add("e.country<>44 ");
+			}
+		}
+		String conditionsSql = StringUtils.join(conditions, " and ");
+		String conditionsSqlNoOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlNoOrder = " where " + conditionsSql;
+		}
+		String conditionsSqlOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlOrder = " where " + conditionsSql + " order by e.updateTime desc";
+		}
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+		List<TVisitorBackupInfo> visitorBackupInfoList = customerInfoDao.queryPageByHQL("select count(*) from TVisitorBackupInfo e" + conditionsSqlNoOrder,
+				"select new com.zhenhappy.ems.manager.dto.QueryCustomerBackupInfo(e.id, e.firstName, e.company, e.country ,e.city"
+						+ ", e.address, e.mobilePhone, e.telephone, e.email, e.createdTime, e.updateTime, e.isProfessional, e.isActivated, e.backup_date) "
+						+ "from TVisitorBackupInfo e"  + conditionsSqlOrder, new Object[]{}, page);
+		QueryCustomerResponse response = new QueryCustomerResponse();
+		response.setResultCode(0);
+		response.setRows(visitorBackupInfoList);
+		response.setTotal(page.getTotalCount());
+		return response;
+	}
+
+	/**
+	 * 根据id查询客商备份基本信息
+	 * @param id
+	 * @return
+	 */
+	@Transactional
+	public TVisitorBackupInfo loadCustomerBackupInfoById(Integer id) {
+		TVisitorBackupInfo customerBackupInfo = customerBackupInfoDao.query(id);
+		return customerBackupInfo;
+	}
+
+	/**
+	 * 分页获取参观团列表
+	 * @param request
+	 * @return
+	 */
+	@Transactional
+	public QueryCustomerResponse queryVisitorGroupByPage(QueryVisitorGroupRequest request) throws UnsupportedEncodingException {
+		List<String> conditions = new ArrayList<String>();
+		if (StringUtils.isNotEmpty(request.getGroup_name())) {
+			conditions.add(" (e.group_name like '%" + request.getGroup_name() + "%' OR e.group_name like '%" +
+					new String(request.getGroup_name().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_name like '%" +
+					new String(request.getGroup_name().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_name())) {
+			conditions.add(" (e.group_header_name like '%" + request.getGroup_header_name() + "%' OR e.group_header_name like '%" +
+					new String(request.getGroup_header_name().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_name like '%" +
+					new String(request.getGroup_header_name().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_telphone())) {
+			conditions.add(" (e.group_header_telphone like '%" + request.getGroup_header_telphone() + "%' OR e.group_header_telphone like '%" +
+					new String(request.getGroup_header_telphone().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_telphone like '%" +
+					new String(request.getGroup_header_telphone().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_position())) {
+			conditions.add(" (e.group_header_position like '%" + request.getGroup_header_position() + "%' OR e.group_header_position like '%" +
+					new String(request.getGroup_header_position().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_position like '%" +
+					new String(request.getGroup_header_position().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_email())) {
+			conditions.add(" (e.group_header_email like '%" + request.getGroup_header_email() + "%' OR e.group_header_email like '%" +
+					new String(request.getGroup_header_email().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_email like '%" +
+					new String(request.getGroup_header_email().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_address())) {
+			conditions.add(" (e.group_header_address like '%" + request.getGroup_header_address() + "%' OR e.group_header_address like '%" +
+					new String(request.getGroup_header_address().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_address like '%" +
+					new String(request.getGroup_header_address().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_create_time())) {
+			conditions.add(" (e.group_header_create_time like '%" + request.getGroup_header_create_time() + "%' OR e.group_header_create_time like '%" +
+					new String(request.getGroup_header_create_time().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_create_time like '%" +
+					new String(request.getGroup_header_create_time().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		if (StringUtils.isNotEmpty(request.getGroup_header_update_time())) {
+			conditions.add(" (e.group_header_update_time like '%" + request.getGroup_header_update_time() + "%' OR e.group_header_update_time like '%" +
+					new String(request.getGroup_header_update_time().getBytes("ISO-8859-1"),"GBK") + "%' OR e.group_header_update_time like '%" +
+					new String(request.getGroup_header_update_time().getBytes("ISO-8859-1"),"utf-8") + "%') ");
+		}
+		String conditionsSql = StringUtils.join(conditions, " and ");
+		String conditionsSqlNoOrder = "";
+		if(StringUtils.isNotEmpty(conditionsSql)){
+			conditionsSqlNoOrder = " and " + conditionsSql;
+		}
+		Page page = new Page();
+		page.setPageSize(request.getRows());
+		page.setPageIndex(request.getPage());
+
+		List<TVisitorGroupInfo> tVisitorGroupInfoList = visitorGroupDao.queryPageByHQL("select count(*) from TVisitorGroupInfo e where e.group_header_or_member_flag = 1" + conditionsSqlNoOrder,
+				"from TVisitorGroupInfo e where e.group_header_or_member_flag = 1 " +  conditionsSqlNoOrder + " order by e.group_header_update_time DESC", new Object[]{}, page);
+
+		QueryCustomerResponse response = new QueryCustomerResponse();
+		response.setResultCode(0);
+		response.setRows(tVisitorGroupInfoList);
+		response.setTotal(page.getTotalCount());
+		return response;
+	}
+
+	/**
+	 * 根据id查询参观团详细信息
+	 * @param id
+	 * @return
+	 */
+	@Transactional
+	public TVisitorGroupInfo loadVisitorGroupDetailInfoById(Integer id) {
+		TVisitorGroupInfo tVisitorGroupInfo = visitorGroupDao.query(id);
+		return tVisitorGroupInfo;
+	}
+
+	/**
+	 * 根据groupId查询参观团对就应的成员
+	 * @param groupId
+	 * @return
+	 */
+	@Transactional
+	public List<TVisitorGroupInfo> loadProductBackupInfoById(Integer groupId) {
+		return visitorGroupDao.queryByHql("from TVisitorGroupInfo where group_id_for_member=?", new Object[]{groupId});
 	}
 }

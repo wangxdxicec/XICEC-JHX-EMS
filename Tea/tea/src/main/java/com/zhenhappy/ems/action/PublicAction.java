@@ -77,7 +77,13 @@ public class PublicAction {
 
                 response.setResultCode(0);
             }
-            httpServletRequest.getSession().setAttribute("zone",request.getArea());
+
+            if (exhibitor.getArea() != null) {
+                httpServletRequest.getSession().setAttribute("zone", exhibitor.getArea());
+            } else {
+                //默认国内展区
+                httpServletRequest.getSession().setAttribute("zone", new Integer(1));
+            }
         } catch (Exception e) {
             log.error("login error.username:" + request.getUsername(), e);
             response.setResultCode(3);

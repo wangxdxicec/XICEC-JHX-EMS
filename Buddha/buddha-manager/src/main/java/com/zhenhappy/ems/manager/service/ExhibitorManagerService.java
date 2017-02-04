@@ -607,6 +607,7 @@ public class ExhibitorManagerService extends ExhibitorService {
         modifyExhibitorInfoRequest.setCompanyEn(exhibitor.getCompanye());*/
         modifyExhibitorInfoRequest.setCompany(exhibitorInfo.getCompany());
         modifyExhibitorInfoRequest.setCompanyEn(exhibitorInfo.getCompanyEn());
+        modifyExhibitorInfoRequest.setCompanyT(exhibitorInfo.getCompanyT());
         modifyExhibitorInfo(modifyExhibitorInfoRequest, eid, adminId);
     	if(eid != null){
     		TExhibitorBooth booth = new TExhibitorBooth();
@@ -876,6 +877,8 @@ public class ExhibitorManagerService extends ExhibitorService {
 				exhibitorInfo.setMainProductEn(request.getMainProductEn());
 				exhibitorInfo.setMark(request.getMark());
                 exhibitorInfo.setCompany(request.getCompany());
+                exhibitorInfo.setCompanyEn(request.getCompanyEn());
+                exhibitorInfo.setCompanyT(request.getCompanyT());
 				if(StringUtils.isNotEmpty(request.getLogo())) exhibitorInfo.setLogo(request.getLogo());
 				if(request.getEinfoid() != null) exhibitorInfoDao.update(exhibitorInfo);
 				else exhibitorInfoDao.create(exhibitorInfo);

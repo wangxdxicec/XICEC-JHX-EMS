@@ -23,6 +23,9 @@
             width: 200px;
             height: 20px;
         }
+
+        #bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=50);}
+        .loading{display: none; position: absolute; top: 50%; left: 50%; z-index:1002; }
     </style>
 </head>
 <body>
@@ -31,18 +34,20 @@
     <!-- 账号信息按钮:修改账号信息  发送邮件  发送短信  设置是否专业客商-->
     <table id="customerinfo" name="customerinfo" style="width: 90%;margin-left: 10px;margin-top: 5px">
         <tr style="height: 30px;">
-            <td style="width: 400px" colspan="3">
+            <td style="width: 400px" colspan="4">
                 <a id="modifyBaseInfo" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">修改账号信息</a>
                 <a id="sendEmail" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" style="margin-left: 10px" >发送邮件</a>
                 <a id="sendMsg" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'">发送短信</a>
                 <a id="setProfessional" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo'"><#if customer.isProfessional?exists && customer.isProfessional==1>设为普通客商<#else>设为专业客商</#if></a>
                 <a id="setActiveOrUnactive" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo'"><#if customer.isActivated?exists && customer.isActivated==1>注销<#else>激活</#if></a>
+                <a id="loadEmailContent" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">下载邮件内容</a>
             </td>
-            <td style="width: 200px"></td>
-            <td style="width: 100px"></td>
-            <td style="width: 200px"></td>
         </tr>
     </table>
+    <!-- 导出邮件内容 -->
+    <form id="exportEmailContentToZip" action="${base}/user/exportEmailContentToZip" method="post">
+        <div id="eidParm1"></div>
+    </form>
     <!-- 账号信息内容 -->
     <table id="accountInfoTable" name="accountInfoTable" border="0" style="width: 100%;margin-top: 5px;margin-bottom: 10px">
         <tr style="height: 30px">
@@ -55,7 +60,13 @@
             <td style="width: 4%;text-align: right">密码：</td>
             <td style="width: 6%;"><#if customer.password?exists>${customer.password}</#if></td>
             <td style="width: 6%;text-align: right">是否激活：</td>
-            <td style="width: 6%;"><#if customer.isActivated==1>激活<#else>注销</#if></td>
+            <td style="width: 6%;">
+                <font color="blue">
+                    <#if customer.isActivated==0>注销</#if>
+                    <#if customer.isActivated==1>网页激活</#if>
+                    <#if customer.isActivated==2>短信激活</#if>
+                </font>
+            </td>
             <td style="width: 6%;text-align: right">是否专业：</td>
             <td style="width: 6%;"><font color="blue"><#if customer.isProfessional==1>专业<#else>普通</#if></font></td>
             <td style="width: 8%;text-align: right">登记时间：</td>
@@ -237,7 +248,7 @@
         </table>
     </form>
 </div>
-
+<div class="loading"><img src="${base}/resource/load.gif"></div>
 <script>
 var country = [];
 var province = [];
@@ -245,6 +256,7 @@ var checkedProducts = [];
 var checkedJoiners = [];
 var checkedContacts = [];
 var isNormalOrProfessional;
+var eidParm1 = document.getElementById("eidParm1");
 
 /********************************************************自定义函数开始****************************************************************/
 function country_change(countryId){
@@ -274,15 +286,16 @@ function refreshAccountInfo(){
     var tabRow = accountInfoTable.rows;
     var tabCell0 = tabRow[0].cells;
     tabCell0[1].innerText = document.accountInfoManageForm.username.value;
-    tabCell0[3].innerText = document.accountInfoManageForm.email.value;
+    tabCell0[2].innerText = document.accountInfoManageForm.email.value;
+    tabCell0[3].innerText = document.accountInfoManageForm.password.value;
     tabCell0[5].innerText = document.accountInfoManageForm.company.value;
     tabCell0[7].innerText = document.accountInfoManageForm.position.value;
-    tabCell0[9].innerText = document.accountInfoManageForm.password.value;
     var tabCell1 = tabRow[1].cells;
     tabCell1[3].innerText = document.accountInfoManageForm.address.value;
     tabCell1[5].innerText = document.accountInfoManageForm.mobilePhone.value;
     tabCell1[7].innerText = document.accountInfoManageForm.website.value;
     tabCell1[11].innerText = document.accountInfoManageForm.fax.value;
+    window.location.href=window.location.href;
 }
 
 $(document).ready(function () {
@@ -394,7 +407,7 @@ $(document).ready(function () {
                                 showType: 'slide'
                             });
                             alert('客商属性修改成功');
-                            window.location.href=window.location.href;
+                            window.location.href = window.location.href;
                         } else if (data.resultCode == 2) {
                             $.messager.alert('错误', data.description);
                         } else {
@@ -469,6 +482,7 @@ $(document).ready(function () {
         $("#customerSelectEmailTypeDlg").dialog("close");
         $.messager.confirm('确认发送','你确定要给普通客商发邮件吗?',function(r){
             if (r){
+                $("#bg,.loading").show();
                 $.ajax({
                     url: "${base}/user/emailAllInlandStoneCustomers",
                     type: "post",
@@ -483,6 +497,7 @@ $(document).ready(function () {
                         });
                     },
                     success: function (data) {
+                        $("#bg,.loading").hide();
                         if (data.resultCode == 0) {
                             $.messager.show({
                                 title: '成功',
@@ -497,6 +512,10 @@ $(document).ready(function () {
                         } else {
                             $.messager.alert('错误', '系统错误');
                         }
+                    },
+                    error: function (result) {
+                        $("#bg,.loading").hide();
+                        alert('给普通客商发送邮件失败');
                     }
                 });
             }
@@ -516,6 +535,7 @@ $(document).ready(function () {
         $("#customerSelectEmailTypeDlg").dialog("close");
         $.messager.confirm('确认发送','你确定要给专业客商发邮件吗?',function(r){
             if (r){
+                $("#bg,.loading").show();
                 $.ajax({
                     url: "${base}/user/emailAllInlandStoneCustomers",
                     type: "post",
@@ -530,6 +550,7 @@ $(document).ready(function () {
                         });
                     },
                     success: function (data) {
+                        $("#bg,.loading").hide();
                         if (data.resultCode == 0) {
                             $.messager.show({
                                 title: '成功',
@@ -544,6 +565,10 @@ $(document).ready(function () {
                         } else {
                             $.messager.alert('错误', '系统错误');
                         }
+                    },
+                    error: function (result) {
+                        $("#bg,.loading").hide();
+                        alert('给专业客商发送邮件失败');
                     }
                 });
             }
@@ -558,12 +583,22 @@ $(document).ready(function () {
     //发送短信
     $("#sendMsg").click(function () {
         $.messager.confirm('确认发送','你确定要给客商发短信吗?',function(r){
+            var value = 0;
+            if (${customer.isActivated} == 1) {
+                value = 1;
+            }
+            if (${customer.isActivated} == 0){
+                value = 2;
+            }
+            if (${customer.isActivated} == 2){
+                value = 1;
+            }
             if (r){
                 $.ajax({
                     url: "${base}/user/msgAllInlandStoneCustomers",
                     type: "post",
                     dataType: "json",
-                    data: {"cids": ${id}},
+                    data: {"cids": ${id},"type":value},
                     beforeSend:function(XMLHttpRequest){
                         $.messager.show({
                             title: '处理中...',
@@ -589,6 +624,18 @@ $(document).ready(function () {
                         }
                     }
                 });
+            }
+        });
+    });
+
+    $('#loadEmailContent').click(function(){
+        $.messager.confirm('确认下载','你确认要下载邮件内容吗?',function(r){
+            if (r){
+                eidParm1.innerHTML = "";
+                var node = "<input type='hidden' name='cids' value='" + ${id} + "'/>";
+                eidParm1.innerHTML += node;
+                document.getElementById("exportEmailContentToZip").submit();
+                $.messager.alert('提示', '下载邮件内容成功');
             }
         });
     });

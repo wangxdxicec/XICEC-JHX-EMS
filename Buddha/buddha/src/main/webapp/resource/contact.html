@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="bootstrap/b2/css/bootstrap.css" rel="stylesheet">
+    <script src="common/jquery.min.js"></script>
+    <style>
+        .form-horizontal {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="modal hide fade" id="contactUs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">联系我们</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" id="contactUsForm" target="submitFrame">
+                    <div><label style="width: auto;"><b>厦门会展金泓信展览有限公司</b></label></div>
+                    <div><label style="width: auto;">地 址：福建省厦门市会展路198号厦门国际会展中心</label></div>
+                    <div><label style="width: auto;">邮 编：361008</label></div>
+                    <div><label style="width: auto;">电 话：0592-5959618</label></div>
+                    <div><label style="width: auto;">传 真：0592-5959689</label></div>
+                    <div><label style="width: auto;">网 址：www.buddhafair.com</label></div>
+                    <div><label style="width: auto;">信 箱：info@buddhafair.com</label></div>
+                    <div><label style="width: auto;">展 馆：中国·厦门国际会展中心</label></div>
+                    <div><label style="width: auto;">馆 址：福建省厦门市会展路198号</label></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="close">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#contactUs").modal({backdrop: 'static', keyboard: false});
+        $("#close").click(function () {
+            location.href="/";
+        });
+    })
+</script>
+<script src="bootstrap/b2/js/bootstrap.js"></script>
+</body>
+</html>

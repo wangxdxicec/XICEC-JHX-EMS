@@ -1,7 +1,12 @@
 package com.zhenhappy.ems.manager.action.user;
 
 import java.util.Date;
+import java.util.List;
 
+import com.zhenhappy.ems.entity.TTeaVisitorInfo;
+import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
+import com.zhenhappy.util.EmailPattern;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,11 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.zhenhappy.ems.dto.BaseResponse;
 import com.zhenhappy.ems.entity.TArticle;
 import com.zhenhappy.ems.manager.action.BaseAction;
-import com.zhenhappy.ems.manager.dto.AddArticleRequest;
-import com.zhenhappy.ems.manager.dto.ManagerPrinciple;
-import com.zhenhappy.ems.manager.dto.ModifyArticleRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerRequest;
-import com.zhenhappy.ems.manager.dto.QueryCustomerResponse;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 
 /**
@@ -35,31 +35,6 @@ public class CustomerAction extends BaseAction {
 
     @Autowired
     private CustomerInfoManagerService customerInfoManagerService;
-
-    /**
-     * 分页查询客商
-     *
-     * @param request
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "queryCustomersByPage")
-    public QueryCustomerResponse queryCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
-    	QueryCustomerResponse response = new QueryCustomerResponse();
-        try {
-        	response = customerInfoManagerService.queryCustomersByPage(request);
-        } catch (Exception e) {
-            response.setResultCode(1);
-            log.error("query customers error.", e);
-        }
-        return response;
-    }
-    
-    @RequestMapping(value = "customer")
-    public ModelAndView directToCustomer() {
-        ModelAndView modelAndView = new ModelAndView("/user/customer/customer");
-        return modelAndView;
-    }
     
     @ResponseBody
     @RequestMapping(value = "addCustomer", method = RequestMethod.POST)
@@ -106,6 +81,141 @@ public class CustomerAction extends BaseAction {
         	if(ids == null) throw new Exception();
         } catch (Exception e) {
         	log.error("delete articles error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询国内客商
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryInlandCustomersByPage")
+    public QueryCustomerResponse queryInlandCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryInlandCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 分页查询国外客商
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryForeignCustomersByPage")
+    public QueryCustomerResponse queryForeignCustomersByPage(@ModelAttribute QueryCustomerRequest request) {
+        QueryCustomerResponse response = new QueryCustomerResponse();
+        try {
+            response = customerInfoManagerService.queryForeignCustomersByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query customers error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 显示客商详细页面
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "directToCustomerInfo")
+    public ModelAndView directToCustomerInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/customer/customerInfo");
+        modelAndView.addObject("id", id);
+        TTeaVisitorInfo wCustomer = customerInfoManagerService.loadCustomerInfoById(id);
+        modelAndView.addObject("customer", wCustomer);
+        return modelAndView;
+    }
+
+    /**
+     * 修改客商账号
+     * @param request
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerInfo", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerAccount(@ModelAttribute ModifyCustomerInfo request,
+                                              @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            EmailPattern pattern = new EmailPattern();
+            if(pattern.isEmailPattern(request.getEmail())) {
+                List<TTeaVisitorInfo> wCustomers = customerInfoManagerService.loadCustomerByEmail(request.getEmail());
+                if(wCustomers == null){
+                    customerInfoManagerService.modifyCustomerAccount(request, principle.getAdmin().getId());
+                } else {
+                    response.setDescription("邮箱不能重复");
+                    response.setResultCode(3);
+                }
+            } else {
+                response.setResultCode(2);
+                response.setDescription("请输入有效的邮箱格式");
+            }
+            if(!pattern.isMobileNO(request.getMobilePhone())) {
+                response.setResultCode(2);
+                response.setDescription("请输入有效的手机号码");
+            }
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 激活或注销客商信息
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "setCustomerActiveOrUnactive", method = RequestMethod.POST)
+    public BaseResponse setCustomerActiveOrUnactive(@ModelAttribute QueryCustomerRequest request,
+                                                    @RequestParam(value = "id", defaultValue = "")Integer id) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.setCustomerActiveOrUnactive(request, id);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 修改客商是否专业
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyCustomerProfessional", method = RequestMethod.POST)
+    public BaseResponse modifyCustomerProfessional(@ModelAttribute QueryCustomerRequest request, @RequestParam(value = "id", defaultValue = "")Integer id) {
+        BaseResponse response = new BaseResponse();
+        try {
+            customerInfoManagerService.modifyCustomerProfessional(request, id);
+        } catch (DuplicateUsernameException e) {
+            response.setResultCode(2);
+            response.setDescription(e.getMessage());
+        } catch (Exception e) {
+            log.error("modify customer account error.", e);
             response.setResultCode(1);
         }
         return response;

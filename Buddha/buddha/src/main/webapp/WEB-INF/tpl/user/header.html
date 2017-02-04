@@ -26,7 +26,7 @@
         <img src="${resource}/images/banner.jpg">
         <div style="position: absolute;top: 80px;left: 300px;color: #61590e">
             <p style="font-size: 24px;font-weight: bold"><@spring.message "site"/></p>
-            <p style="font-size: 14px"><@spring.message "site.desc"/></p>
+            <p style="font-size: 14px">${tExhibitorTime.buddha_Fair_Show_Date}&nbsp;<@spring.message "banner.two"/></p>
         </div>
         <font style="color:#b94a48;position: absolute;right: 3px;bottom: 10px;"><@spring.message "banner.time"/></font>
         <font id="baiwei" style="color:#b94a48;position: absolute;right: 70px;bottom: 10px;">0</font>
@@ -54,7 +54,7 @@
 </div>
 <script>
     $(document).ready(function(){
-        var kaishi = new Date(${tExhibitorTime.buddha_Fair_Show_Date_Begin});
+        var kaishi = new Date('${tExhibitorTime.buddha_Fair_Show_Date_Begin}');
         var now = new Date();
         var day = ((kaishi.getTime()-now.getTime())/1000/60/60/24);
         var dayString = Math.ceil(day)+"";

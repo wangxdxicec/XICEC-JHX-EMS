@@ -97,22 +97,26 @@
 				</tr>
 			</thead>
 	</table>
-	<!-- 导出所选会刊 -->
-	<form id="exportTransactionsToZip" action="${base}/user/exportTransactionsToZip" method="post">
-		<div id="eidParm1"></div>
-	</form>
-	<!-- 导出所选展商到Excel -->
-	<form id="exportExhibitorsToExcel" action="${base}/user/exportExhibitorsToExcel" method="post">
-		<div id="eidParm2"></div>
-	</form>
-	<!-- 导出所选展位号+企业楣牌 -->
-	<form id="exportBoothNumAndMeipaiToExcel" action="${base}/user/exportBoothNumAndMeipaiToExcel" method="post">
-		<div id="eidParm3"></div>
-	</form>
-    <!-- 导出展商参展人员到Excel -->
-    <form id="exportExhibitorJoinersToExcel" action="${base}/user/exportExhibitorJoinersToExcel" method="post">
-        <div id="eidParm5"></div>
-    </form>
+		<!-- 导出所选会刊 -->
+		<form id="exportTransactionsToZip" action="${base}/user/exportTransactionsToZip" method="post">
+			<div id="eidParm1"></div>
+		</form>
+		<!-- 导出所选展商到Excel -->
+		<form id="exportExhibitorsToExcel" action="${base}/user/exportExhibitorsToExcel" method="post">
+			<div id="eidParm2"></div>
+		</form>
+		<!-- 导出所选展位号+企业楣牌 -->
+		<form id="exportBoothNumAndMeipaiToExcel" action="${base}/user/exportBoothNumAndMeipaiToExcel" method="post">
+			<div id="eidParm3"></div>
+		</form>
+		<!-- 导出展商参展人员到Excel -->
+		<form id="exportExhibitorJoinersToExcel" action="${base}/user/exportExhibitorJoinersToExcel" method="post">
+			<div id="eidParm5"></div>
+		</form>
+		<!-- 导出所有展商增值税专用发票 -->
+		<form id="exportExhibitorInvitationToZip" action="${base}/user/exportExhibitorInvitationToZip" method="post">
+			<div id="eidParm7"></div>
+		</form>
 	</div>
 </div>
 <!-- 添加展商账号表单 -->
@@ -303,6 +307,9 @@
 		<div id="exportSelectedExhibitors" iconCls="icon-redo">所选展商基本信息到Excel</div>
 		<div id="exportAllExhibitorJoiners" iconCls="icon-redo">所有参展人员列表到Excel</div>
 		<div id="exportSelectedExhibitorJoiners" iconCls="icon-redo">所选参展人员列表到Excel</div>
+		<div class="menu-sep"></div>
+		<div id="exportAllExhibitorInvitationInfo" iconCls="icon-redo">所有展商增值税专用发票</div>
+		<div id="exportSelectedExhibitorInvitationInfo" iconCls="icon-redo">所选展商增值税专用发票</div>
 	</div>
 	<div id="import" style="width:100px;">
 		<div id="importExhibitor" iconCls="icon-undo">导入展商账号</div>
@@ -612,6 +619,30 @@
 			$.messager.alert('提示', '请至少选择一项展商再导出');
 		}
 	});
+	//导出所有展商增值税专用发票
+	$('#exportAllExhibitorInvitationInfo').click(function(){
+		eidParm7.innerHTML = "";
+		var node = "<input type='hidden' name='eids' value='-1'/>";
+		eidParm7.innerHTML += node;
+		document.getElementById("exportExhibitorInvitationToZip").submit();
+		$.messager.alert('提示', '请勿关闭窗口,耐心等待1~2分钟后会提示下载');
+	});
+	//导出所选展商增值税专用发票
+	$('#exportSelectedExhibitorInvitationInfo').click(function(){
+		eidParm7.innerHTML = "";
+		if(checkedItems.length > 0){
+			for (var i = 0; i < checkedItems.length; i++) {
+				var node = "<input type='hidden' name='eids' value='"+checkedItems[i]+"'/>";
+				eidParm7.innerHTML += node;
+			}
+			document.getElementById("exportExhibitorInvitationToZip").submit();
+			$.messager.alert('提示', '导出所选展商增值税专用发票成功');
+		}else{
+			$.messager.alert('提示', '请至少选择一项展商再导出');
+		}
+	});
+
+
 	//导入展商账号
 	$('#importExhibitor').click(function(){
 		$("#countryImport").html('');

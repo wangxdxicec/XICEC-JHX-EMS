@@ -3,7 +3,6 @@ package com.zhenhappy.ems.manager.action.user;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,21 +11,29 @@ import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dao.xicecmap.XicecMapDao;
 import com.zhenhappy.ems.manager.dto.*;
+import com.zhenhappy.ems.manager.dto.backupinfo.QueryExhibitorBackupRequest;
+import com.zhenhappy.ems.manager.dto.backupinfo.QueryProductOrContactOrJoinerRequest;
 import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionRequest;
 import com.zhenhappy.ems.manager.dto.xicecmap.QueryXicecMapIntetionResponse;
+import com.zhenhappy.ems.manager.entity.backupinfo.*;
 import com.zhenhappy.ems.manager.entity.xicecmap.ReserverExhibitorInfoAndBooth;
 import com.zhenhappy.ems.manager.entity.xicecmap.SelloutExhibitorInfoAndBooth;
 import com.zhenhappy.ems.manager.entity.xicecmap.TXicecMapIntetion;
 import com.zhenhappy.ems.manager.exception.DuplicateTagException;
 import com.zhenhappy.ems.manager.service.ImportExportService;
+import com.zhenhappy.ems.manager.service.TVisaManagerService;
 import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.manager.util.JXLExcelView;
+import com.zhenhappy.ems.service.InvoiceExtendService;
 import com.zhenhappy.ems.service.managerrole.TUserInfoService;
+import com.zhenhappy.util.Page;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +51,6 @@ import com.zhenhappy.ems.manager.exception.DuplicateUsernameException;
 import com.zhenhappy.ems.manager.service.ExhibitorManagerService;
 import com.zhenhappy.ems.manager.service.TagManagerService;
 import com.zhenhappy.ems.service.CountryProvinceService;
-import com.zhenhappy.ems.service.InvoiceService;
 import com.zhenhappy.ems.service.MeipaiService;
 import com.zhenhappy.system.SystemConfig;
 
@@ -65,7 +71,7 @@ public class ExhibitorAction extends BaseAction {
     @Autowired
     private MeipaiService meipaiService;
     @Autowired
-    private InvoiceService invoiceService;
+    private InvoiceExtendService invoiceService;
     @Autowired
     private CountryProvinceService countryProvinceService;
     @Autowired
@@ -80,6 +86,8 @@ public class ExhibitorAction extends BaseAction {
     private XicecMapDao xicecMapDao;
     @Autowired
     private TUserInfoService userInfoService;
+    @Autowired
+    private HibernateTemplate hibernateTemplate;
 
     /**
      * 分页查询展商列表
@@ -156,7 +164,8 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "addExhibitor", method = RequestMethod.POST)
-    public BaseResponse addExhibitorAccount(@ModelAttribute AddExhibitorRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse addExhibitorAccount(@ModelAttribute AddExhibitorRequest request,
+                                            @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	exhibitorManagerService.addExhibitor(request, principle.getAdmin().getId());
@@ -258,6 +267,29 @@ public class ExhibitorAction extends BaseAction {
     }
 
     /**
+     * 绑定展位号
+     * @param request
+     * @param principle
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "modifyBoothMark", method = RequestMethod.POST)
+    public BaseResponse modifyBoothMark(@ModelAttribute BindBoothRequest request, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+        BaseResponse response = new BaseResponse();
+        try {
+            TExhibitorBooth booth = exhibitorManagerService.queryBoothByEid(request.getEid());
+            if(booth != null){
+                booth.setMark(request.getMark());
+                hibernateTemplate.update(booth);
+            }
+        } catch (Exception e) {
+            log.error("modify booth type error.", e);
+            response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
      * 批量修改所属人
      * @param eids
      * @param tag
@@ -266,7 +298,9 @@ public class ExhibitorAction extends BaseAction {
      */
     @ResponseBody
     @RequestMapping(value = "modifyExhibitorsTag", method = RequestMethod.POST)
-    public BaseResponse modifyExhibitorsTag(@RequestParam(value = "eids", defaultValue = "") Integer[] eids, @RequestParam("tag") Integer tag, @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
+    public BaseResponse modifyExhibitorsTag(@RequestParam(value = "eids", defaultValue = "") Integer[] eids,
+                                            @RequestParam("tag") Integer tag,
+                                            @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse response = new BaseResponse();
         try {
         	if(eids != null && tag != null){
@@ -513,6 +547,30 @@ public class ExhibitorAction extends BaseAction {
                 if (!logo.exists()) return;
 				OutputStream outputStream = response.getOutputStream();
                 FileUtils.copyFile(logo, outputStream);
+                outputStream.close();
+                outputStream.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 显示发票图片
+     * @param response
+     * @param eid
+     */
+    @RequestMapping(value = "showInvoiceImage", method = RequestMethod.GET)
+    public void showInvoiceImage(HttpServletResponse response, @RequestParam("eid") Integer eid) {
+        try {
+            String logoFileName = invoiceService.getByEid(eid).getInvoice_image_address();
+            if (StringUtils.isNotEmpty(logoFileName)) {
+                OutputStream outputStream = response.getOutputStream();
+                File logo = new File(logoFileName);
+                if (!logo.exists()) {
+                    return;
+                }
+                FileUtils.copyFile(new File(logoFileName), outputStream);
                 outputStream.close();
                 outputStream.flush();
             }
@@ -811,5 +869,274 @@ public class ExhibitorAction extends BaseAction {
         }catch (Exception e) {
         }
         return reserverExhibitorInfoAndBooth;
+    }
+
+    /**
+     * 分页查询备份展商数据
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryAllExhibitorBackupInfosByPage")
+    public QueryExhibitorResponse queryAllExhibitorBackupInfosByPage(@ModelAttribute QueryExhibitorBackupRequest request) {
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        try {
+            response = exhibitorManagerService.queryAllExhibitorBackupInfosByPage(request);
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query exhibitor backup info error.", e);
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "directorExhibitorBackupInfo")
+    public ModelAndView directorExhibitorBackupInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/databackup/exhibitorBackupDetailInfo");
+        TExhibitorBackupInfo tExhibitorBackupInfo = exhibitorManagerService.loadExhibitorBackupInfoById(id);
+        modelAndView.addObject("id", tExhibitorBackupInfo.getId());
+        modelAndView.addObject("tExhibitorBackupInfo", tExhibitorBackupInfo);
+        /*modelAndView.addObject("term", exhibitorManagerService.getExhibitorTermByEid(tExhibitorBackupInfo.getEid()));
+        modelAndView.addObject("booth", exhibitorManagerService.queryBoothByEid(tExhibitorBackupInfo.getEid()));
+        modelAndView.addObject("currentTerm", exhibitorManagerService.queryCurrentTermNumber());
+        modelAndView.addObject("exhibitorInfo", exhibitorManagerService.loadExhibitorInfoByEid(tExhibitorBackupInfo.getEid()));
+        modelAndView.addObject("invoice", invoiceService.getByEid(tExhibitorBackupInfo.getEid()));*/
+        return modelAndView;
+    }
+
+    /**
+     * 显示展商备份Logo
+     * @param response
+     * @param id
+     */
+    @RequestMapping(value = "showExhibitorBackupInvoiceImage", method = RequestMethod.GET)
+    public void showExhibitorBackupInvoiceImage(HttpServletResponse response, @RequestParam("id") Integer id) {
+        try {
+            TExhibitorBackupInfo tExhibitorBackupInfo = exhibitorManagerService.loadExhibitorBackupInfoById(id);
+            if(tExhibitorBackupInfo != null){
+                String logoFileName = tExhibitorBackupInfo.getExhibitor_invoice_apply_invoice_image_address();
+                if (StringUtils.isNotEmpty(logoFileName)) {
+                    OutputStream outputStream = response.getOutputStream();
+                    File logo = new File(logoFileName);
+                    if (!logo.exists()) {
+                        return;
+                    }
+                    FileUtils.copyFile(new File(logoFileName), outputStream);
+                    outputStream.close();
+                    outputStream.flush();
+                }
+            }
+        } catch (Exception e) {
+            log.error("query exhibitor backup invoice image error.", e);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 显示备份展商Logo
+     * @param response
+     * @param id
+     */
+    @RequestMapping(value = "showExhibitorBackupLogo", method = RequestMethod.GET)
+    public void showExhibitorBackupLogo(HttpServletResponse response, @RequestParam("id") Integer id) {
+        try {
+            TExhibitorBackupInfo tExhibitorBackupInfo = exhibitorManagerService.loadExhibitorBackupInfoById(id);
+            if(tExhibitorBackupInfo != null){
+                String logoFileName = tExhibitorBackupInfo.getExhibitor_info_logo();
+                if (StringUtils.isNotEmpty(logoFileName)) {
+                    File logo = new File(logoFileName);
+                    if (!logo.exists()) return;
+                    OutputStream outputStream = response.getOutputStream();
+                    FileUtils.copyFile(logo, outputStream);
+                    outputStream.close();
+                    outputStream.flush();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 备份展商数据
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "backupExhibitorData", method = RequestMethod.POST)
+    public BaseResponse backupExhibitorData() {
+        BaseResponse response = new BaseResponse();
+        try {
+            exhibitorManagerService.backupExhibitorData();
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("backup exhibitor info error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 根据id查询展商备份对应产品列表
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryExhibitorBackupProductList", method = RequestMethod.POST)
+    public QueryExhibitorResponse queryExhibitorBackupProductList(@ModelAttribute QueryProductOrContactOrJoinerRequest request) {
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        try {
+            Page page = new Page();
+            page.setPageSize(request.getRows());
+            page.setPageIndex(request.getPage());
+            List<TProductBackupInfo> tProductBackupInfoList = exhibitorManagerService.loadProductBackupInfoById(request.getId());
+            response.setRows(tProductBackupInfoList);
+            response.setResultCode(0);
+            response.setTotal(page.getTotalCount());
+        } catch (Exception e) {
+            response = new QueryExhibitorResponse();
+            log.error("query exhibitor backup product list error.",e);
+        }
+        return response;
+    }
+
+    /**
+     * 根据id查询展商备份对应联系人列表
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryExhibitorBackupContactList", method = RequestMethod.POST)
+    public QueryExhibitorResponse queryExhibitorBackupContactList(@ModelAttribute QueryProductOrContactOrJoinerRequest request) {
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        try {
+            Page page = new Page();
+            page.setPageSize(request.getRows());
+            page.setPageIndex(request.getPage());
+            List<TContactBackupInfo> tContactBackupInfoList = exhibitorManagerService.loadContactBackupInfoById(request.getId());
+            response.setRows(tContactBackupInfoList);
+            response.setResultCode(0);
+            response.setTotal(page.getTotalCount());
+        } catch (Exception e) {
+            response = new QueryExhibitorResponse();
+            log.error("query exhibitor backup contact list error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 根据id查询展商备份对应参展人员列表
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryExhibitorBackupJoinerList", method = RequestMethod.POST)
+    public QueryExhibitorResponse queryExhibitorBackupJoinerList(@ModelAttribute QueryProductOrContactOrJoinerRequest request) {
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        try {
+            Page page = new Page();
+            page.setPageSize(request.getRows());
+            page.setPageIndex(request.getPage());
+            List<TExhibitorJoinerBackupInfo> tExhibitorJoinerBackupInfoList = exhibitorManagerService.loadExhibitorJoinerBackupInfoById(request.getId());
+            response.setRows(tExhibitorJoinerBackupInfoList);
+            response.setResultCode(0);
+            response.setTotal(page.getTotalCount());
+        } catch (Exception e) {
+            response = new QueryExhibitorResponse();
+            log.error("query exhibitor backup joiner list error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 根据id查询展商备份对应VISA列表
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "queryExhibitorBackupVisaList", method = RequestMethod.POST)
+    public QueryExhibitorResponse queryExhibitorBackupVisaList(@ModelAttribute QueryProductOrContactOrJoinerRequest request) {
+        QueryExhibitorResponse response = new QueryExhibitorResponse();
+        try {
+            Page page = new Page();
+            page.setPageSize(request.getRows());
+            page.setPageIndex(request.getPage());
+            List<TVisaBackupInfo> tVisaBackupInfoList = exhibitorManagerService.loadExhibitorVisaBackupInfoByExhibitorInfoBackupId(request.getId());
+            response.setRows(tVisaBackupInfoList);
+            response.setResultCode(0);
+            response.setTotal(page.getTotalCount());
+        } catch (Exception e) {
+            response = new QueryExhibitorResponse();
+            log.error("query exhibitor backup visa list error.", e);
+        }
+        return response;
+    }
+
+    /**
+     * 显示护照
+     * @param response
+     * @param vid
+     */
+    @RequestMapping(value = "showVisaBackupPassportPage", method = RequestMethod.GET)
+    public void showVisaBackupPassportPage(HttpServletResponse response, @RequestParam("vid") Integer vid) {
+        try {
+            TVisaBackupInfo tVisaBackupInfo = exhibitorManagerService.loadExhibitorVisaBackupInfoById(vid);
+            if(tVisaBackupInfo != null){
+                String logoFileName = tVisaBackupInfo.getPassportPage();
+                if (StringUtils.isNotEmpty(logoFileName)) {
+                    if(logoFileName.toLowerCase().contains(".pdf")) response.setContentType("application/pdf");
+                    File logo = new File(logoFileName);
+                    if (!logo.exists()) return;
+                    OutputStream outputStream = response.getOutputStream();
+                    FileUtils.copyFile(logo, outputStream);
+                    outputStream.close();
+                    outputStream.flush();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 显示营业执照
+     * @param response
+     * @param vid
+     */
+    @RequestMapping(value = "showVisaBackupBusinessPage", method = RequestMethod.GET)
+    public void showVisaBackupBusinessPage(HttpServletResponse response, @RequestParam("vid") Integer vid) {
+        try {
+            TVisaBackupInfo tVisaBackupInfo = exhibitorManagerService.loadExhibitorVisaBackupInfoById(vid);
+            if(tVisaBackupInfo != null){
+                String logoFileName = tVisaBackupInfo.getBusinessLicense();
+                if (StringUtils.isNotEmpty(logoFileName)) {
+                    if(logoFileName.toLowerCase().contains(".pdf")) response.setContentType("application/pdf");
+                    File logo = new File(logoFileName);
+                    if (!logo.exists()) return;
+                    OutputStream outputStream = response.getOutputStream();
+                    FileUtils.copyFile(logo, outputStream);
+                    outputStream.close();
+                    outputStream.flush();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 根据ID获取具体的VISA信息
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "tVisaBackupDetailInfo")
+    public ModelAndView directToTVisaBackupDetailInfo(@RequestParam("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("user/visa/tvisaInfo");
+        modelAndView.addObject("id", id);
+        TVisaBackupInfo tVisaBackupInfo = exhibitorManagerService.loadExhibitorVisaBackupInfoById(id);
+        modelAndView.addObject("visaInfo", tVisaBackupInfo);
+        if(tVisaBackupInfo != null){
+            TExhibitorJoinerBackupInfo tExhibitorJoinerBackupInfo = exhibitorManagerService.loadExhibitorJoinerBackupInfoByJoinerId(tVisaBackupInfo.getJoinerId());
+            modelAndView.addObject("joinerInfo", tExhibitorJoinerBackupInfo);
+        }
+        return modelAndView;
     }
 }

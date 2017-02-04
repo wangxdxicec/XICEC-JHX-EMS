@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -83,7 +84,6 @@ public class ExhibitorInfoAction extends BaseAction {
             modelAndView.addObject("booth", booth);
         }
         TExhibitorInfo exhibitorInfo = exhibitorService.loadExhibitorInfoByEid(exhibitorId);
-
         //wangxd 2016-06-24  若账号刚激活，需要登录进基本信信界面，后台颜色才会更新
         TExhibitor exhibitor = exhibitorService.getExhibitorByEid(exhibitorId);
         if(exhibitor != null){
@@ -127,6 +127,7 @@ public class ExhibitorInfoAction extends BaseAction {
             modelAndView.addObject("types", productTypes);
             modelAndView.addObject("selected", JSONObject.toJSONString(productTypeChecks));
             modelAndView.addObject("newinfo", exhibitorInfo);
+            modelAndView.addObject("booth", booth);
         }
         return modelAndView;
     }
@@ -190,7 +191,7 @@ public class ExhibitorInfoAction extends BaseAction {
     @RequestMapping(value = "updateinfo", method = RequestMethod.POST)
     public ModelAndView updateInfo(@ModelAttribute TExhibitorInfo exhibitorInfo,
                                    @RequestParam("companyLogo1") MultipartFile companyLogo1,
-                                   @RequestParam("companyLogo2") MultipartFile companyLogo2,
+                                   /*@RequestParam("companyLogo2") MultipartFile companyLogo2,*/
                                    HttpServletRequest request,
                                    HttpServletResponse response,
                                    Locale locale) throws IOException {
@@ -221,7 +222,7 @@ public class ExhibitorInfoAction extends BaseAction {
                 returnStrCn = "前一个公司Logo大于200k";
                 returnStrEn = "Logo1 bigger 200k";
             }
-            if (companyLogo2 != null && companyLogo2.getSize() > 0 && companyLogo2.getSize() <= 204800) {
+            /*if (companyLogo2 != null && companyLogo2.getSize() > 0 && companyLogo2.getSize() <= 204800) {
                 String fileName2 = systemConfig.getVal(Constants.appendix_directory) + "/logo/" + new Date().getTime() + "." + FilenameUtils.getExtension(companyLogo2.getOriginalFilename());
                 FileUtils.copyInputStreamToFile(companyLogo2.getInputStream(), new File(fileName2));
                 if(StringUtils.isNotEmpty(exhibitorInfo.getLogo())) {
@@ -241,7 +242,7 @@ public class ExhibitorInfoAction extends BaseAction {
             }else if(companyLogo2.getSize() > 204800){
                 returnStrCn = "后一个公司Logo大于200k";
                 returnStrEn = "Logo2 bigger 200k";
-            }
+            }*/
             TExhibitorInfo info = exhibitorService.loadExhibitorInfoByEid(exhibitorInfo.getEid());
             exhibitorInfo.setCreateTime(info.getCreateTime());
             exhibitorInfo.setIsDelete(info.getIsDelete());
@@ -271,6 +272,7 @@ public class ExhibitorInfoAction extends BaseAction {
             modelAndView.addObject("selected", JSONObject.toJSONString(productTypeChecks));
             modelAndView.addObject("newinfo", exhibitorInfo);
             modelAndView.addObject("redirect", "/user/info");
+            modelAndView.addObject("redirectweixin", "/user/weixin/index");
             modelAndView.addObject("brands", brands);
         } catch (Exception e) {
             log.error("update exhibitor information error.", e);
@@ -352,25 +354,27 @@ public class ExhibitorInfoAction extends BaseAction {
                         @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
             String logoFileName = exhibitorService.loadExhibitorInfoByEid(eid).getLogo();
-            if(logoFileName.contains(";")){
-                String[] logos = logoFileName.split(";");
-                if (StringUtils.isNotEmpty(logos[page])) {
-                    OutputStream outputStream = response.getOutputStream();
-                    File logo = new File(logos[page]);
-                    if (!logo.exists()) {
-                        return;
+            if(StringUtils.isNotEmpty(logoFileName)){
+                if(logoFileName.contains(";")){
+                    String[] logos = logoFileName.split(";");
+                    if (StringUtils.isNotEmpty(logos[page])) {
+                        OutputStream outputStream = response.getOutputStream();
+                        File logo = new File(logos[page]);
+                        if (!logo.exists()) {
+                            return;
+                        }
+                        FileUtils.copyFile(new File(logos[page]), outputStream);
+                        outputStream.close();
+                        outputStream.flush();
                     }
-                    FileUtils.copyFile(new File(logos[page]), outputStream);
+                }else if(logoFileName.contains("appendix")){
+                    File logo = new File(logoFileName);
+                    if (!logo.exists()) return;
+                    OutputStream outputStream = response.getOutputStream();
+                    FileUtils.copyFile(logo, outputStream);
                     outputStream.close();
                     outputStream.flush();
                 }
-            }else if(logoFileName.contains("appendix")){
-                File logo = new File(logoFileName);
-                if (!logo.exists()) return;
-                OutputStream outputStream = response.getOutputStream();
-                FileUtils.copyFile(logo, outputStream);
-                outputStream.close();
-                outputStream.flush();
             }
         } catch (Exception e) {
             e.printStackTrace();

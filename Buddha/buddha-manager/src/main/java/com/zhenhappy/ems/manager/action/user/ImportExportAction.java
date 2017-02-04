@@ -23,6 +23,7 @@ import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
+import com.zhenhappy.ems.manager.entity.THistoryVisitorInfo;
 import com.zhenhappy.ems.manager.service.CustomerInfoManagerService;
 import com.zhenhappy.ems.service.ExhibitorService;
 import com.zhenhappy.ems.service.JoinerService;
@@ -717,5 +718,53 @@ public class ImportExportAction extends BaseAction {
             response.setResultCode(1);
         }
         return response;
+    }
+
+    /**
+     * 导出历史客商资料列表到Excel
+     * @param cids
+     * @return
+     */
+    @RequestMapping(value = "exportHistoryVisitoryToExcel", method = RequestMethod.POST)
+    public ModelAndView exportHistoryVisitoryToExcel(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                     @RequestParam(value = "inOrOut") Integer inOrOut) {
+        Map model = new HashMap();
+        List<THistoryVisitorInfo> customers = new ArrayList<THistoryVisitorInfo>();
+        if(cids[0] == -1)
+            customers = customerInfoManagerService.loadAllHistoryVisitoryInfo(inOrOut);
+        else
+            customers = customerInfoManagerService.loadSelectedHistoryVisitory(cids, inOrOut);
+        model.put("list", customers);
+        String[] titles = new String[] { "地址", "公司名", "联系人", "手机", "电话", "传真", "邮箱" ,"电话记录" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "address", "company", "contact", "mobile", "telphone", "fax", "email", "tel_remark" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{50,30,20,20,20,20,20,60};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "客商基本信息.xls");
+        model.put("sheetName", "客商基本信息");
+        return new ModelAndView(new JXLExcelView(), model);
+    }
+
+    /**
+     * 按类别导出历史客商资料列表到Excel
+     * @param typeId
+     * @return
+     */
+    @RequestMapping(value = "exportHistoryVisitoryByTypeToExcel", method = RequestMethod.POST)
+    public ModelAndView exportHistoryVisitoryByTypeToExcel(@RequestParam(value = "typeId") Integer typeId,
+                                                           @RequestParam(value = "inOrOut") Integer inOrOut) {
+        Map model = new HashMap();
+        List<THistoryVisitorInfo> customers = customerInfoManagerService.loadSelectedHistoryVisitoryByType(typeId, inOrOut);
+        model.put("list", customers);
+        String[] titles = new String[] { "地址", "公司名", "联系人", "手机", "电话", "传真", "邮箱" ,"电话记录" };
+        model.put("titles", titles);
+        String[] columns = new String[] { "address", "company", "contact", "mobile", "telphone", "fax", "email", "tel_remark" };
+        model.put("columns", columns);
+        Integer[] columnWidths = new Integer[]{50,30,20,20,20,20,20,60};
+        model.put("columnWidths", columnWidths);
+        model.put("fileName", "客商基本信息.xls");
+        model.put("sheetName", "客商基本信息");
+        return new ModelAndView(new JXLExcelView(), model);
     }
 }

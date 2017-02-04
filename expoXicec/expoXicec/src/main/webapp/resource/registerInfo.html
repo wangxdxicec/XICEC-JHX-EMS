@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="bootstrap/b2/css/bootstrap.css" rel="stylesheet">
+    <script src="common/jquery.min.js"></script>
+    <script src="bootstrap/b2/js/bootstrap.js"></script>
+    <style>
+        .form-horizontal .control-label {
+            text-align: left;
+        }
+        #bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=80);}
+        .loading{display: none; width:66px;height:66px; position: absolute; top: 50%; left: 50%; z-index:5555; }
+    </style>
+</head>
+<body onload="showMobilePhone()">
+<div class="modal hide fade" id="registerInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;position: absolute; top: 30%; left: 50%;"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">完善用户信息</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" id="registerForm" target="submitFrame">
+                    <div class="control-group">
+                        <label for="mobilephone" class="control-label" style="width: 180px;">手机号：</label>
+                        <div class="controls">
+                            <input type="text" readonly="readonly" name="mobilephone" id="mobilephone" maxlength="11">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="username" class="control-label" style="width: 180px;">姓名：</label>
+                        <div class="controls">
+                            <input type="text" name="username" id="username" value=""><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>为必填项
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="company" class="control-label" style="width: 180px;">单位：</label>
+                        <div class="controls">
+                            <input type="text" name="company" id="company" value=""><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>为必填项
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="email" class="control-label" style="width: 180px;">邮箱：</label>
+                        <div class="controls">
+                            <input type="text" name="email" id="email" value="">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="password" class="control-label" style="width: 180px;">密码：</label>
+                        <div class="controls">
+                            <input type="password" name="password" id="password" value=""><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>为必填项
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="passwordCheck" class="control-label" style="width: 180px;">确认密码：</label>
+                        <div class="controls">
+                            <input type="password" name="passwordCheck" id="passwordCheck" value=""><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>为必填项
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="registerInfoBtn">提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="close">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loading"><img src="/resource/load.gif"></div>
+<script>
+    $(document).ready(function () {
+        $("#registerInfo").modal({backdrop: 'static', keyboard: false});
+        $("#close").click(function () {
+            location.href="/";
+        });
+    })
+</script>
+<script>
+    var thisURL = document.URL;
+    var getPhoneVal = thisURL.split('?')[1];
+    var phoneValue = getPhoneVal.split("=")[1];
+    function showMobilePhone(){
+        var phoneNumber = phoneValue.substring(0, 11);
+        document.getElementById('mobilephone').value = phoneNumber;
+        document.getElementById('company').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('password').value = "";
+        document.getElementById('passwordCheck').value = "";
+    }
+
+    $("#registerInfoBtn").click(function () {
+        if ($("#username").val() == '') {
+            alert("姓名不能为空！");
+            return;
+        }
+        if ($("#company").val() == '') {
+            alert("单位不能为空！");
+            return;
+        }
+        if ($("#email").val() == '') {
+            alert("邮箱不能为空！");
+            return;
+        }
+        var email = document.getElementById("email");
+        var value = email.value.trim();
+        if(!isEmailFormat(value)) {
+            alert("请输入正确的邮箱！");
+            return;
+        }
+        if ($("#password").val() != $("#passwordCheck").val()) {
+            alert("两次输入的密码不一致，请重新输入！");
+            document.getElementById('password').value = "";
+            document.getElementById('passwordCheck').value = "";
+            return;
+        }
+        var thisURL = document.URL;
+        var getFairTypeVal = thisURL.split('&')[1];
+        var fairTypeValue = getFairTypeVal.split("=")[1];
+        $("#bg,.loading").show();
+        $.ajax({
+            type: "POST",
+            data: {
+                "username": $("#username").val(),
+                "password": $("#password").val(),
+                "phone": $("#mobilephone").val(),
+                "email": $("#email").val(),
+                "company": $("#company").val(),
+                "fair_type": fairTypeValue},
+            url: "/registerInfo",
+            dataType: "json",
+            success: function (result) {
+                $("#bg,.loading").hide();
+                $("#registerInfoBtn").removeClass("disabled");
+                if (result.resultCode == 0) {
+                    alert("恭喜您，信息注册成功！");
+                    location.href="/";
+                }else{
+                    alert("输入的验证码错误，请重新输入！");
+                }
+            }
+        });
+    });
+
+    function isEmailFormat(emailValue) {
+        var reg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+        var flag = false;
+        if(!reg.test(emailValue)) {
+            flag = false;
+        }else{
+            flag = true;
+        }
+        return flag;
+    }
+
+</script>
+</body>
+</html>

@@ -75,11 +75,17 @@ public class ExhibitorTimeAction extends BaseAction {
                                             @RequestParam(value = "exhibitor_Info_Submit_Deadline_En", defaultValue = "") String exhibitor_Info_Submit_Deadline_En,
                                             @RequestParam(value = "tea_Fair_Show_Year", defaultValue = "") String tea_Fair_Show_Year,
                                             @RequestParam(value = "tea_Fair_Show_Begin_Date", defaultValue = "") String tea_Fair_Show_Begin_Date,
-                                            @RequestParam(value = "tea_Fair_Data_End_Html", defaultValue = "") String tea_Fair_Data_End_Html) {
+                                            @RequestParam(value = "tea_Fair_Data_End_Html", defaultValue = "") String tea_Fair_Data_End_Html,
+                                            @RequestParam(value = "tea_Fair_Contact_Submit_Deadline_Zh", defaultValue = "") String tea_Fair_Contact_Submit_Deadline_Zh,
+                                            @RequestParam(value = "tea_Fair_Contact_Submit_Deadline_En", defaultValue = "") String tea_Fair_Contact_Submit_Deadline_En,
+                                            @RequestParam(value = "tea_Fair_Invoice_Submit_Deadline_Zh", defaultValue = "") String tea_Fair_Invoice_Submit_Deadline_Zh,
+                                            @RequestParam(value = "tea_Fair_Invoice_Submit_Deadline_En", defaultValue = "") String tea_Fair_Invoice_Submit_Deadline_En) {
         BaseResponse response = new BaseResponse();
         try {
             exhibitorTimeManagerService.modifyExhibitorTime(tea_Fair_Show_Date_Zh, tea_Fair_Show_Date_En, exhibitor_Info_Submit_Deadline_Zh,
-                    exhibitor_Info_Submit_Deadline_En, tea_Fair_Show_Year, tea_Fair_Show_Begin_Date, tea_Fair_Data_End_Html);
+                    exhibitor_Info_Submit_Deadline_En, tea_Fair_Show_Year, tea_Fair_Show_Begin_Date, tea_Fair_Data_End_Html,
+                    tea_Fair_Contact_Submit_Deadline_Zh, tea_Fair_Contact_Submit_Deadline_En, tea_Fair_Invoice_Submit_Deadline_Zh,
+                    tea_Fair_Invoice_Submit_Deadline_En);
             response.setResultCode(0);
         } catch (Exception e) {
             log.error("modify tea exhibitor time error.", e);

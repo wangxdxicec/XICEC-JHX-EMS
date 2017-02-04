@@ -1,6 +1,7 @@
 package com.zhenhappy.ems.manager.entity.companyinfo;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by wangxd on 2016-05-24.
@@ -23,8 +24,8 @@ public class THistoryCustomer {
     private String backupaddress;
     private String remark;
     private Integer owner;
-    private String createtime;
-    private String updatetime;
+    private Date createtime;
+    private Date updatetime;
     private String updateowner;
     private Integer isDelete;
 
@@ -39,7 +40,7 @@ public class THistoryCustomer {
     public THistoryCustomer(Integer id, String cateory, String company, Integer country, String address,
                             String contact, String position, String telphone, String email,
                             String fixtelphone, String fax, String website, String backupaddress,
-                            String remark, Integer owner, String createtime, String updatetime, String updateowner, Integer isDelete) {
+                            String remark, Integer owner, Date createtime, Date updatetime, String updateowner, Integer isDelete) {
         this.id = id;
         this.cateory = cateory;
         this.company = company;
@@ -199,20 +200,20 @@ public class THistoryCustomer {
     }
 
     @Column(name = "createtime")
-    public String getCreatetime() {
+    public Date getCreatetime() {
         return createtime;
     }
 
-    public void setCreatetime(String createtime) {
+    public void setCreatetime(Date createtime) {
         this.createtime = createtime;
     }
 
     @Column(name = "updatetime")
-    public String getUpdatetime() {
+    public Date getUpdatetime() {
         return updatetime;
     }
 
-    public void setUpdatetime(String updatetime) {
+    public void setUpdatetime(Date updatetime) {
         this.updatetime = updatetime;
     }
 

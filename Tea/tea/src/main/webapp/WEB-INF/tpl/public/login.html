@@ -8,18 +8,42 @@
         *{padding:0;margin:0;font-size:12px;font-family:"宋体";}
         img{display:block;border:0;}
         input{border:0;}
-        .whbox{margin-top:10%;overflow:hidden;position:relative;}
-        .header{width:960px;margin:0 auto;overflow:hidden;}
+        .whbox{margin-top:10%;overflow:visible;position:relative;}
+        .header{width:960px;margin:0 auto;overflow:visible;}
         .header .logobox{float:left;}
+        .QR{
+            width:80px;
+            height:90px;
+            float:left;
+            text-align:center;
+            margin-top:-30px;
+            margin-left:30px;
+        }
+        .QR img{
+            max-width:90px;
+
+        }
+        .illus{
+
+            margin-top:25px;
+            margin-left:10px;
+
+        }
+        .illus>p{
+            margin-top:5px;
+            color:#a83700;
+        }
         .lah{float:right;margin-top:50px;}
         .lah a{float:left;color:#999;padding:2px 16px;border-right:1px solid #CCC;text-decoration:none;}
 
-        .mainbox{width:960px;height:400px;margin:0 auto;position:relative;overflow:hidden;}
+        .mainbox{width:960px;height:400px;margin:0 auto;position:relative;overflow:hidden;position:relative;}
         .white{height:240px;background:#dcdad4;position:absolute;top:180px;width:100%;filter:alpha(opacity=60);opacity:0.6;-moz-opacity:0.6;z-index:-1;}
         .intro{height:240px;position:absolute;left:0;top:80px;width:960px;z-index:5;background:white;filter:alpha(opacity=80);opacity:0.8;-moz-opacity:0.8;}
-        .inbox{width:450px;padding:20px 30px;box-sizing:border-box;}
+        .inbox{width:520px;padding:10px 30px;box-sizing:border-box;padding-top:20px;}
         .inbox h1{margin-bottom:10px;font-size:16px;color:#a83700;}
-        .inbox p{line-height:20px;color:#a83700;}
+
+
+        .inbox p{line-height:20px;color:#a83700;margin-top:10px; text-align:justify;}
         .loginbox{color:red;position:absolute;right:60px;top:30px;width:340px;height:340px;z-index:10;background:white;}
         .form{margin-top:40px;margin-left:20px;}
         #username{height:38px;width:300px;background:url(${resource}/images/login/act.png); background-repeat:no-repeat;border:1px solid #bdbdbd;margin-bottom:20px;font-size:14px;font-family:arial;padding-left:44px;box-sizing:border-box;color:#666666;}
@@ -68,6 +92,12 @@
 <div class="whbox">
     <div class="header">
         <div class="logobox"><img src="${resource}/images/login/logo.png"></div>
+        <div class="QR">
+            <div class="illus">
+                <p>官方微信</p>
+            </div>
+            <img src="${resource}/images/tea_qrcode.jpg">
+        </div>
         <div class="lah">
             <a href="http://www.teafair.com.cn/">展会官网</a>
             <a href="#" id="lc" name="language" >中文</a>
@@ -91,7 +121,7 @@
             <form>
                 <div class="form">
                     <input type="text" id="username" placeholder="请输入用户名"><br>
-                    <input type="text" id="password" placeholder="请输入密码">
+                    <input type="password" id="password" placeholder="请输入密码">
                 </div>
                 <div class="expt">
                     <div class="chek">

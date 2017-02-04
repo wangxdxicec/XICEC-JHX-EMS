@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="${resource}/expoxicec/common.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/bootstrap.min.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/all-skins.min.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/AdminLTE.min.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/font-awesome.min.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/Site.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/StepWizard.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/jquery.webui-popover.min.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/jquery.pagewalkthrough.min.css" rel="stylesheet">
+    <link href="${resource}/expoxicec/bootstrap-tokenfield.min.css" rel="stylesheet">
+
+    <script src="${resource}/expoxicec/jquery-2.1.0.js" type="text/javascript"></script>
+    <script src="${resource}/expoxicec/select2.min.js"></script>
+    <script src="${resource}/expoxicec/bootstrap.min.js"></script>
+    <script src="${resource}/expoxicec/prettify.min.js"></script>
+    <script src="${resource}/expoxicec/anchor.min.js"></script>
+
+    <link href="${resource}/expoxicec/bootstrap.css" type="text/css" rel="stylesheet">
+    <link href="${resource}/expoxicec/select2.min.css" type="text/css" rel="stylesheet" />
+    <style>
+        #bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=80);}
+        .loading{display: none; width:66px;height:66px; position: absolute; top: 50%; left: 50%; z-index:5555; }
+    </style>
+</head>
+
+<body>
+<#include "/user/expoxicec/head02.html" />
+
+<div class="box box-primary">
+    <div class="box-header"><div class="box-title">添加展位</div></div>
+    <div class="box-body">
+        <form action="${base}/user/createbooth" class="form-horizontal" id="formCreateBooth" method="post">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">展位号</label>
+                <div class="col-sm-7">
+                    <select class="form-control" name="Name" id="txtAddBoothName"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">展位类型</label>
+                <div class="col-sm-7"><select class="form-control" id="Type" name="Type"><option value=""></option>
+                    <option value="1">标摊</option>
+                    <option value="2">特装</option>
+                </select></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">参展单位</label>
+                <div class="col-sm-7"><input type="text" class="form-control" name="Company" id="txtAddBoothCompany"  /></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">搭建单位</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" name="Contact" id="txtAddBoothContact" value="${contactname}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">联系电话</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" name="Mobile" id="txtAddBoothMobile" value="${mobile}"/>
+                </div>
+            </div>            <div class="form-group" style="margin-top:20px;margin-bottom:40px">
+                <div class="col-sm-7 col-sm-offset-3">
+                    <p id="CreateBoothSummary" class="text-danger"></p>
+                    <button type="button" class="btn btn-primary" id="btnCreateBooth">添加展位</button>
+                    <a type="button" class="btn btn-default" href="#" onclick="history.go(-1)">取消</a>
+                </div>
+            </div>
+            <input name="Booth" type="hidden" />
+        </form>
+    </div>
+</div>
+
+<#include "/user/expoxicec/bottom.html" />
+</body>
+
+<div class="loading"><img src="/resource/load.gif"></div>
+<script>
+    // 添加展位
+    $('#btnCreateBooth').one('click', function () {
+        CreateBooth();
+    });
+
+    var minimumInputLength = parseInt('1');
+    $("#txtAddBoothName").select2({
+        ajax: {
+            url: "${base}/user/queryCompanyInfoByBoothNumber",
+            dataType: 'json',
+            delay: 250,
+            type: 'POST',
+            data: function (params) {
+                $("#bg,.loading").show();
+                return {
+                    booth: params.term,
+                    pageSize: params.page
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                $("#bg,.loading").hide();
+                return {
+                    results: data.items,
+                    pagination: {
+                        more: (params.page * 15) < data.total
+                    }
+                };
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; },
+        minimumInputLength: minimumInputLength,
+        templateResult: formatRepo,
+        templateSelection: formatRepo
+    });
+
+    function formatRepo(repo) {
+        if (repo.loading) return repo.company;
+        $('#formCreateBooth').find('[name="Booth"]').val(repo.booth);
+        var markup = '<span><strong>' + repo.booth + '</strong> ' + repo.company + ' (' + repo.area + '㎡)</span>';
+        SetCompany(repo.company);
+        //SetArea(repo.area);
+        return markup;
+    }
+
+    function SetCompany(company) {
+        $('#formCreateBooth').find('[name="Company"]').val(company);
+        $('#formCreateBooth').find('[name="Company"]').val(company);
+    }
+
+    function SetArea(area)
+    {
+        //$('#formCreateBooth').find('[name="Company"]').val(company);
+        $('#totalArea').text(area);
+    }
+
+    function CreateBooth() {
+        var form = $('#formCreateBooth');
+        var company = form.find('[name="Company"]').val();
+        var contact = form.find('[name="Contact"]').val();
+        var mobile = form.find('[name="Mobile"]').val();
+        var type = form.find('[name="Type"]').val();
+        var booth = form.find('[name="Booth"]').val();
+        if (booth == '') {
+            $('#CreateBoothSummary').text('请填写展位号');
+            return;
+        }
+        if (type == '') {
+            $('#CreateBoothSummary').text('请选择展位类型');
+            return;
+        }
+        if (contact == '') {
+            $('#CreateBoothSummary').text('请填写展位联系人');
+            return;
+        }
+        if (mobile == '') {
+            $('#CreateBoothSummary').text('请填写联系电话');
+            return;
+        }
+        $('#btnCreateBooth').addClass('disabled').text('请稍候 ...').unbind('click');
+        $.ajax({
+            url: "${base}/user/createbooth",
+            data: {"booth": booth, "company":company, "contact":contact, "mobile":mobile, "type":type},
+            type: "post",
+            dataType: "json",
+            success: function (e) {
+                console.log(e);
+                if (e.result) {
+                    //window.location = '/Project/Details/b0143030-8bc6-e611-aa57-0050568027d2';
+                }
+                else {
+                    $('#CreateBoothSummary').text(e.msg);
+                }
+            },
+            complete: function () {
+                $('#btnCreateBooth').removeClass('disabled').text('添加展位').one('click', function () {
+                    //CreateBooth();
+                });
+            }
+        });
+    }
+
+    function updateTotalArea(value) {
+        var boothnos = $('#txtAddBoothName').tokenfield('getTokensList', ',');
+        console.log(boothnos);
+        $.ajax({
+            url: '/Booth/GetTotalArea',
+            type: 'POST',
+            data: { ProjectId: 'b0143030-8bc6-e611-aa57-0050568027d2', Name: boothnos },
+            success: function (area) {
+                $('#infoArea').text(area);
+            }
+        });
+    }
+
+    var autoCapitalization = parseInt('1') == 1 ? true : false;
+    $('#txtAddBoothName').parents('.form-group').find('p:first').hide();
+</script>
+</html>

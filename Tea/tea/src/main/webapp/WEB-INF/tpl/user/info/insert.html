@@ -81,7 +81,7 @@
                         <label for="inputEmail3" class="control-label"><@spring.message "info.insert.exhibition.company_zh"/></label>
 
                         <div class="controls">
-                            <input type="text" catValidate="required:true" name="company" class="form-control" placeholder='<@spring.message "info.insert.exhibition.company_zh"/>'><span style="font-weight: bolder;color: red;padding-left: 5px;">*</span>
+                            <input type="text" catValidate="required:true" name="company" class="form-control" placeholder='<@spring.message "info.insert.exhibition.company_zh"/>'><span style="font-weight: bolder;color: red;padding-left: 5px;">*（如需修改公司名，请您联系相关负责人）</span>
                         </div>
                     </div>
                     <div class="control-group">
@@ -136,17 +136,24 @@
                                    placeholder='<@spring.message "info.insert.exhibition.address_zh"/>'>
                         </div>
                     </div>
-                    <div class="control-group">
+                    <!--<div class="control-group">
                         <label for="inputEmail3" class=" control-label"><@spring.message "info.insert.exhibition.zipcode"/></label>
 
                         <div class="controls">
                             <input type="text" name="zipcode" class="form-control" id="inputEmail3" placeholder='<@spring.message "info.insert.exhibition.zipcode"/>'>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="control-group">
                         <label for="inputPassword3" class="control-label"><@spring.message "info.update.exhibition.product_zh"/></label>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <!-- Build your select: -->
+
+                        <div class="controls">
+                            <input type="text" name="mainProduct" value="${newinfo.mainProduct!""}" class="form-control"
+                            id="mainProduct" placeholder='<@spring.message "info.update.exhibition.product_zh"/>'><span style="font-weight: bolder;color: red;padding-left: 5px;">少于15个字</span>
+                            <!--<input type="hidden" name="mainProduct" value="${newinfo.mainProduct!''}" id="mainProduct">-->
+                            <input type="hidden" name="mainProductEn" value="${newinfo.mainProductEn!''}" id="mainProductEn">
+                        </div>
+                        <!--&nbsp;&nbsp;&nbsp;&nbsp;
+                        &lt;!&ndash; Build your select: &ndash;&gt;
                         <select id="product_zh-multiple-select" multiple="multiple">
                             <option value="茶叶">茶叶</option>
                             <option value="茶具">茶具</option>
@@ -157,12 +164,12 @@
                             <option value="茶叶衍生品">茶叶衍生品</option>
                             <option value="其他">其他</option>
                         </select>
-                        <input type="hidden" name="mainProduct" id="mainProduct">
+                        <input type="hidden" name="mainProduct" id="mainProduct">-->
                     </div>
-                    <div class="control-group">
+                    <!--<div class="control-group">
                         <label for="inputPassword3" class="control-label"><@spring.message "info.update.exhibition.product_en"/></label>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <!-- Build your select: -->
+                        &lt;!&ndash; Build your select: &ndash;&gt;
                         <select id="product_en-multiple-select" multiple="multiple">
                             <option value="Tea">Tea</option>
                             <option value="Tea Ware">Tea Ware</option>
@@ -174,7 +181,7 @@
                             <option value="Others">Others</option>
                         </select>
                         <input type="hidden" name="mainProductEn" id="mainProductEn">
-                    </div>
+                    </div>-->
                     <div class="control-group">
                         <label for="inputEmail3" class=" control-label"><@spring.message "info.insert.exhibition.remark"/></label>
 
@@ -345,7 +352,7 @@
             $("#brandsData").val($.toJSON(brands));
             $("#classjson").val($.toJSON(request));
             function needValidate(o){
-                if(o.name=='fax'||o.name=='website'||o.name=='zipcode'|| o.name=='mark'|| o.name=='address'){
+                if(o.name=='fax'||o.name=='website'/*||o.name=='zipcode'*/|| o.name=='mark'|| o.name=='address'){
                     return false;
                 }
                 if($("#infoform [name='"+o.name+"']").attr("placeholder")==undefined){
@@ -375,7 +382,7 @@
 </script>
 <!-- Initialize the plugin: -->
 <script type="text/javascript">
-    $(document).ready(function() {
+    /*$(document).ready(function() {
         $('#product_zh-multiple-select').multiselect({
             onChange: function(option, checked, select) {
                 document.getElementById("mainProduct").value = '';
@@ -396,7 +403,7 @@
                 console.log(document.getElementById("mainProductEn").value);
             }
         });
-    });
+    });*/
 </script>
 <!--/.container-->
 <script src="${resource}/bootstrap/b2/js/bootstrap.js"></script>

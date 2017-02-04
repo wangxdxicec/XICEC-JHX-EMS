@@ -53,12 +53,13 @@ public class WCustomer implements java.io.Serializable {
 	private Integer sendMsgNum;
 	private Date sendEmailDate;
 	private Date sendMsgDate;
+	private Integer isActivated;
+	private Boolean isMobile;
+	private Boolean isjudged;
+	private Integer isProfessional;
+	private Integer IsReaded;
 	private Boolean isDisabled;
 	private String guid;
-	private Integer isProfessional;
-	private Boolean isjudged;
-	private Boolean isMobile;
-	private Integer isActivated;
 
 	// Constructors
 
@@ -455,6 +456,15 @@ public class WCustomer implements java.io.Serializable {
 
 	public void setSendMsgDate(Date sendMsgDate) {
 		this.sendMsgDate = sendMsgDate;
+	}
+
+	@Column(name = "IsReaded")
+	public Integer getIsReaded() {
+		return IsReaded;
+	}
+
+	public void setIsReaded(Integer isReaded) {
+		IsReaded = isReaded;
 	}
 
 	@Column(name = "IsActivated")

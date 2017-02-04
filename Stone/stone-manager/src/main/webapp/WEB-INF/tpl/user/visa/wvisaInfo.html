@@ -28,29 +28,31 @@
 <div style="height: auto;" class="easyui-panel" title="visa信息">
     <table  id="visaInfoTable"  name="visaInfoTable" style="width: 90%;margin-left: 10px;margin-top: 5px;margin-bottom: 10px">
         <tr style="height: 30px">
-            <td style="width: 80px;text-align: right">姓名：</td>
+            <td style="width: auto;text-align: right">姓名：</td>
             <td style="width: 200px"><#if visaInfo.fullPassportName?exists>${visaInfo.fullPassportName}</#if></td>
-            <td style="width: 80px;text-align: right">性别：</td>
+            <td style="width: auto;text-align: right">性别：</td>
             <td style="width: 200px"><#if visaInfo.gender?exists>${visaInfo.gender}</#if></td>
-            <td style="width: 80px;text-align: right">民族：</td>
+            <td style="width: auto;text-align: right">国藉：</td>
             <td style="width: 200px"><#if visaInfo.nationality?exists>${visaInfo.nationality}</#if></td>
         </tr>
-        <tr>
-            <td style="width: 120px;text-align: right">户照ID：</td>
+        <tr style="height: 30px;">
+            <td style="width: auto;text-align: right">护照ID：</td>
             <td style="width: 200px"><#if visaInfo.passportNo?exists>${visaInfo.passportNo}</#if></td>
-            <td style="width: 120px;text-align: right">出生日期：</td>
+            <td style="width: auto;text-align: right">出生日期：</td>
             <td style="width: 200px;"><#if visaInfo.dateOfBirth?exists>${visaInfo.dateOfBirth}</#if></td>
-            <td style="width: 140px;text-align: right">中国使馆：</td>
+            <td style="width: auto;text-align: right">中国使馆：</td>
             <td style="width: 200px;"><#if visaInfo.chineseEmbassy?exists>${visaInfo.chineseEmbassy}</#if></td>
         </tr>
-        <tr>
-            <td style="width: 140px;text-align: right">是否邮寄：</td>
-            <td style="width: 200px;"><#if visaInfo.needPost>已经邮寄<#else>未邮寄</#if></td>
-            <td style="width: 140px;text-align: right">是否可用：</td>
-            <td style="width: 200px;"><#if visaInfo.isDisabled>可用<#else>不可用</#if></td>
-            <td style="width: 120px;text-align: right">durationBeginTime：</td>
+        <tr style="height: 30px;">
+            <td style="width: auto;text-align: right">是否邮寄：</td>
+            <td style="width: 200px;"><#if visaInfo.needPost?exists && visaInfo.needPost>已经邮寄<#else>未邮寄</#if></td>
+            <td style="width: auto;text-align: right">是否可用：</td>
+            <td style="width: 200px;"><#if visaInfo.isDisabled?exists && visaInfo.isDisabled>可用<#else>不可用</#if></td>
+        </tr>
+        <tr style="height: 30px;">
+            <td style="width: auto;text-align: right">durationBeginTime：</td>
             <td style="width: 200px;"><#if visaInfo.durationBeginTime?exists>${visaInfo.durationBeginTime}</#if></td>
-            <td style="width: 120px;text-align: right">durationEndTime：</td>
+            <td style="width: auto;text-align: right">durationEndTime：</td>
             <td style="width: 200px;"><#if visaInfo.durationEndTime?exists>${visaInfo.durationEndTime}</#if></td>
         </tr>
         <tr>

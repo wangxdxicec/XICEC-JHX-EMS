@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>金泓信展商管理后台</title>
+	<script src="${base}/resource/ckeditor/ckeditor.js"></script>
+	<link rel="stylesheet" href="${base}/resource/ckeditor/samples/sample.css">
+	<link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/metro-blue/easyui.css">
+	<link rel="stylesheet" type="text/css" href="${base}/resource/easyui/themes/icon.css">
+	<script type="text/javascript" src="${base}/resource/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="${base}/resource/common.js"></script>
+	<script src="js/esl.js"></script>
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+		}
+
+		input {
+			width: 200px;
+			height: 20px;
+		}
+	</style>
+</head>
+<body>
+<div>
+	<div id="barRegin" style="height: 530px;padding:20px;"></div>
+	<div align="center">
+		<button type="button" class="btn btn-sm btn-success" onclick="refresh(true)">刷 新</button>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<span class="text-primary">切换主题</span>
+		<select id="theme-select" onchange="modifyTheme();">
+			<option selected="true" value='default'>default</option>
+			<option value='infographic'>infographic</option>
+			<option value='macarons'>macarons</option>
+			<option value='shine'>shine</option>
+			<option value='dark'>dark</option>
+			<option value='blue'>blue</option>
+			<option value='green'>green</option>
+			<option value='red'>red</option>
+			<option value='gray'>gray</option>
+			<option value="helianthus">helianthus</option>
+		</select>
+	</div>
+</div>
+</body>
+<script>
+	var barChart;
+	$(document).ready(function () {
+		//加载报表对象数据
+		$.ajax({
+			url:"${base}/user/queryDataReportTable",
+			type: "post",
+			async : false, //同步执行
+			dataType: "json",
+			success : function(result) {
+				alert("--------------");
+				if(result.resultCode == 0){
+					alert(result.phoneType + ",  " + result.netType + ",  " + parseInt(result.phoneValue) + ",  " + parseInt(result.netValue));
+					initBarChartInfo(result.phoneType, result.netType, parseInt(result.phoneValue), parseInt(result.netValue), 'default');
+				}
+			}
+		});
+	});
+
+	function initBarChartInfo(phoneType, netType, phoneValue, netValue, themeInfo) {
+		require.config({
+			paths: {
+				echarts: '${base}/resource/echarts/echarts',
+				'echarts/chart': '${base}/resource/echarts/bar'
+			}
+		});
+
+		var def,infographic,macarons,shine,dark, blue,green,red,gray,helianthus;
+		require(['${base}/resource/echarts/theme/default'], function(theme) {
+			def = theme;
+		});
+		require(['${base}/resource/echarts/theme/infographic'], function(theme) {
+			infographic = theme;
+		});
+		require(['${base}/resource/echarts/theme/macarons'], function(theme) {
+			macarons = theme;
+		});
+		require(['${base}/resource/echarts/theme/shine'], function(theme) {
+			shine = theme;
+		});
+		require(['${base}/resource/echarts/theme/dark'], function(theme) {
+			dark = theme;
+		});
+		require(['${base}/resource/echarts/theme/blue'], function(theme) {
+			blue = theme;
+		});
+		require(['${base}/resource/echarts/theme/green'], function(theme) {
+			green = theme;
+		});
+		require(['${base}/resource/echarts/theme/red'], function(theme) {
+			red = theme;
+		});
+		require(['${base}/resource/echarts/theme/gray'], function(theme) {
+			gray = theme;
+		});
+		require(['${base}/resource/echarts/theme/helianthus'], function(theme) {
+			helianthus = theme;
+		});
+
+		require(['echarts','echarts/chart'],DrawEChart);
+		function DrawEChart(ec) {
+			if(themeInfo.toLowerCase() == 'default'){
+				mapChart = ec.init(document.getElementById('barRegin'), def);
+			} else if(themeInfo.toLowerCase() == 'infographic'){
+				mapChart = ec.init(document.getElementById('barRegin'), infographic);
+			} else if(themeInfo.toLowerCase() == 'macarons'){
+				mapChart = ec.init(document.getElementById('barRegin'), macarons);
+			} else if(themeInfo.toLowerCase() == 'shine'){
+				mapChart = ec.init(document.getElementById('barRegin'), shine);
+			} else if(themeInfo.toLowerCase() == 'dark'){
+				mapChart = ec.init(document.getElementById('barRegin'), dark);
+			} else if(themeInfo.toLowerCase() == 'blue'){
+				mapChart = ec.init(document.getElementById('barRegin'), blue);
+			} else if(curTheme.toLowerCase() == 'green'){
+				mapChart = ec.init(document.getElementById('barRegin'), green);
+			} else if(themeInfo.toLowerCase() == 'red'){
+				mapChart = ec.init(document.getElementById('barRegin'), red);
+			} else if(themeInfo.toLowerCase() == 'gray'){
+				mapChart = ec.init(document.getElementById('barRegin'), gray);
+			} else if(themeInfo.toLowerCase() == 'helianthus'){
+				mapChart = ec.init(document.getElementById('barRegin'), helianthus);
+			} else {
+				mapChart = ec.init(document.getElementById('barRegin'), def);
+			}
+			mapChart.showLoading({text : "图表数据正在努力加载..."});
+			//定义图表options
+			var option = {
+				title: {
+					text: '2016年春季佛事展预登记后台数据'
+				},
+				tooltip: {
+					trigger: 'axis',
+					backgroundColor: 'rgba(255,255,255,0.7)',
+					axisPointer: {
+						type: 'shadow'
+					}
+				},
+				legend: {
+					x: 'right',
+					data:[phoneType,netType]
+				},
+				toolbox: {
+					show: true,
+					orient: 'vertical',
+					y: 'center',
+					feature: {
+						mark: {show: true},
+						dataView: {show: true, readOnly: false},
+						restore: {show: true},
+						saveAsImage: {show: true}
+					}
+				},
+				calculable: true,
+				grid: {
+					y: 80,
+					y2: 40,
+					x2: 40
+				},
+				xAxis: [
+					{
+						type: 'category',
+						data: [phoneType,netType]
+					}
+				],
+				yAxis: [
+					{
+						type: 'value'
+					}
+				],
+				series: [
+					{
+						name: phoneType,
+						type: 'bar',
+						itemStyle: itemStyle,
+						data: [phoneCount]
+					},
+					{
+						name: netType,
+						type: 'bar',
+						itemStyle: itemStyle,
+						data: [netCount]
+					}
+				]
+			};
+
+			mapChart.setOption(option);
+			mapChart.hideLoading();
+		}
+	}
+</script>
+
+<script type="text/javascript" src="${base}/resource/echarts/theme/blue.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/dark.min.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/default.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/gray.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/green.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/helianthus.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/infographic.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/macarons.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/red.js"></script>
+<script type="text/javascript" src="${base}/resource/echarts/theme/shine.js"></script>
+</html>

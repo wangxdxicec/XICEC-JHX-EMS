@@ -1,6 +1,7 @@
 package com.zhenhappy.ems.manager.action.user;
 
 import com.zhenhappy.ems.dto.BaseResponse;
+import com.zhenhappy.ems.entity.TVisitorTemplate;
 import org.apache.log4j.Logger;
 import com.zhenhappy.ems.manager.action.BaseAction;
 import com.zhenhappy.ems.manager.dto.*;
@@ -10,6 +11,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 /**
  * Created by wangxd on 2016/4/5.
@@ -89,7 +92,7 @@ public class TemplateManagerAction extends BaseAction {
         return response;
     }
 
-    //邮件网页
+    //短信网页
     @RequestMapping(value = "tMsg")
     public ModelAndView directToMsgTemplate() {
         ModelAndView modelAndView = new ModelAndView("user/email/messageTemplate");
@@ -97,7 +100,7 @@ public class TemplateManagerAction extends BaseAction {
     }
 
     /**
-     * 查询邮件模板
+     * 查询短信模板
      *
      * @param request
      * @return
@@ -116,7 +119,7 @@ public class TemplateManagerAction extends BaseAction {
     }
 
     /**
-     * 更新邮件模板
+     * 更新短信模板
      *
      * @return
      */
@@ -130,15 +133,53 @@ public class TemplateManagerAction extends BaseAction {
                                                          @RequestParam(value = "msg_invite_subject_cn", defaultValue = "") String msg_invite_subject_cn,
                                                          @RequestParam(value = "msg_invite_subject_en", defaultValue = "") String msg_invite_subject_en,
                                                          @RequestParam(value = "msg_invite_content_cn", defaultValue = "") String msg_invite_content_cn,
-                                                         @RequestParam(value = "msg_invite_content_en", defaultValue = "") String msg_invite_content_en) {
+                                                         @RequestParam(value = "msg_invite_content_en", defaultValue = "") String msg_invite_content_en,
+                                                       @RequestParam(value = "msg_unregister_subject_cn", defaultValue = "") String msg_unregister_subject_cn,
+                                                       @RequestParam(value = "msg_unregister_content_cn", defaultValue = "") String msg_unregister_content_cn,
+                                                       @RequestParam(value = "msg_unregister_subject_en", defaultValue = "") String msg_unregister_subject_en,
+                                                       @RequestParam(value = "msg_unregister_content_en", defaultValue = "") String msg_unregister_content_en,
+                                                       @RequestParam(value = "msg_unactive_subject_cn", defaultValue = "") String msg_unactive_subject_cn,
+                                                       @RequestParam(value = "msg_unactive_content_cn", defaultValue = "") String msg_unactive_content_cn,
+                                                       @RequestParam(value = "msg_unactive_subject_en", defaultValue = "") String msg_unactive_subject_en,
+                                                       @RequestParam(value = "msg_unactive_content_en", defaultValue = "") String msg_unactive_content_en,
+                                                       @RequestParam(value = "msg_new_year_content", defaultValue = "") String msg_new_year_content) {
         BaseResponse response = new BaseResponse();
         try {
             customerTemplaeService.modifyMessageManagerTemplate(msg_register_subject_cn,msg_register_subject_en,msg_register_content_cn,
-                    msg_register_content_en,msg_invite_subject_cn,msg_invite_subject_en,msg_invite_content_cn,msg_invite_content_en);
+                    msg_register_content_en,msg_invite_subject_cn,msg_invite_subject_en,msg_invite_content_cn,msg_invite_content_en, msg_unregister_subject_cn,
+                    msg_unregister_content_cn, msg_unregister_subject_en, msg_unregister_content_en, msg_unactive_subject_cn, msg_unactive_content_cn,
+                    msg_unactive_subject_en, msg_unactive_content_en, msg_new_year_content);
             response.setResultCode(0);
         } catch (Exception e) {
             log.error("modify exhibitor group error.", e);
             response.setResultCode(1);
+        }
+        return response;
+    }
+
+    /**
+     * 更新新年短信祝福模板
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "loadMsgTemplatContent")
+    public QueryMsgNewYearContentResponse loadMsgTemplatContent(@ModelAttribute QueryMsgNewYearContentRequest request) {
+        QueryMsgNewYearContentResponse response = new QueryMsgNewYearContentResponse();
+        try {
+            List<TVisitorTemplate> customerTemplatesList = customerTemplaeService.loadAllCustomerTemplate();
+            if(customerTemplatesList != null){
+                for(TVisitorTemplate tVisitorTemplate:customerTemplatesList){
+                    if("msg_new_year_content".equalsIgnoreCase(tVisitorTemplate.getTpl_key())){
+                        response.setResultCode(0);
+                        response.setMsgContent(tVisitorTemplate.getTpl_value());
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            response.setResultCode(1);
+            log.error("query tags error.", e);
         }
         return response;
     }

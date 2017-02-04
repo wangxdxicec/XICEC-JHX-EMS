@@ -27,39 +27,78 @@
 		<td>
 			<table style="width: 100%;height: 100%;">
 				<tr>
-					<td style="width: 130px;text-align: left">短信注册标题中文：</td>
+					<td style="width: 130px;text-align: left">已预登记(已激活)短信标题_中文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="2" name="msg_register_subject_cn" id="msg_register_subject_cn"></textarea>
+						<textarea cols="70" rows="1" name="msg_register_subject_cn" id="msg_register_subject_cn"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 130px;text-align: left">短信注册中文内容：</td>
+					<td style="width: 130px;text-align: left">已预登记(已激活)短信内容_中文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="15" name="msg_register_content_cn" id="msg_register_content_cn"></textarea>
+						<textarea cols="70" rows="4" name="msg_register_content_cn" id="msg_register_content_cn"></textarea>
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width: 130px;text-align: left">未预登记短信标题_中文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="1" name="msg_unregister_subject_cn" id="msg_unregister_subject_cn"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 130px;text-align: left">短信邀请标题中文：</td>
+					<td style="width: 130px;text-align: left">未预登记短信内容_中文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="2" name="msg_invite_subject_cn" id="msg_invite_subject_cn"></textarea>
+						<textarea cols="70" rows="6" name="msg_unregister_content_cn" id="msg_unregister_content_cn"></textarea>
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width: 130px;text-align: left">已预登记(未激活)短信标题_中文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="1" name="msg_unactive_subject_cn" id="msg_unactive_subject_cn"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 130px;text-align: left">短信邀请中文内容：</td>
+					<td style="width: 130px;text-align: left">已预登记(未激活)短信内容_中文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="15" name="msg_invite_content_cn" id="msg_invite_content_cn"></textarea>
+						<textarea cols="70" rows="5" name="msg_unactive_content_cn" id="msg_unactive_content_cn"></textarea>
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width: 130px;text-align: left">短信邀请标题_中文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="1" name="msg_invite_subject_cn" id="msg_invite_subject_cn"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 130px;text-align: left">短信邀请内容_中文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="2" name="msg_invite_content_cn" id="msg_invite_content_cn"></textarea>
 					</td>
 				</tr>
 			</table>
@@ -67,40 +106,89 @@
 		<td>
 			<table style="width: 100%;height: 100%;">
 				<tr>
-					<td style="width: 130px;text-align: left">短信注册标题英文：</td>
+					<td style="width: 130px;text-align: left">已预登记(已激活)短信_英文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="2" name="msg_register_subject_en" id="msg_register_subject_en"></textarea>
+						<textarea cols="70" rows="1" name="msg_register_subject_en" id="msg_register_subject_en"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 130px;text-align: left">短信注册英文内容：</td>
+					<td style="width: 130px;text-align: left">已预登记(已激活)短信内容_英文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="15" name="msg_register_content_en" id="msg_register_content_en"></textarea>
+						<textarea cols="70" rows="4" name="msg_register_content_en" id="msg_register_content_en"></textarea>
 					</td>
 				</tr>
+
 				<tr>
-					<td style="width: 130px;text-align: left">短信邀请标题英文：</td>
+					<td style="width: 130px;text-align: left">未预登记短信标题_英文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="2" name="msg_invite_subject_en" id="msg_invite_subject_en"></textarea>
+						<textarea cols="70" rows="1" name="msg_unregister_subject_en" id="msg_unregister_subject_en"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 130px;text-align: left">短信邀请英文内容：</td>
+					<td style="width: 130px;text-align: left">未预登记短信内容_英文：</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td style="text-align: right">
-						<textarea cols="70" rows="15" name="msg_invite_content_en" id="msg_invite_content_en"></textarea>
+						<textarea cols="70" rows="6" name="msg_unregister_content_en" id="msg_unregister_content_en"></textarea>
 					</td>
+				</tr>
+				<tr>
+					<td style="width: 130px;text-align: left">已预登记(未激活)短信标题_英文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="1" name="msg_unactive_subject_en" id="msg_unactive_subject_en"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 130px;text-align: left">已预登记(未激活)短信内容_英文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="5" name="msg_unactive_content_en" id="msg_unactive_content_en"></textarea>
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width: 130px;text-align: left">短信邀请标题_英文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="1" name="msg_invite_subject_en" id="msg_invite_subject_en"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td style="width: 130px;text-align: left">短信邀请内容_英文：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="2" name="msg_invite_content_en" id="msg_invite_content_en"></textarea>
+					</td>
+				</tr>
+				<tr>
+				<tr>
+					<td style="width: 130px;text-align: left">国内历史客商新年祝福短信内容：</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td style="text-align: right">
+						<textarea cols="70" rows="2" name="msg_new_year_content" id="msg_new_year_content"></textarea>
+					</td>
+				</tr>
 				</tr>
 			</table>
 		</td>
@@ -150,6 +238,24 @@
 								document.getElementById("msg_register_policyDeclare_cn").value = map["tpl_value"];
 							}else if(equalsIgnoreCase(map[key],"msg_register_policyDeclare_en")){
 								document.getElementById("msg_register_policyDeclare_en").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unregister_subject_cn")){
+								document.getElementById("msg_unregister_subject_cn").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unregister_content_cn")){
+								document.getElementById("msg_unregister_content_cn").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unregister_subject_en")){
+								document.getElementById("msg_unregister_subject_en").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unregister_content_en")){
+								document.getElementById("msg_unregister_content_en").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unactive_subject_cn")){
+								document.getElementById("msg_unactive_subject_cn").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unactive_content_cn")){
+								document.getElementById("msg_unactive_content_cn").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unactive_subject_en")){
+								document.getElementById("msg_unactive_subject_en").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_unactive_content_en")){
+								document.getElementById("msg_unactive_content_en").value = map["tpl_value"];
+							}else if(equalsIgnoreCase(map[key],"msg_new_year_content")){
+								document.getElementById("msg_new_year_content").value = map["tpl_value"];
 							}
 						}
 					}
@@ -174,7 +280,16 @@
 							"msg_invite_subject_cn": $("#msg_invite_subject_cn").val(),
 							"msg_invite_subject_en": $("#msg_invite_subject_en").val(),
 							"msg_invite_content_cn": $("#msg_invite_content_cn").val(),
-							"msg_invite_content_en": $("#msg_invite_content_en").val()},
+							"msg_invite_content_en": $("#msg_invite_content_en").val(),
+							"msg_unregister_subject_cn": $("#msg_unregister_subject_cn").val(),
+							"msg_unregister_content_cn": $("#msg_unregister_content_cn").val(),
+							"msg_unregister_subject_en": $("#msg_unregister_subject_en").val(),
+							"msg_unregister_content_en": $("#msg_unregister_content_en").val(),
+							"msg_unactive_subject_cn": $("#msg_unactive_subject_cn").val(),
+							"msg_unactive_content_cn": $("#msg_unactive_content_cn").val(),
+							"msg_unactive_subject_en": $("#msg_unactive_subject_en").val(),
+							"msg_unactive_content_en": $("#msg_unactive_content_en").val(),
+							"msg_new_year_content": $("#msg_new_year_content").val()},
 						success: function (data) {
 							if (data.resultCode == 1) {
 								$.messager.alert('错误', '更新短信模板失败错误');

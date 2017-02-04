@@ -116,7 +116,7 @@ public class ExhibitorGroupManagerService {
 	
 	/**
 	 * 通过展团英文名查询展团
-	 * @param name
+	 * @param nameEn
 	 * @return
 	 */
 	@Transactional

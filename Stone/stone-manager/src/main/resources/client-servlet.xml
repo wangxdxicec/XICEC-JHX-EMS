@@ -83,8 +83,7 @@
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
         <property name="allowSessionOverride" value="true"/>
-        <property name="viewClass"
-                  value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
 
         <property name="suffix" value=".html"/>
         <property name="order" value="0" />

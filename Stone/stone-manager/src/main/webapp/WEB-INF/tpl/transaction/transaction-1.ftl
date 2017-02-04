@@ -8,7 +8,6 @@ ${transaction.company}
 <#if transaction.companye?exists>
 ${transaction.companye}
 </#if>
-
 <#if transaction.address?exists && transaction.addressEn?exists>
 地址/Add: ${transaction.address}
           ${transaction.addressEn}

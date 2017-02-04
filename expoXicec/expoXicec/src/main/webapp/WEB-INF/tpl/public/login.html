@@ -1,0 +1,329 @@
+<!doctype html>
+<#import "/common/spring.ftl" as spring />
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script src="${base}/resource/common/jquery.min.js"></script>
+    <script src="${resource}/js/jquery.json-2.4.js"></script>
+    <style>
+        *{
+            padding:0;
+            margin:0;
+            font-family:"微软雅黑";
+        }
+        img{
+            border:0;
+            display:block;
+        }
+        a{
+            text-decoration:none;
+
+        }
+        /*-----------------------------------------------------*/
+        .topInner>img{
+            float:left;
+            margin:15px 20px;
+        }
+        .topInner>span{
+            float:left;
+
+            color:#017eb2;
+            font-size:24px;
+            letter-spacing:2px;
+        }
+        .mainBox{
+            width:1200px;
+            height:420px;
+            margin:0 auto;
+            overflow:hidden;
+            margin-top:105px;
+        }
+        .leftpic{
+            float:left;
+            height:420px;
+            width:690px;
+            overflow:hidden;
+            margin-left:30px;
+        }
+        .loginBox{
+            width:347px;
+            height:390px;
+            background:#fafafa;
+            border:1px solid #dddddd;
+            border-radius:4px;
+            -moz-border-radius:4px;
+            -ms-border-radius:4px;
+            -webkit-border-radius:4px;
+            -o-border-radius:4px;
+            box-shadow:2px 2px 10px  #dedede;
+            -moz-box-shadow:2px 2px 10px  #dedede;
+            -ms-box-shadow:2px 2px 10px  #dedede;
+            -webkit-box-shadow:2px 2px 10px  #dedede;
+            -o-box-shadow:2px 2px 10px  #dedede;
+            float:right;
+            margin-right:70px;
+        }
+        .loginTop{
+            background:#0b99c7;
+            font-size:18px;
+            font-weight:bold;
+            line-height:48px;
+            height:48px;
+            width:100%;
+            border-radius:4px 4px 0 0;
+            -moz-border-radius:4px 4px 0 0;
+            -ms-border-radius:4px 4px 0 0;
+            -o-border-radius:4px 4px 0 0;
+            -webkit-border-radius:4px 4px 0 0;
+            color:white;
+            padding-left:22px;
+            box-sizing:border-box;
+
+        }
+        .infoInput{
+            width:300px;
+            margin:0 auto;
+        }
+        .infoInput>input{
+            height:42px;
+            line-height:42px;
+            width:300px;
+            border:1px solid #dddddd;
+            border-radius:4px;
+            -moz-border-radius:4px;
+            -ms-border-radius:4px;
+            -o-border-radius:4px;
+            -webkit-border-radius:4px;
+            font-size:14px;
+            margin:12px auto;
+            padding:0 6px;
+            box-sizing:border-box;
+            outline:none;
+            color:#666666;
+        }
+        #phone{
+            margin-top:10px;
+        }
+        #mobilephone{
+            background:url(${resource}/images/login/user.png);
+            background-repeat:no-repeat;
+            background-position:right center;
+
+        }
+        #password{
+            background:url(${resource}/images/login/password.png);
+            background-repeat:no-repeat;
+            background-position:right center;
+
+        }
+        .newUser{
+            width:300px;
+            margin:0 auto;
+            padding-left:6px;
+            box-sizing:border-box;
+        }
+        .newUser>a{
+            font-size:14px;
+            color:#666666;
+
+        }
+        .loginBtn{
+            margin-top:50px;
+            margin-left:auto;
+            margin-right:auto;
+            width:300px;
+        }
+        .loginBtn>input{
+            line-height:42px;
+            height:42px;
+            width:300px;
+            background:#0b99c7;
+            font-size:18px;
+            font-weight:bold;
+            color:white;
+            border-radius:4px;
+            -moz-border-radius:4px;
+            -ms-border-radius:4px;
+            -o-border-radius:4px;
+            -webkit-border-radius:4px;
+            outline:none;
+            cursor:pointer;
+            border:0;
+        }
+        .guidance{
+            height:36px;
+            ling-height:36px;
+            border:1px solid #dddddd;
+            -moz-border-radius:4px;
+            -ms-border-radius:4px;
+            -o-border-radius:4px;
+            -webkit-border-radius:4px;
+            width:300px;
+            margin:10px auto;
+        }
+        .guidance>a{
+            color:#5d5d5d;
+            font-size:16px;
+            line-height:36px;
+            padding:8px 32px;
+        }
+        .bottomInner>a{
+            color:#7e7e7e;
+            font-size:12px;
+            margin-left:30px;
+        }
+        .bottomInner>span{
+            color:#7e7e7e;
+            font-size:12px;
+            float:right;
+            margin-fight:30px;
+
+        }
+        #bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=80);}
+        .loading{display: none; width:66px;height:66px; position: absolute; top: 50%; left: 50%; z-index:5555; }
+    </style>
+</head>
+
+<body style="overflow-x: hidden;">
+<#include "/user/expoxicec/head.html" />
+
+<div class="mainBox">
+    <div class="leftpic">
+        <ul>
+            <li><img src="${resource}/images/login/pic01.jpg"></li>
+        </ul>
+    </div>
+    <div class="loginBox">
+        <div class="loginTop">
+            用户登录
+        </div>
+        <div class="infoInput" id="phone">
+            <input type="text" id="mobilephone" placeholder="请输入手机号">
+        </div>
+        <div class="infoInput" id="key">
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+        <div class="infoInput" id="fair" style="margin-bottom: 20px;">
+            <span style="font-size: 12px;padding-right: 20px;color: #666666;box-sizing: border-box;">选择展会</span>
+            <select id="fair_name" name="fair_name" style="font-size: 12px;margin-left: 20px;color: #666666;box-sizing: border-box;padding:0 20px;float:right;"></select>
+        </div>
+        <div class="newUser">
+            <a href="#" id="register">新用户注册 |</a>  <a href="#" id="findpassword">忘记密码</a>
+        </div>
+        <div class="loginBtn">
+            <input type="button" id="loginButton" name="loginButton" value="登录">
+        </div>
+        <div class="guidance">
+            <a href="" style="border-right:1px solid #dddddd;">资质审核通知</a>
+            <a href="">操作流程</a>
+        </div>
+    </div>
+</div>
+<#include "/user/expoxicec/bottom.html" />
+</body>
+</html>
+
+<script type="text/javascript">
+    $(function () {
+        if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE6.0") {
+            $(".iptArea").css("width", "270px");
+        } else if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE7.0") {
+            $(".iptArea").css("width", "270px");
+            $("#username").css("margin-top", "12px");
+            $("#key").css("margin-top", "12px");
+            $("input").css("line-height", "14px");
+        } else if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE8.0") {
+            $("#username").css("margin-top", "12px");
+            $("#key").css("margin-top", "12px");
+            $("input").css("line-height", "14px");
+        } else if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE9.0") {
+            $("#username").css("margin-top", "12px");
+            $("#key").css("margin-top", "12px");
+            $("input").css("line-height", "14px");
+        }
+    });
+</script>
+<div class="loading"><img src="/resource/load.gif"></div>
+<script>
+    $(document).ready(function () {
+        //加载激活展会列表
+        $.ajax({
+            type:"POST",
+            dataType:"json",
+            url:"${base}/loadAllEnableFairName",
+            success : function(result) {
+                if(result){
+                    $("#fair_name").html('');
+                    for(var i=0,a;a=result[i++];){
+                        $("#fair_name").append('<option value="'+a.id+'">'+a.fair_name+'</option>');
+                    }
+                    $("#fair_name").options[0].selected = true;
+                }
+            }
+        });
+
+        $("#register").click(function () {
+            location.href = "${resource}/registerCheckingCode.html";
+        });
+
+        $("#findpassword").click(function () {
+            location.href = "${resource}/findPassword.html";
+        });
+
+        $("#loginButton").click(function () {
+            var fair_type_value = $("#fair_name option:selected").val();
+            var phone = document.getElementById("mobilephone");
+            var value = phone.value.trim();
+            if (value == '') {
+                alert("手机号不能为空");
+                return;
+            }
+            if ($("#password").val() == '') {
+                alert("密码不能为空");
+                return;
+            }
+
+            if(!checkMobile(value)) {
+                alert("请输入正确的手机号！");
+                return;
+            }
+            //$("#bg,.loading").show();
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: $.toJSON({
+                    "inputPhone": value,
+                    "password": $("#password").val(),
+                    "fair_type": fair_type_value
+                }),
+                url: "${base}/login",
+                dataType: "json",
+                success: function (result) {
+                    //$("#bg,.loading").hide();
+                    $("#loginButton").removeClass("disabled");
+                    if (result.resultCode == 1) {
+                        alert("当前展会下无此账号！");
+                    } else if (result.resultCode > 1) {
+                        alert("服务器错误");
+                    } else {
+                        window.location.href = "${base}/user/boothempty.html"
+                    }
+                }
+            });
+        });
+
+        function checkMobile(s){
+            var length = s.length;
+            if(length == 11 && /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(14[0-9]{1})|)+\d{8})$/.test(s) )
+            {
+                return true;
+            }else{
+                return false;
+            }
+        }
+    });
+</script>
+</html>

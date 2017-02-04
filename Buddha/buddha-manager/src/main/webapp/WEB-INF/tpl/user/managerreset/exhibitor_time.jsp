@@ -73,9 +73,16 @@
 	</div>
 </div>
 <div style="height: auto;" class="easyui-panel" title="国内客商归类">
-	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
-		<button type="button" class="btn btn-primary" id="classOneKey">一键归类</button>
-	</div>
+	<table>
+		<tr>
+			<td style="width: 240px">国内客商归类：</td>
+			<td>
+				<div class="email-footer" align="center">
+					<button type="button" class="btn btn-primary" id="classOneKey">一键归类</button>
+				</div>
+			</td>
+		</tr>
+	</table>
 </div>
 <script>
 	function queryExhibitorTimeData() {
@@ -96,6 +103,35 @@
 			}
 		});
 	}
+
+	$('#classOneKey').click(function(){
+		$.messager.confirm('确认归类','你确定要一键归类客商类别？',function(r){
+			if (r){
+				$("#bg,.loading").show();
+				$.ajax({
+					url: "${base}/user/classVisitorByOneKey",
+					type: "post",
+					dataType: "json",
+					traditional: true,
+					success: function (data) {
+						$("#bg,.loading").hide();
+						if (data.resultCode == 1) {
+							$.messager.alert('错误', '一键归类客商类别失败');
+						} else if (data.resultCode > 1) {
+							$.messager.alert('错误', '服务器错误');
+						} else {
+							$.messager.show({
+								title: '成功',
+								msg: '一键归类客商类别成功',
+								timeout: 2000,
+								showType: 'slide'
+							});
+						}
+					}
+				});
+			}
+		});
+	});
 
 	$(document).ready(function () {
 		$("#saveData").click(function () {
@@ -119,33 +155,6 @@
 								$.messager.show({
 									title: '成功',
 									msg: '修改时间参数成功',
-									timeout: 2000,
-									showType: 'slide'
-								});
-							}
-						}
-					});
-				}
-			});
-		});
-
-		$("#classOneKey").click(function () {
-			$.messager.confirm('确认归类','你确定要一键归类客商类别？',function(r){
-				if (r){
-					$.ajax({
-						url: "${base}/user/classVisitorByOneKey",
-						type: "post",
-						dataType: "json",
-						traditional: true,
-						success: function (data) {
-							if (data.resultCode == 1) {
-								$.messager.alert('错误', '一键归类客商类别失败');
-							} else if (data.resultCode > 1) {
-								$.messager.alert('错误', '服务器错误');
-							} else {
-								$.messager.show({
-									title: '成功',
-									msg: '一键归类客商类别成功',
 									timeout: 2000,
 									showType: 'slide'
 								});

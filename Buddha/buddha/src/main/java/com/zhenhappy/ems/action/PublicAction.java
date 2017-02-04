@@ -8,13 +8,12 @@ import com.zhenhappy.ems.dto.Principle;
 import com.zhenhappy.ems.entity.TExhibitor;
 import com.zhenhappy.ems.service.ExhibitorBuddhaTimeService;
 import com.zhenhappy.ems.service.ExhibitorService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +33,8 @@ public class PublicAction {
 
     @Autowired
     private ExhibitorBuddhaTimeService exhibitorTimeService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private static Logger log = Logger.getLogger(PublicAction.class);
 
@@ -87,5 +88,62 @@ public class PublicAction {
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.getSession().removeAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE);
         response.sendRedirect(request.getContextPath());
+    }
+
+    /**
+     * findPassword method
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "findPassword")
+    public String findPassword(@RequestParam("company") String company, @RequestParam("username") String username) {
+        if (StringUtils.isNotEmpty(company) && StringUtils.isNotEmpty(username)) {
+            String password = "";
+            try {
+                password = (String) jdbcTemplate.queryForObject("select password from [t_exhibitor] where company = ?", new Object[]{company}, java.lang.String.class);
+            } catch (Exception e) {
+                return "company";
+            }
+            try {
+                password = (String) jdbcTemplate.queryForObject("select password from [t_exhibitor] where username = ?", new Object[]{username}, java.lang.String.class);
+            } catch (Exception e) {
+                return "username";
+            }
+            try {
+                password = (String) jdbcTemplate.queryForObject("select password from [t_exhibitor] where company = ? and username = ?", new Object[]{company, username}, java.lang.String.class);
+            } catch (Exception e) {
+                return "all";
+            }
+            return password;
+        } else return "";
+    }
+
+    /**
+     * findPassword method
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "findPasswordEn")
+    public String findPasswordEn (@RequestParam("username") String username, @RequestParam("booth") String booth){
+        if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(booth)) {
+            Integer eid = 0;
+            try {
+                eid = (Integer) jdbcTemplate.queryForObject("select eid from [t_exhibitor_booth] where booth_number = ?", new Object[]{booth}, java.lang.Integer.class);
+            } catch (Exception e) {
+                return "booth";
+            }
+            String password = "";
+            try {
+                password = (String) jdbcTemplate.queryForObject("select password from [t_exhibitor] where username = ?", new Object[]{username}, java.lang.String.class);
+            } catch (Exception e) {
+                return "username";
+            }
+            try {
+                password = (String) jdbcTemplate.queryForObject("select password from [t_exhibitor] where eid = ? and username = ?", new Object[]{eid, username}, java.lang.String.class);
+            } catch (Exception e) {
+                return "all";
+            }
+            return password;
+        } else return "";
     }
 }

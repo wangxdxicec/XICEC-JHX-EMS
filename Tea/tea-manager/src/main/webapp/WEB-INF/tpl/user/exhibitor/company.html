@@ -99,8 +99,6 @@
                 <td style="width: 12.5%;"><a href="mailto:<#if exhibitorInfo.email?exists>${exhibitorInfo.email}</#if>"><#if exhibitorInfo.email?exists>${exhibitorInfo.email}</#if></a></td>
                 <td style="width: 10%;text-align: right">网址：</td>
                 <td style="width: 10%;"><a href="<#if exhibitorInfo.website?exists>${exhibitorInfo.website}</#if>"><#if exhibitorInfo.website?exists>${exhibitorInfo.website}</#if></a></td>
-                <td style="width: 6.5%;text-align: right">发票抬头：</td>
-                <td style="width: 9.2%;"><#if invoice?exists><#if invoice.title?exists>${invoice.title}</#if></#if></td>
             </tr>
             <tr style="height: 30px">
                 <td style="width: 8%;text-align: right">地址：</td>
@@ -111,8 +109,6 @@
                 <td style="width: 12.5%;"><#if exhibitorMeipai?exists><#if exhibitorMeipai.meipai?exists>${exhibitorMeipai.meipai}</#if></#if></td>
             	<td style="width: 10%;text-align: right">企业楣牌(英文)：</td>
                 <td style="width: 10%;"><#if exhibitorMeipai?exists><#if exhibitorMeipai.meipaiEn?exists>${exhibitorMeipai.meipaiEn}</#if></#if></td>
-                <td style="width: 6.5%;text-align: right">地税税号：</td>
-                <td style="width: 9.7%;"><#if invoice?exists><#if invoice.invoiceNo?exists>${invoice.invoiceNo}</#if></#if></td>
             </tr>
             <tr style="height: 30px">
             	<td style="width: 8%;text-align: right">产品分类：</td>
@@ -125,7 +121,15 @@
                 <td style="width: 12.5%;"><#if exhibitor.exhibitionArea?exists>${exhibitor.exhibitionArea}</#if>平方米</td>
             </tr>
             <tr style="height: 30px">
-            	<td style="width: 8%;text-align: right">公司简介：</td>
+                <td style="width: 8%;text-align: right">邮件地址：</td>
+                <td style="width: 30%;"><#if exhibitorInfo.email_address?exists>${exhibitorInfo.email_address}</#if></td>
+                <td style="width: 8%;text-align: right">邮件收件人：</td>
+                <td style="width: 20%;"><#if exhibitorInfo.email_contact?exists>${exhibitorInfo.email_contact}</#if></td>
+                <td style="width: 8%;text-align: right">收件人手机号：</td>
+                <td style="width: 10%;"><#if exhibitorInfo.email_telphone?exists>${exhibitorInfo.email_telphone}</#if></td>
+            </tr>
+            <tr style="height: 30px">
+                <td style="width: 8%;text-align: right">公司简介：</td>
                 <td colspan="9" style="width: 92%;text-align: left;word-break:break-all"><#if exhibitorInfo.mark?exists>${exhibitorInfo.mark}</#if></td>
             </tr>
             <tr style="height: 30px">
@@ -146,6 +150,55 @@
         </table>
 	<#else>
 		<div style="margin:10px 10px">该展商未完善展商信息。</div>
+    </#if>
+</div>
+
+<div style="height: auto;" class="easyui-panel" title="发票信息">
+    <!-- 发票信息内容 -->
+    <#if invoice?exists>
+        <table id="invoiceInfoTable" name="invoiceInfoTable" class="exhibitorinfo" border="0" style="width: 100%;table-layout：fixed">
+            <tr style="height: 30px">
+                <td style="width: 10%;">发票类型：</td>
+                <td style="width: 10%;color: red">
+                    <#if invoice.invoice_flag?exists && invoice.invoice_flag==0>不开发票</#if>
+                    <#if invoice.invoice_flag?exists && invoice.invoice_flag==1>普通发票</#if>
+                    <#if invoice.invoice_flag?exists && invoice.invoice_flag==2>增值发票</#if>
+                    <#if invoice.invoice_flag?exists && invoice.invoice_flag==3>增值发票</#if>
+                </td>
+            </tr>
+            <#if invoice.invoice_flag?exists && invoice.invoice_flag==1>
+                <tr style="height: 30px">
+                    <td style="width: 10%;">发票抬头：</td>
+                    <td style="width: 25%;color: red"><#if invoice?exists><#if invoice.title?exists>${invoice.title}</#if></#if></td>
+                </tr>
+                <tr style="height: 30px">
+                    <td style="width: 6.5%;">地税税号：</td>
+                    <td style="width: 9.7%;"><#if invoice.invoiceNo?exists>${invoice.invoiceNo}</#if>
+                    </td>
+                </tr>
+            </#if>
+            <#if invoice.invoice_flag?exists && invoice.invoice_flag==2>
+                <tr style="height: 30px">
+                    <td style="width: 10%;text-align: left">发票图片：</td>
+                    <td colspan="4" style="width: 46%;text-align: right;word-break:break-all"><font color="red"><strong>未上传发票图片</strong></font>
+                    </td>
+                </tr>
+            </#if>
+            <#if invoice.invoice_flag?exists && invoice.invoice_flag==3>
+                <tr style="height: 30px">
+                    <td style="width: 10%;text-align: left">发票图片：</td>
+                    <td colspan="4" style="width: 46%;word-break:break-all">
+                        <#if invoice.invoice_image_address?exists && invoice.invoice_image_address!=''>
+                            <img src="${base}/user/showInvoiceImage?eid=${invoice.eid}" name="preview" width="300px"/>
+                        <#else>
+                            <img src="" id="previewInvoiceImage" name="previewInvoiceImage" class="img-rounded"/>
+                        </#if>
+                    </td>
+                </tr>
+            </#if>
+        </table>
+        <#else>
+            <div style="margin:10px 10px">该展商无对就在的发票信息。</div>
     </#if>
 </div>
 <!-- 产品列表 -->
@@ -1045,7 +1098,7 @@ $(document).ready(function () {
 			}
 		}
 	});
-	
+
 	<#if exhibitorInfo?exists>
 		$('#queryProductType').combotree({
 			lines:true,

@@ -58,10 +58,13 @@ public class ExhibitorTeaTimeManagerService {
     }
 
 	@Transactional
-	public void modifyExhibitorTime(String value1, String value2, String value3, String value4, String value5, String value6, String value7) throws Exception {
+	public void modifyExhibitorTime(String value1, String value2, String value3, String value4, String value5, String value6, String value7,
+									String value8, String value9, String value10, String value11) throws Exception {
 		jdbcTemplate.update("update t_exhibitor_teafair_time set tea_Fair_Show_Date_Zh=?, tea_Fair_Show_Date_En=?," +
 				"exhibitor_Info_Submit_Deadline_Zh=?, exhibitor_Info_Submit_Deadline_En=?, tea_Fair_Show_Year=?, " +
-				"tea_Fair_Show_Begin_Date=?, tea_Fair_Data_End_Html=?",
-				new Object[]{value1, value2, value3, value4, value5, value6, value7});
+				"tea_Fair_Show_Begin_Date=?, tea_Fair_Data_End_Html=?, tea_Fair_Contact_Submit_Deadline_Zh=?, " +
+				"tea_Fair_Contact_Submit_Deadline_En=?, tea_Fair_Invoice_Submit_Deadline_Zh=?, " +
+				"tea_Fair_Invoice_Submit_Deadline_En=?",
+				new Object[]{value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, value11});
 	}
 }

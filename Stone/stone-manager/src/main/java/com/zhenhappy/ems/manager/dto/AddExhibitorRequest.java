@@ -18,6 +18,7 @@ public class AddExhibitorRequest extends BaseRequest {
 	private Integer country;
 	private Integer area;
 	private String contractId;
+	private String exhibitionPosition;
 
 	public String getExhibitionArea() {
 		return exhibitionArea;
@@ -113,5 +114,13 @@ public class AddExhibitorRequest extends BaseRequest {
 
 	public void setContractId(String contractId) {
 		this.contractId = contractId;
+	}
+
+	public String getExhibitionPosition() {
+		return exhibitionPosition;
+	}
+
+	public void setExhibitionPosition(String exhibitionPosition) {
+		this.exhibitionPosition = exhibitionPosition;
 	}
 }

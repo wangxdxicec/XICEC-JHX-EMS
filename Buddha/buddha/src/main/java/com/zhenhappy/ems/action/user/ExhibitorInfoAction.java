@@ -317,14 +317,19 @@ public class ExhibitorInfoAction extends BaseAction {
     }
 
     @RequestMapping(value = "addMeipai", method = RequestMethod.GET)
-    public ModelAndView addMeipai(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle) {
+    public ModelAndView addMeipai(@ModelAttribute(Principle.PRINCIPLE_SESSION_ATTRIBUTE) Principle principle,
+                                  Locale locale) {
         ModelAndView modelAndView = null;
         Integer exhibitorId = principle.getExhibitor().getEid();
         TExhibitorMeipai meipai = meipaiService.getMeiPaiByEid(principle.getExhibitor().getEid());
         if (meipai == null) {
             modelAndView = new ModelAndView("user/meipai/add");
         } else {
-            modelAndView = new ModelAndView("user/meipai/update");
+            if (locale.equals(Locale.US)) {
+                modelAndView = new ModelAndView("user/meipai/update_en");
+            } else{
+                modelAndView = new ModelAndView("user/meipai/update");
+            }
             modelAndView.addObject("meipai", meipai);
         }
         return modelAndView;

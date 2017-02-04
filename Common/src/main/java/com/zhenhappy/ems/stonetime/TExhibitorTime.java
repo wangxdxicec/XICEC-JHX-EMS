@@ -30,6 +30,7 @@ public class TExhibitorTime {
     private String stone_Fair_Show_Date_Zh;
     private String stone_Fair_Show_Date_En;
     private Integer menu_move_switch;
+    private Integer area_time;
 
     @Id
     @Column(name = "id")
@@ -220,5 +221,15 @@ public class TExhibitorTime {
 
     public void setMenu_move_switch(Integer menu_move_switch) {
         this.menu_move_switch = menu_move_switch;
+    }
+
+    @Basic
+    @Column(name = "area_time")
+    public Integer getArea_time() {
+        return area_time;
+    }
+
+    public void setArea_time(Integer area_time) {
+        this.area_time = area_time;
     }
 }

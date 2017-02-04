@@ -54,6 +54,11 @@
     <div>
         <div id="addExhibitorGroup" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加展团</div>
         <div id="deleteExhibitorGroups" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除展团</div>
+        <div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
+    </div>
+    <div id="export" style="width:180px;">
+        <div id="exportAllGroupExhibitors" iconCls="icon-redo">所有展团基本信息到Excel</div>
+        <div id="exportSelectedGroupExhibitors" iconCls="icon-redo">所选展团基本信息到Excel</div>
     </div>
 </div>
 <!-- 添加展团  -->
@@ -61,11 +66,11 @@
     <form id="addExhibitorGroupForm" name="addExhibitorGroupForm">
         <table style="width: 320px;margin: 20px auto">
 			<tr>
-				<td style="width: 90px;text-align: right">展团中文名：</td>
+				<td style="width: 120px;text-align: right">展团中文名：</td>
 				<td><input class="easyui-validatebox" type="text" name="groupName"></td>
 			</tr>
 			<tr>
-				<td style="width: 90px;text-align: right">展团英文名：</td>
+				<td style="width: 120px;text-align: right">展团英文名：</td>
 				<td><input class="easyui-validatebox" type="text" name="groupNameEn"></td>
 			</tr>
         </table>
@@ -80,13 +85,18 @@
 				<td><input class="easyui-validatebox" type="text" name="groupName"></td>
 			</tr>
 			<tr>
-				<td style="width: 90px;text-align: right">展团英文名：</td>
+				<td style="width: 120px;text-align: right">展团英文名：</td>
 				<td><input class="easyui-validatebox" type="text" name="groupNameEn"></td>
 			</tr>
 			<input type="hidden" value="" name="id">
         </table>
     </form>
 </div>
+
+<!-- 导出展团到Excel -->
+<form id="exportExhibitorGroupToZip" action="${base}/user/exportExhibitorGroupToZip" method="post">
+    <div id="eidParm2"></div>
+</form>
 
 <script>
 	var checkedItems = [];
@@ -127,6 +137,29 @@
 		    }
 		});
 	});
+
+    //导出所有展团到Excel
+    $('#exportAllGroupExhibitors').click(function(){
+        eidParm2.innerHTML = "";
+        var node = "<input type='hidden' name='groupid' value='-1'/>";
+        eidParm2.innerHTML += node;
+        document.getElementById("exportExhibitorGroupToZip").submit();
+        $.messager.alert('提示', '导出所有展团信息成功');
+    });
+    //导出所选展团到Excel
+    $('#exportSelectedGroupExhibitors').click(function(){
+        eidParm2.innerHTML = "";
+        if(checkedItems.length > 0){
+            for (var i = 0; i < checkedItems.length; i++) {
+                var node = "<input type='hidden' name='groupid' value='"+checkedItems[i]+"'/>";
+                eidParm2.innerHTML += node;
+            }
+            document.getElementById("exportExhibitorGroupToZip").submit();
+            $.messager.alert('提示', '导出所选展团信息成功');
+        }else{
+            $.messager.alert('提示', '请至少选择一项展团再导出');
+        }
+    });
 //----------------------------------------------------工具栏函数结束--------------------------------------------------------//
     $(document).ready(function () {
     	// 文章列表渲染
@@ -240,7 +273,7 @@
 		// 修改展团弹出框
         $('#modifyExhibitorGroupDlg').dialog({
             title: '修改展团',
-            width: 350,
+            width: 370,
             height: 180,
             closed: true,
             cache: false,

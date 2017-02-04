@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        .infoBox{
+            background:#f5f5f5;
+            width:100%;
+            padding:20px 0;
+            box-sizing:border-box;
+
+        }
+        #addBooth{
+            line-height:28px;
+            height:28px;
+            width:100px;
+            background:#0b99c7;
+            font-size:16px;
+            font-weight:bold;
+            color:white;
+            border-radius:4px;
+            -moz-border-radius:4px;
+            -ms-border-radius:4px;
+            -o-border-radius:4px;
+            -webkit-border-radius:4px;
+            outline:none;
+            cursor:pointer;
+            border:0;
+        }
+        .alertinfo{
+            background:#ffffff;
+            width:1080px;
+            margin:0 auto;
+            border-radius:4px;
+            -moz-border-radius:4px;
+            -ms-border-radius:4px;
+            -o-border-radius:4px;
+            -webkit-border-radius:4px;
+            height:320px;
+            line-height:320px;
+            text-align:center;
+
+        }
+    </style>
+    <link href="${resource}/expoxicec/common.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script src="${base}/resource/common/jquery.min.js"></script>
+    <script src="${resource}/js/jquery.json-2.4.js"></script>
+</head>
+
+<body>
+<#include "/user/expoxicec/head02.html" />
+
+<div class="infoBox">
+    <div class="alertinfo">
+        <span style="font-size:16px;">还没有展位信息，请先</span>
+        <input type="button" value="添加展位" id="addBooth">
+    </div>
+</div>
+<#include "/user/expoxicec/bottom.html" />
+</body>
+<script>
+    $(document).ready(function () {
+        $("#addBooth").click(function () {
+            window.location.href = "${base}/user/addbooth.html"
+        });
+    });
+</script>
+</html>

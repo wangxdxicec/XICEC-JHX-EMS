@@ -40,6 +40,9 @@ public class TExhibitorInfo implements java.io.Serializable {
 	private Integer adminUser;
 	private Date adminUpdateTime;
     private String company_hignlight;
+    private String email_address;
+    private String email_contact;
+    private String email_telphone;
 	@Transient
 	private String classjson;
     @Transient
@@ -94,6 +97,44 @@ public class TExhibitorInfo implements java.io.Serializable {
         this.classjson = classjson;
         this.brandsData = brandsData;
         this.company_hignlight = company_hignlight;
+    }
+
+    public TExhibitorInfo(Integer einfoid, Integer eid, String organizationCode, String company, String companyEn, String companyT,
+                          String phone, String fax, String email, String website, String address, String addressEn, String zipcode,
+                          String mainProduct, String mainProductEn, String logo, String mark, String emark, String meipai, String meipaiEn,
+                          Integer isDelete, Date createTime, Date updateTime, Integer adminUser, Date adminUpdateTime, String classjson,
+                          String brandsData, String company_hignlight, String email_address, String email_contact, String email_telphone) {
+        this.einfoid = einfoid;
+        this.eid = eid;
+        this.organizationCode = organizationCode;
+        this.company = company;
+        this.companyEn = companyEn;
+        this.companyT = companyT;
+        this.phone = phone;
+        this.fax = fax;
+        this.email = email;
+        this.website = website;
+        this.address = address;
+        this.addressEn = addressEn;
+        this.zipcode = zipcode;
+        this.mainProduct = mainProduct;
+        this.mainProductEn = mainProductEn;
+        this.logo = logo;
+        this.mark = mark;
+        this.emark = emark;
+        this.meipai = meipai;
+        this.meipaiEn = meipaiEn;
+        this.isDelete = isDelete;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.adminUser = adminUser;
+        this.adminUpdateTime = adminUpdateTime;
+        this.classjson = classjson;
+        this.brandsData = brandsData;
+        this.company_hignlight = company_hignlight;
+        this.email_address = email_address;
+        this.email_contact = email_contact;
+        this.email_telphone = email_telphone;
     }
 
     // Property accessors
@@ -352,6 +393,33 @@ public class TExhibitorInfo implements java.io.Serializable {
         this.company_hignlight = company_hignlight;
     }
 
+    @Column(name = "email_address")
+    public String getEmail_address() {
+        return email_address;
+    }
+
+    public void setEmail_address(String email_address) {
+        this.email_address = email_address;
+    }
+
+    @Column(name = "email_contact")
+    public String getEmail_contact() {
+        return email_contact;
+    }
+
+    public void setEmail_contact(String email_contact) {
+        this.email_contact = email_contact;
+    }
+
+    @Column(name = "email_telphone")
+    public String getEmail_telphone() {
+        return email_telphone;
+    }
+
+    public void setEmail_telphone(String email_telphone) {
+        this.email_telphone = email_telphone;
+    }
+
     @Override
     public String toString() {
         return "TExhibitorInfo{" +
@@ -382,6 +450,9 @@ public class TExhibitorInfo implements java.io.Serializable {
                 ", classjson='" + classjson + '\'' +
                 ", brandsData='" + brandsData + '\'' +
                 ", company_hignlight='" + company_hignlight + '\'' +
+                ", email_address='" + email_address + '\'' +
+                ", email_contact='" + email_contact + '\'' +
+                ", email_telphone='" + email_telphone + '\'' +
                 '}';
     }
 }

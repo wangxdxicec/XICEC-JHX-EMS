@@ -89,14 +89,15 @@ public class ExhibitorTimeAction extends BaseAction {
                                             @RequestParam(value = "visa_Info_Submit_Deadline_Zh", defaultValue = "") String visa_Info_Submit_Deadline_Zh,
                                             @RequestParam(value = "visa_Info_Submit_Deadline_En", defaultValue = "") String visa_Info_Submit_Deadline_En,
                                             @RequestParam(value = "stone_Fair_Show_Date_Zh", defaultValue = "") String stone_Fair_Show_Date_Zh,
-                                            @RequestParam(value = "stone_Fair_Show_Date_En", defaultValue = "") String stone_Fair_Show_Date_En) {
+                                            @RequestParam(value = "stone_Fair_Show_Date_En", defaultValue = "") String stone_Fair_Show_Date_En,
+                                            @RequestParam(value = "exhibitor_area") Integer exhibitor_area) {
         BaseResponse response = new BaseResponse();
         try {
             exhibitorTimeManagerService.modifyExhibitorTime(company_Info_Submit_Deadline_Zh, company_Info_Submit_Deadline_En, participant_List_Submit_Deadline_Zh,
                     participant_List_Submit_Deadline_En, invoice_Information_Submit_Deadline_Zh, invoice_Information_Submit_Deadline_En,
                     advertisement_Submit_Deadline_Zh, advertisement_Submit_Deadline_En, company_Info_Insert_Submit_Deadline_Zh, company_Info_Insert_Submit_Deadline_En,
                     stone_fair_end_year, stone_fair_begin_year, company_Info_Data_End_Html, visa_Info_Submit_Deadline_Zh, visa_Info_Submit_Deadline_En,
-                    stone_Fair_Show_Date_Zh, stone_Fair_Show_Date_En);
+                    stone_Fair_Show_Date_Zh, stone_Fair_Show_Date_En, exhibitor_area);
             response.setResultCode(0);
         } catch (Exception e) {
             log.error("modify exhibitor time error.", e);
@@ -113,10 +114,11 @@ public class ExhibitorTimeAction extends BaseAction {
     @ResponseBody
     @RequestMapping(value = "modifyExhibitorMenuMove")
     public BaseResponse modifyExhibitorMenuMove(@ModelAttribute QueryExhibitorTimeRequest request,
-                                                @RequestParam(value = "menu_move_switch") Integer menu_move_switch) {
+                                                @RequestParam(value = "menu_move_switch") Integer menu_move_switch,
+                                                @RequestParam(value = "exhibitor_area") Integer exhibitor_area) {
         BaseResponse response = new BaseResponse();
         try {
-            exhibitorTimeManagerService.modifyExhibitorMenuMove(menu_move_switch);
+            exhibitorTimeManagerService.modifyExhibitorMenuMove(menu_move_switch, exhibitor_area);
             response.setResultCode(0);
         } catch (Exception e) {
             log.error("modify exhibitor time error.", e);

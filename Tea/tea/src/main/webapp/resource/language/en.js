@@ -38,7 +38,7 @@ var words = {
     meipaiENameRequired:"Facial board for Shell Scheme(English) is required",
 
     //info
-    isRequired:"is required",
+    isRequired:" is required",
 
     unread:"Unread"
 }

@@ -7,6 +7,7 @@ import com.zhenhappy.ems.entity.*;
 import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.entity.TExhibitorBooth;
+import com.zhenhappy.ems.manager.entity.THistoryVisitorInfo;
 import com.zhenhappy.ems.manager.tag.StringUtil;
 import com.zhenhappy.ems.service.CountryProvinceService;
 import com.zhenhappy.ems.service.ExhibitorService;
@@ -293,7 +294,6 @@ public class ImportExportService extends ExhibitorService {
 			report.add("共导入:" + count + "条数据");
 			book.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return report;

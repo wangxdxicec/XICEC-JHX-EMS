@@ -122,6 +122,16 @@
 <!-- 工具栏 -->
 <div id="customerbar">
 	<div style="display:inline-block;">
+		<div class="easyui-menubutton" menu="#msg" iconCls="icon-redo">短信</div>
+	</div>
+	<div id="msg" style="width:180px;">
+		<div id="msgAllCustomers" iconCls="icon-redo">群发所有未预登记客商短信</div>
+		<div id="msgSelectedCustomers" iconCls="icon-redo">群发所选未预登记客商短信</div>
+		<div class="menu-sep"></div>
+		<div id="msgAllCustomersToNewYear" iconCls="icon-redo">群发所有未预登记客商新年祝福短信</div>
+		<div id="msgSelectedCustomersToNewYear" iconCls="icon-redo">群发所选未预登记客商新年祝福短信</div>
+	</div>
+	<div style="display:inline-block;">
 		<div class="easyui-menubutton" menu="#template" iconCls="icon-redo">模板</div>
 	</div>
 	<div id="template" style="width:180px;">
@@ -209,6 +219,29 @@
 		</table>
 	</form>
 </div>
+
+<!-- 新年祝福短信内容框 -->
+<div id="newYearContentDlg" data-options="iconCls:'icon-add',modal:true">
+	<form id="newYearContentForm" name="newYearContentForm">
+		<table style="width: 380px;margin: 20px auto">
+			<tr>
+				<td style="width: 100px;text-align: left">使用模板：</td>
+				<td style="width: 100px;text-align: left"><input id="msgContentTemplate" name="msgContentTemplate" type="checkbox" onclick="setConent()"/></td>
+			</tr>
+			<tr>
+				<td style="width: 100px;text-align: left">短信内容：</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<textarea style="height:150px;width:370px;resize: none;" catValidate="required:false" name="msg_content" id="msg_content"></textarea>
+				</td>
+			</tr>
+			<input name="selectOrAllFlag" id="selectOrAllFlag" type="hidden">
+		</table>
+	</form>
+</div>
+
 <div class="loading"><img src="${base}/resource/load.gif"></div>
 <script>
 	var checkedItems = [];
@@ -239,6 +272,191 @@
 			$.messager.alert('提示', '请至少选择一项客商再导出');
 		}
 	});
+	//群发所有未预登记客商短信
+	$('#msgAllCustomers').click(function(){
+		$.messager.confirm('确认发送','你确定要群发所有未预登记客商短信吗?',function(r){
+			if (r){
+				$("#bg,.loading").show();
+				$.ajax({
+					url: "${base}/user/msgAllInlandStoneCustomers",
+					type: "post",
+					data: {"cids": "-1","type":"3"},
+					dataType: "json",
+					success: function (data) {
+						$("#bg,.loading").hide();
+						if (data.resultCode == 0) {
+							$.messager.show({
+								title: '成功',
+								msg: '群发所有未预登记客商短信成功',
+								timeout: 5000,
+								showType: 'slide'
+							});
+							$("#customers").datagrid("reload");
+						} else {
+							$.messager.alert('错误', '系统错误');
+						}
+					}
+				});
+			}
+		});
+	});
+	//群发所选未预登记客商短信
+	$('#msgSelectedCustomers').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认删除','你确定要群发所选未预登记客商短信吗?',function(r){
+				if (r){
+					$("#bg,.loading").show();
+					$.ajax({
+						url: "${base}/user/msgAllInlandStoneCustomers",
+						type: "post",
+						data: {"cids": checkedItems,"type":"3"},
+						dataType: "json",
+						traditional: true,
+						success: function (data) {
+							$("#bg,.loading").hide();
+							if (data.resultCode == 0) {
+								$.messager.show({
+									title: '成功',
+									msg: '群发所选未预登记客商短信成功',
+									timeout: 5000,
+									showType: 'slide'
+								});
+								$("#customers").datagrid("reload");
+							} else {
+								$.messager.alert('错误', '系统错误');
+							}
+						}
+					});
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项客商再操作');
+		}
+	});
+
+	$(function(){
+		$('#msgContentTemplate').click(function(){
+			if($('input[name="msgContentTemplate"]').prop("checked"))
+			{
+				//加载短信模板内容
+				$.ajax({
+					type:"POST",
+					dataType:"json",
+					url:"${base}/user/loadMsgTemplatContent",
+					success : function(result) {
+						if(result.resultCode == 0){
+							document.getElementById("msg_content").value = result.msgContent;
+							document.getElementById('msg_content').disabled = true;
+						}
+					}
+				});
+			} else{
+				document.getElementById("msg_content").value = "";
+				document.getElementById('msg_content').disabled = false;
+			}
+		});
+	})
+
+	// 新年短信内容弹出框
+	$('#newYearContentDlg').dialog({
+		title: '新年短信内容',
+		width: 400,
+		height: 320,
+		closed: true,
+		cache: false,
+		modal: true,
+		buttons: [
+			{
+				text: '确认发送',
+				iconCls: 'icon-ok',
+				handler: function () {
+					var content = document.getElementById("msg_content").value;
+					var flag = document.getElementById("selectOrAllFlag").value;
+					sendNewYearMsgContent(flag,content);
+				}
+			},
+			{
+				text: '取消',
+				handler: function () {
+					$("#newYearContentDlg").dialog("close");
+				}
+			}
+		]
+	});
+
+	//群发所有未预登记客商新年祝福短信
+	$('#msgAllCustomersToNewYear').click(function(){
+		$.messager.confirm('确认发送','你确定要群发所有未预登记客商新年祝福短信吗?',function(r){
+			if (r){
+				document.getElementById("selectOrAllFlag").value = 1;
+				$("#newYearContentDlg").dialog("open");
+			}
+		});
+	});
+	//群发所选未预登记客商新年祝福短信
+	$('#msgSelectedCustomersToNewYear').click(function(){
+		if(checkedItems.length > 0){
+			$.messager.confirm('确认删除','你确定要群发所选未预登记客商新年祝福短信吗?',function(r){
+				if (r){
+					document.getElementById("selectOrAllFlag").value = 0;
+					$("#newYearContentDlg").dialog("open");
+				}
+			});
+		}else{
+			$.messager.alert('提示', '请至少选择一项客商再操作');
+		}
+	});
+
+	function sendNewYearMsgContent(selectOrAllFlag, content) {
+		$("#newYearContentDlg").dialog("close");
+		if(1 == selectOrAllFlag){
+			$("#bg,.loading").show();
+			$.ajax({
+				url: "${base}/user/msgAllInlandHistoryStoneCustomers",
+				type: "post",
+				data: {"cids": "-1", "content": content},
+				dataType: "json",
+				success: function (data) {
+					$("#bg,.loading").hide();
+					if (data.resultCode == 0) {
+						$.messager.show({
+							title: '成功',
+							msg: '群发所有未预登记客商新年祝福短信成功',
+							timeout: 3000,
+							showType: 'slide'
+						});
+						$("#customers").datagrid("reload");
+					} else {
+						$.messager.alert('错误', '系统错误');
+					}
+				}
+			});
+		}else if(0 == selectOrAllFlag){
+			$("#bg,.loading").show();
+			$.ajax({
+				url: "${base}/user/msgAllInlandHistoryStoneCustomers",
+				type: "post",
+				data: {"cids": checkedItems, "content": content},
+				dataType: "json",
+				traditional: true,
+				success: function (data) {
+					$("#bg,.loading").hide();
+					if (data.resultCode == 0) {
+						$.messager.show({
+							title: '成功',
+							msg: '群发所选未预登记客商新年祝福短信成功',
+							timeout: 3000,
+							showType: 'slide'
+						});
+						$("#customers").datagrid("reload");
+					} else {
+						$.messager.alert('错误', '系统错误');
+					}
+				}
+			});
+		}
+	}
+
 	//导入国内历史客商资料
 	$('#importInlandCustomer').click(function(){
 		$("#importInlandCustomerDlg").dialog("open");

@@ -142,6 +142,17 @@ public class ExhibitorService {
         return allProductTypes;
     }
 
+    @Transactional
+    public List<TExhibitorInfo> loadExhibitorInfoList(Integer[] eids) {
+        List<TExhibitorInfo> exhibitorInfoList = new ArrayList<TExhibitorInfo>();
+        for (Integer eid:eids){
+            TExhibitorInfo exhibitorInfo = loadExhibitorInfoByEid(eid);
+            if (exhibitorInfo != null)
+                exhibitorInfoList.add(exhibitorInfo);
+        }
+        return exhibitorInfoList.size() > 0 ? exhibitorInfoList : null;
+    }
+
     /**
      * load exhibitor information by exhibitor id;
      *

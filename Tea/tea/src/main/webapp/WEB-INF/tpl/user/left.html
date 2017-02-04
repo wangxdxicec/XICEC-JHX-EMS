@@ -100,14 +100,29 @@
     }
 </style>
 
+<#assign exhibitor_data_end_html = "${tExhibitorTime.exhibitor_Info_Submit_Deadline_Zh}">
+<#assign contact_data_end_html_zh = "${tExhibitorTime.tea_Fair_Contact_Submit_Deadline_Zh}">
+<#assign invoice_data_end_html_zh = "${tExhibitorTime.tea_Fair_Invoice_Submit_Deadline_Zh}">
 <div id="leftContent">
     <div id="exhibitorManage" class="leftMenu"><h3 class="hover"><a href="#" style="color: #ffffff;"><@spring.message "left.exhibitor"/></a>
     </h3>
         <ul class="menuList">
-            <li class="menuItem menuSeparate1"><a href="${base}/user/info"><@spring.message "left.exhibitor.info"/></a></li>
-            <li class="menuItem menuSeparate2"><a href="${base}/user/queryJoiners"><@spring.message "left.exhibitor.joiners"/></a></li>
+            <#if .now?date gt exhibitor_data_end_html?date>
+                <li class="menuItem menuSeparate1"><a href="#" onclick="showInfoZh();"><@spring.message "left.exhibitor.info"/></a></li>
+            <#else>
+                <li class="menuItem menuSeparate1"><a href="${base}/user/info"><@spring.message "left.exhibitor.info"/></a></li>
+            </#if>
+            <#if .now?date gt contact_data_end_html_zh?date>
+                <li class="menuItem menuSeparate1"><a href="#" onclick="showInfoZh();"><@spring.message "left.exhibitor.joiners"/></a></li>
+            <#else>
+                <li class="menuItem menuSeparate1"><a href="${base}/user/queryJoiners"><@spring.message "left.exhibitor.joiners"/></a></li>
+            </#if>
             <li class="menuItem menuSeparate1"><a href="${base}/user/contact/index"><@spring.message "left.exhibitor.contacts"/></a></li>
-            <li class="menuItem menuSeparate2"><a href="${base}/user/invoice/index"><@spring.message "module.invoice"/></a></li>
+            <#if .now?date gt invoice_data_end_html_zh?date>
+                <li class="menuItem menuSeparate1"><a href="#" onclick="showInfoZh();"><@spring.message "module.invoice"/></a></li>
+            <#else>
+                <li class="menuItem menuSeparate1"><a href="${base}/user/invoice/index"><@spring.message "module.invoice"/></a></li>
+            </#if>
             <li class="menuItem menuSeparate1"><a href="${base}/user/addMeipai"><@spring.message "left.meipai"/></a></li>
             <li class="menuItem menuSeparate2"><a href="${base}/user/weixin/index"><@spring.message "left.weixin"/></a></li>
         </ul>
@@ -119,11 +134,22 @@
             <li class="menuItem menuSeparate2"><a href="${base}/user/products"><@spring.message "left.products.maintain"/></a></li>
         </ul>
     </div>
+    <!--<#if zone==2>
+        <div id="visaManage" class="leftMenu"><h3 class="hover"><a href="${base}/user/visa/index.html" style="color: #ffffff;"><@spring.message "left.visa"/></a>
+        </div>
+    </#if>-->
     <div id="accountManage" class="leftMenu"><h3 class="hover"><a href="#" style="color: #ffffff;"><@spring.message "left.account"/></a>
     </h3>
         <ul class="menuList">
             <li class="menuItem menuSeparate1"><a href="${base}/user/password"><@spring.message "left.account.modifyPassword"/></a></li>
             <li class="menuItem menuSeparate2"><a href="${base}/logout"><@spring.message "left.account.quit"/></a></li>
+        </ul>
+    </div>
+
+    <div id="emailManage" class="leftMenu"><h3 class="hover"><a href="#" style="color: #ffffff;"><@spring.message "left.email"/></a>
+    </h3>
+        <ul class="menuList">
+            <li class="menuItem menuSeparate1"><a href="${base}/user/email/update.html"><@spring.message "left.email.fillEmail"/></a></li>
         </ul>
     </div>
 </div>
@@ -154,5 +180,13 @@
         $(".list").find("tr").click(function () {
             window.location.href = $(this).find("a").attr("href");
         })
-    })
+    });
+
+    function showInfoZh() {
+        alert("已截止提交。");
+    }
+
+    function showInfoEn() {
+        alert("File Closed.");
+    }
 </script>

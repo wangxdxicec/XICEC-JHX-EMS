@@ -63,19 +63,19 @@ public class ExhibitorTimeManagerService {
 	public void modifyExhibitorTime(String value1, String value2, String value3, String value4, String value5,
 									String value6, String value7, String value8, String value9, String value10,
 									String value11, String value12, String value13, String value14, String value15,
-									String value16, String value17) throws Exception {
+									String value16, String value17, Integer exhibitor_area) throws Exception {
 		jdbcTemplate.update("update t_exhibitor_time set company_Info_Submit_Deadline_Zh=?, company_Info_Submit_Deadline_En=?," +
 						"participant_List_Submit_Deadline_Zh=?, participant_List_Submit_Deadline_En=?, invoice_Information_Submit_Deadline_Zh=?," +
 						"invoice_Information_Submit_Deadline_En=?, advertisement_Submit_Deadline_Zh=?, advertisement_Submit_Deadline_En=?, " +
 						"company_Info_Insert_Submit_Deadline_Zh=?, company_Info_Insert_Submit_Deadline_En=?, stone_fair_end_year=?," +
 						"stone_fair_begin_year=?, company_Info_Data_End_Html=?, visa_Info_Submit_Deadline_Zh=?, visa_Info_Submit_Deadline_En=?," +
-				"stone_Fair_Show_Date_Zh=? ,stone_Fair_Show_Date_En=?",
+				"stone_Fair_Show_Date_Zh=? ,stone_Fair_Show_Date_En=? where area_time=?",
 				new Object[]{value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, value11, value12, value13,
-						value14, value15, value16,value17});
+						value14, value15, value16,value17, exhibitor_area});
 	}
 
 	@Transactional
-	public void modifyExhibitorMenuMove(Integer value) throws Exception {
-		jdbcTemplate.update("update t_exhibitor_time set menu_move_switch=?", new Object[]{value});
+	public void modifyExhibitorMenuMove(Integer value, Integer exhibitor_area) throws Exception {
+		jdbcTemplate.update("update t_exhibitor_time set menu_move_switch=? where area_time=?", new Object[]{value, exhibitor_area});
 	}
 }

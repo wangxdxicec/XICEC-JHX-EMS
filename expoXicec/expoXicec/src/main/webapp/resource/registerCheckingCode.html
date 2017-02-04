@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="bootstrap/b2/css/bootstrap.css" rel="stylesheet">
+    <script src="common/jquery.min.js"></script>
+    <script src="bootstrap/b2/js/bootstrap.js"></script>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .form-horizontal .control-label {
+            text-align: left;
+        }
+        #bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=80);}
+        .loading{display: none; width:66px;height:66px; position: absolute; top: 50%; left: 50%; z-index:5555; }
+    </style>
+</head>
+<body>
+<div class="modal hide fade" id="register" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;position: absolute; top: 30%; left: 50%;"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">新用户注册</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" id="registerForm" target="submitFrame">
+                    <div class="control-group">
+                        <label for="mobilephone" class="control-label" style="width: 180px;">手机号：</label>
+                        <div class="controls">
+                            <input type="text" name="mobilephone" id="mobilephone" value="" maxlength="11">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="mobilecode" class="control-label" style="width: 180px;">验证码：</label>
+                        <div class="controls">
+                            <input type="text" name="mobilecode" id="mobilecode" >
+                            <button id="getCheckCodeBtn" type="button" title="获取验证码">获取验证码</button>
+                        </div>
+                    </div>
+                    <div class="control-group" id="fair" style="margin-bottom: 20px;">
+                        <label for="mobilecode" class="control-label" style="width: 180px;">选择展会：</label>
+                        <div class="controls">
+                            <select id="fair_name" name="fair_name" ></select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="registerBtn">注册</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="close">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loading"><img src="/resource/load.gif"></div>
+<script>
+    $(document).ready(function () {
+        //加载激活展会列表
+        $.ajax({
+            type:"POST",
+            dataType:"json",
+            url:"/loadAllEnableFairName",
+            success : function(result) {
+                if(result){
+                    $("#fair_name").html('');
+                    for(var i=0,a;a=result[i++];){
+                        $("#fair_name").append('<option value="'+a.id+'">'+a.fair_name+'</option>');
+                    }
+                    $("#fair_name").options[0].selected = true;
+                }
+            }
+        });
+
+        function checkMobile(s){
+            var length = s.length;
+            if(length == 11 && /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(14[0-9]{1})|)+\d{8})$/.test(s) )
+            {
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        $("#register").modal({backdrop: 'static', keyboard: false});
+        $("#getCheckCodeBtn").click(function () {
+            var fair_type_value = $("#fair_name option:selected").val();
+            var phone = document.getElementById("mobilephone");
+            var value = phone.value.trim();
+
+            if(!checkMobile(value)) {
+                alert("请输入正确的手机号！");
+                return;
+            }
+
+            if(value && value.length == 11){
+                $("#bg,.loading").show();
+                $.ajax({
+                    type: "POST",
+                    data: {"inputPhone" : value, "fair_type": fair_type_value},
+                    url: "/sendSms",
+                    dataType: "json",
+                    success: function (result) {
+                        $("#bg,.loading").hide();
+                        $("#getCheckCodeBtn").removeClass("disabled");
+                        if (result.resultCode == 0) {
+                            //alert("短信验证码已经发到您手机，请注意查收！");
+                            // 1分钟内禁止点击
+                            for (var i = 1; i <= 60; i++) {
+                                // 1秒后显示
+                                window.setTimeout("updateTime(" + (60 - i) + ")", i * 1000);
+                            }
+                        }else if(result.resultCode == 1){
+                            alert("此手机已经注册过，请更换个手机号注册，谢谢！");
+                        }
+                    }
+                });
+            }else{
+                alert("请输入正确的手机号码");
+                phone.focus();
+                return;
+            }
+        });
+
+        $("#registerBtn").click(function () {
+            var fair_type_value = $("#fair_name option:selected").val();
+            if ($("#mobilephone").val() == '') {
+                alert("手机号不能为空");
+                return;
+            }
+            if ($("#mobilecode").val() == '') {
+                alert("验证码不能为空");
+                return;
+            }
+            $("#bg,.loading").show();
+            $.ajax({
+                type: "POST",
+                data: {"inputCode" : $("#mobilecode").val()},
+                url: "/compareCheckingCode",
+                dataType: "json",
+                success: function (result) {
+                    $("#bg,.loading").hide();
+                    $("#registerBtn").removeClass("disabled");
+                    if (result.resultCode == 0) {
+                        window.location.replace("registerInfo.html?phone=" + $("#mobilephone").val() + "&fairtype="+fair_type_value);
+                    }else{
+                        document.getElementById('mobilecode').value = "";
+                        alert("输入的验证码错误，请重新输入！");
+                    }
+                }
+            });
+        });
+
+        $("#close").click(function () {
+            location.href="/";
+        });
+    })
+</script>
+<script type="text/javascript">
+    function updateTime(i){
+        // setTimeout传多个参数到function有点麻烦，只能重新获取对象
+        var obj = document.getElementById("getCheckCodeBtn");
+        if(i > 0){
+            obj.innerHTML  = "" + i + "秒后重试";
+            obj.disabled = true;
+        }else{
+            obj.innerHTML = "获取验证码";
+            obj.disabled = false;
+        }
+    }
+
+    function checkTime(){
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "${base}/getCheckingCodeTime",
+            success : function(result) {
+                if(result && result.codeTime){
+                    var nowTime = new Date().getTime();
+                    var flag = Math.floor((nowTime - result.codeTime)/1000);
+                    if(flag < 60){
+                        var end = 60 - flag;
+                        // 进页面马上开始，选i为0
+                        for (var i = 0; i <= end; i++) {
+                            window.setTimeout("updateTime(" + (end - i) + ")", i * 1000);
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

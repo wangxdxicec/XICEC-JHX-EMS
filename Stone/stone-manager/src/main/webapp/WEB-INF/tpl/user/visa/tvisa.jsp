@@ -5,26 +5,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>金泓信展商管理后台</title>
-    <style>
-        body {
-            margin: 0px;
-            padding: 0px;
-            width: 100%;
-            height: 100%;
-        }
+	<title>金泓信展商管理后台</title>
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+		}
 
-        input {
-            width: 200px;
-            height: 20px;
-        }
-    </style>
+		input {
+			width: 200px;
+			height: 20px;
+		}
+	</style>
 </head>
 <body>
 <!-- 展商visa列表 -->
 <div id="tvisatabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
 	<div title="展商visa列表" style="padding:5px">
-		<table id="tvisa" data-options="url:'${base}/user/queryTVisaByPage',
+		<table id="tvisa" class="easyui-tabs" data-options="url:'${base}/user/queryTVisaByPage',
          						   loadMsg: '数据加载中......',
 						           singleSelect:false,	//只能当行选择：关闭
 						           fit:true,
@@ -71,9 +71,9 @@
 </form>
 <!-- 工具栏 -->
 <div id="tvisaBar">
-    <div>
+	<div>
 		<div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
-    </div>
+	</div>
 	<div id="export" style="width:180px;">
 		<div id="exportAllVisas" iconCls="icon-redo">所有VISA信息到Excel</div>
 		<div id="exportSelectedVisas" iconCls="icon-redo">所选VISA信息到Excel</div>
@@ -86,7 +86,7 @@
 	var sort = "";
 	var order = "asc";
 	var vidParm1 = document.getElementById("vidParm1");
-//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
+	//----------------------------------------------------工具栏函数开始--------------------------------------------------------//
 	//导出所有VISA信息到Excel
 	$('#exportAllVisas').click(function(){
 //		$.messager.alert('提示', '开发中');
@@ -99,23 +99,20 @@
 	//导出所选VISA信息到Excel
 	$('#exportSelectedVisas').click(function(){
 //		$.messager.alert('提示', '开发中');
-//     	alert(checkedItems);
 		vidParm1.innerHTML = "";
-//     	alert(vidParm1.innerHTML);
 		if(checkedItems.length > 0){
 			for (var i = 0; i < checkedItems.length; i++) {
 				var node = "<input type='hidden' name='vids' value='"+checkedItems[i]+"'/>";
 				vidParm1.innerHTML += node;
 			}
-//         	alert(vidParm1.innerHTML);
 			document.getElementById("exportTVisasToExcel").submit();
 			$.messager.alert('提示', '导出所选展商成功');
 		}else{
 			$.messager.alert('提示', '请至少选择一项展商再导出');
 		}
 	});
-//----------------------------------------------------工具栏函数结束--------------------------------------------------------//
-//----------------------------------------------------自定义函数开始--------------------------------------------------------//
+	//----------------------------------------------------工具栏函数结束--------------------------------------------------------//
+	//----------------------------------------------------自定义函数开始--------------------------------------------------------//
 	//国家显示
 	function formatCountry(val, row) {
 		if (val != null) {
@@ -175,7 +172,7 @@
 				(this.getFullYear() + "").substr(4 - RegExp.$1.length));
 		for (var k in o) if (new RegExp("(" + k + ")").test(format))
 			format = format.replace(RegExp.$1,
-							RegExp.$1.length == 1 ? o[k] :
+					RegExp.$1.length == 1 ? o[k] :
 							("00" + o[k]).substr(("" + o[k]).length));
 		return format;
 	}
@@ -200,53 +197,48 @@
 		$('#tvisa').datagrid('options').url = '${base}/user/queryTVisaByPage' + filterParm;
 		$('#tvisa').datagrid('reload');
 		/*$('#tvisa').datagrid('reload', {
-			passportName : document.getElementById("tvisaPassportName").value,
-			nationality : document.getElementById("tvisaNationality").value,
-			companyName : document.getElementById("tvisaCompanyName").value,
-			createTime : document.getElementById("createTime").value,
-			sort : sort,
-			order : order
-		});*/
+		 passportName : document.getElementById("tvisaPassportName").value,
+		 nationality : document.getElementById("tvisaNationality").value,
+		 companyName : document.getElementById("tvisaCompanyName").value,
+		 createTime : document.getElementById("createTime").value,
+		 sort : sort,
+		 order : order
+		 });*/
 	}
-//----------------------------------------------------自定义函数结束--------------------------------------------------------//
-    $(document).ready(function () {
-
-    	// 国外展商VISA信息列表渲染
-        $('#tvisa').datagrid({
-       		onSelect:function (rowIndex, rowData){
-	        	var row = $('#tvisa').datagrid('getSelections');
+	//----------------------------------------------------自定义函数结束--------------------------------------------------------//
+	$(document).ready(function () {
+		// 国外展商VISA信息列表渲染
+		$('#tvisa').datagrid({
+			onSelect:function (rowIndex, rowData){
+				var row = $('#tvisa').datagrid('getSelections');
 				for (var i = 0; i < row.length; i++) {
 					if (findCheckedItem(row[i].id) == -1) {
 						checkedItems.push(row[i].id);
 					}
 				}
-//					alert(checkedItems);
-	        },
-	        onUnselect:function (rowIndex, rowData){
+			},
+			onUnselect:function (rowIndex, rowData){
 				var k = findCheckedItem(rowData.id);
 				if (k != -1) {
 					checkedItems.splice(k, 1);
 				}
-//					alert(checkedItems);
-	        },
-	        onSelectAll:function (rows){
-	        	for (var i = 0; i < rows.length; i++) {
-	        		var k = findCheckedItem(rows[i].id);
+			},
+			onSelectAll:function (rows){
+				for (var i = 0; i < rows.length; i++) {
+					var k = findCheckedItem(rows[i].id);
 					if (k == -1) {
 						checkedItems.push(rows[i].id);
 					}
 				}
-//					alert(checkedItems);
-	        },
-	        onUnselectAll:function (rows){
-	        	for (var i = 0; i < rows.length; i++) {
+			},
+			onUnselectAll:function (rows){
+				for (var i = 0; i < rows.length; i++) {
 					var k = findCheckedItem(rows[i].id);
 					if (k != -1) {
 						checkedItems.splice(k, 1);
 					}
 				}
-// 					alert(checkedItems);
-	        },
+			},
 			onDblClickRow: function (index, field, value) {
 				if(field.passportName != ""){
 					if (!$("#tvisatabs").tabs("exists", field.passportName)) {
@@ -260,14 +252,14 @@
 					}
 				}
 			}
-        }).datagrid('getPager').pagination({
-            pageSize: 20,//每页显示的记录条数，默认为10
-            pageList: [10,20,30,40,50],//可以设置每页记录条数的列表
-            beforePageText: '第',//页数文本框前显示的汉字
-            afterPageText: '页    共 {pages} 页',
-            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
-        });
-        function findCheckedItem(id) {
+		}).datagrid('getPager').pagination({
+			pageSize: 20,//每页显示的记录条数，默认为10
+			pageList: [10,20,30,40,50],//可以设置每页记录条数的列表
+			beforePageText: '第',//页数文本框前显示的汉字
+			afterPageText: '页    共 {pages} 页',
+			displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
+		});
+		function findCheckedItem(id) {
 			for (var i = 0; i < checkedItems.length; i++) {
 				if (checkedItems[i] == id) return i;
 			}
@@ -304,14 +296,14 @@
 					companyName : document.getElementById("tvisaCompanyName").value,
 					updateTime : document.getElementById("updateTime").value,
 					createTime : document.getElementById("createTime").value,
-					sort : sort,
-					order : order
+					sort : null,
+					order : null
 				});
 				$(this).html($(this).html().split(" ▲")[0].split(" ▼")[0]);
 				order = "asc";
 			}
 		});
-    });
+	});
 </script>
 </body>
 </html>

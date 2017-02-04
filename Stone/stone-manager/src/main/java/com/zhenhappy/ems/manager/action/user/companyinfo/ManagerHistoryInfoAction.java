@@ -10,6 +10,7 @@ import com.zhenhappy.ems.entity.VApplyEmail;
 import com.zhenhappy.ems.entity.managerrole.TUserInfo;
 import com.zhenhappy.ems.entity.managerrole.TUserRole;
 import com.zhenhappy.ems.manager.action.BaseAction;
+import com.zhenhappy.ems.manager.dao.companyinfo.HistoryCustomerInfoDao;
 import com.zhenhappy.ems.manager.dto.*;
 import com.zhenhappy.ems.manager.dto.companyinfo.*;
 import com.zhenhappy.ems.manager.entity.companyinfo.THistoryCustomer;
@@ -70,6 +71,8 @@ public class ManagerHistoryInfoAction extends BaseAction {
     private TagManagerService tagManagerService;
     @Autowired
     private TagDao tagDao;
+    @Autowired
+    private HistoryCustomerInfoDao historyCustomerInfoDao;
 
     //国内历史客商数据
     @RequestMapping(value = "historyInlandCustomer")
@@ -423,9 +426,11 @@ public class ManagerHistoryInfoAction extends BaseAction {
         return response;
     }
 
+    //type:  1：表示给客商发信息完整邮件；2：表示给客商发邀请邮件
     @ResponseBody
     @RequestMapping(value = "emailAllHistoryInlandStoneCustomers", method = RequestMethod.POST)
     public BaseResponse emailAllHistoryInlandStoneCustomers(@RequestParam(value = "cids", defaultValue = "") Integer[] cids,
+                                                            @RequestParam(value = "type") Integer type,
                                                             @ModelAttribute(ManagerPrinciple.MANAGERPRINCIPLE) ManagerPrinciple principle) {
         BaseResponse baseResponse = new BaseResponse();
         List<THistoryCustomer> customers = new ArrayList<THistoryCustomer>();
@@ -499,13 +504,15 @@ public class ManagerHistoryInfoAction extends BaseAction {
                         ReadWriteEmailAndMsgFile.readTxtFile(ReadWriteEmailAndMsgFile.stoneEmailFileName);
                         ReadWriteEmailAndMsgFile.writeTxtFile(str + ", 给邮箱为：" + customer.getEmail() + "账号发邮件。", ReadWriteEmailAndMsgFile.stoneEmailFileName);
                         //log.info("======给境内邮箱为：" + customer.getEmail() + "账号发邮件======");
-                        /*if(customer.getIsProfessional() == 1) {
-                            email.setFlag(1);//专业采购商
-                        } else {
+                        if(type == 1) {
                             email.setFlag(0);//展会观众
-                        }*/
-                        email.setFlag(1);//专业采购商
-                        email.setEmailType(1);
+                            email.setEmailType(0);
+                        } else if(type == 2) {
+                            email.setFlag(1);//专业采购商
+                            email.setEmailType(1);
+                        }
+                        /*email.setFlag(1);//专业采购商
+                        email.setEmailType(1);*/
                         //email.setEmailType(customer.getIsProfessional());
                         //email.setCheckingNo(customer.getCheckingNo());
                         email.setCustomerId(customer.getId());
@@ -513,6 +520,7 @@ public class ManagerHistoryInfoAction extends BaseAction {
                         email.setUseTemplate(false);
                         email.setCompany(customer.getCompany());
                         email.setName(customer.getContact());
+                        email.setRegID(String.valueOf(customer.getId()));
                         //email.setName(customer.getFirstName());
                         if(customer.getPosition() == null || customer.getPosition() == ""){
                             email.setPosition("");
@@ -524,6 +532,8 @@ public class ManagerHistoryInfoAction extends BaseAction {
                         //email.setReceivers("datea120@163.com");
 
                         mailService.sendMailByAsyncAnnotationMode(email);
+                        customer.setUpdatetime(new Date());
+                        historyCustomerInfoDao.update(customer);
 
                         List<VApplyEmail> customerApplyEmailList = customerApplyEmailInfoDao.queryByHql("from VApplyEmail where CustomerID=?", new Object[]{customer.getId()});
                         if(customerApplyEmailList != null && customerApplyEmailList.size()>0){

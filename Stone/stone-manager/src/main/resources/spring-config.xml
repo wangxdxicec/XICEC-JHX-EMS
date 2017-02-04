@@ -133,14 +133,16 @@
 				<prop key="mail.smtp.timeout">25000</prop>
 			</props>
 		</property>
-		<property name="username">
+		<!--<property name="username">
 			<value>do-not-reply@stonefair.org.cn</value>
-			<!--<value>hxscsd@163.com</value>-->
+			&lt;!&ndash;<value>hxscsd@163.com</value>&ndash;&gt;
 		</property>
 		<property name="password">
 			<value>Jhxsf2015~</value>
-			<!--<value>dilimic120</value>-->
-		</property>
+			&lt;!&ndash;<value>dilimic120</value>&ndash;&gt;
+		</property>-->
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
 	</bean>
 	<!--②异步线程执行器 -->
 	<bean id="taskExecutor"

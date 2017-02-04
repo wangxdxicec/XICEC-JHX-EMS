@@ -38,6 +38,7 @@ public class TExhibitor implements java.io.Serializable {
 	private String exhibitionArea;
 	private String exhibitor_type;  //0或null：表示普通展商；1：表示素食展；2：表示泰国展
 	private Integer isLogin; //是否登录过。0：表示未登录；1或null表示登录过；
+	private Integer send_invitation_flag;  //是否发送展商邀请涵
 
     // Constructors
 
@@ -56,7 +57,7 @@ public class TExhibitor implements java.io.Serializable {
 	public TExhibitor(Integer eid, String username, String password, Integer level,Integer area, Date lastLoginTime,
 					  String lastLoginIp, Integer isLogout, Integer createUser, Date createTime,
 					  Integer updateUser, Date updateTime, Integer tag, Integer province, Integer country,
-					  Integer group, String contractId, String exhibitionArea, String exhibitor_type, Integer isLogin) {
+					  Integer group, String contractId, String exhibitionArea, String exhibitor_type, Integer isLogin, Integer send_invitation_flag) {
 		this.eid = eid;
 		this.username = username;
 		this.password = password;
@@ -77,6 +78,7 @@ public class TExhibitor implements java.io.Serializable {
 		this.exhibitionArea = exhibitionArea;
 		this.exhibitor_type = exhibitor_type;
 		this.isLogin = isLogin;
+		this.send_invitation_flag = send_invitation_flag;
 	}
 
 	public TExhibitor(Integer eid, String username, String password, Integer level,
@@ -316,6 +318,15 @@ public class TExhibitor implements java.io.Serializable {
 		this.isLogin = isLogin;
 	}
 
+	@Column(name = "send_invitation_flag")
+	public Integer getSend_invitation_flag() {
+		return send_invitation_flag;
+	}
+
+	public void setSend_invitation_flag(Integer send_invitation_flag) {
+		this.send_invitation_flag = send_invitation_flag;
+	}
+
 	@Override
 	public String toString() {
 		return "TExhibitor{" +
@@ -342,6 +353,7 @@ public class TExhibitor implements java.io.Serializable {
 				", exhibitionArea='" + exhibitionArea + '\'' +
 				", exhibitor_type='" + exhibitor_type + '\'' +
 				", isLogin='" + isLogin + '\'' +
+				", send_invitation_flag='" + send_invitation_flag + '\'' +
 				'}';
 	}
 }

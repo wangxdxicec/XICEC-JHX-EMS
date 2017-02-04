@@ -214,6 +214,8 @@ public class HistoryCustomerService extends ExhibitorService {
 						org.apache.poi.ss.usermodel.Cell companyCell = xssfRow.getCell(1);
 						//地址  只有一个
 						org.apache.poi.ss.usermodel.Cell addressShell = xssfRow.getCell(2);
+						//联系点人
+						org.apache.poi.ss.usermodel.Cell contactShell = xssfRow.getCell(3);
 						String companyStr = "";
 						String addressStr = "";
 						if(companyCell != null){
@@ -225,7 +227,7 @@ public class HistoryCustomerService extends ExhibitorService {
 
 						org.apache.poi.ss.usermodel.Cell emailShell = xssfRow.getCell(6);
 						//邮箱
-						if(emailShell != null){
+						if(emailShell != null && emailShell.getStringCellValue() != null){
 							String emailValue = emailShell.getStringCellValue().trim();
 							if(StringUtil.isNotEmpty(emailValue)){
 								String emailContent = emailValue.replaceAll(" ", "");
@@ -266,12 +268,16 @@ public class HistoryCustomerService extends ExhibitorService {
 						tHistoryCustomer.setId(willImportId++);
 						tHistoryCustomer.setCountry(44);
 						if(userInfo != null){
-							tHistoryCustomer.setOwner(userInfo.getOwnerId());
+							if(userInfo.getOwnerId() != null){
+								tHistoryCustomer.setOwner(userInfo.getOwnerId());
+							} else {
+								tHistoryCustomer.setOwner(0);
+							}
 						}else{
 							tHistoryCustomer.setOwner(0);
 						}
-						tHistoryCustomer.setCreatetime((new Date()).toString());
-						tHistoryCustomer.setUpdatetime((new Date()).toString());
+						tHistoryCustomer.setCreatetime(new Date());
+						tHistoryCustomer.setUpdatetime(new Date());
 						tHistoryCustomer.setIsDelete(0);
 						if(userInfo != null){
 							tHistoryCustomer.setUpdateowner(userInfo.getName());
@@ -487,8 +493,8 @@ public class HistoryCustomerService extends ExhibitorService {
 				if(userInfo != null){
 					tHistoryCustomer.setOwner(userInfo.getOwnerId());
 				}
-				tHistoryCustomer.setCreatetime((new Date()).toString());
-				tHistoryCustomer.setUpdatetime((new Date()).toString());
+				tHistoryCustomer.setCreatetime(new Date());
+				tHistoryCustomer.setUpdatetime(new Date());
 				int lastContactIndex = contactBuffer.toString().lastIndexOf("&");
 				String contactValue = contactBuffer.toString().substring(0,lastContactIndex);
 				int lastPositionIndex = positionBuffer.toString().lastIndexOf("&");
@@ -686,8 +692,8 @@ public class HistoryCustomerService extends ExhibitorService {
 				tHistoryCustomer.setOwner(userInfo.getOwnerId());
 				tHistoryCustomer.setUpdateowner(userInfo.getName());
 			}
-			tHistoryCustomer.setCreatetime(String.valueOf(new Date()));
-			tHistoryCustomer.setUpdatetime(String.valueOf(new Date()));
+			tHistoryCustomer.setCreatetime(new Date());
+			tHistoryCustomer.setUpdatetime(new Date());
 			tHistoryCustomer.setPosition(request.getPosition());
 			tHistoryCustomer.setRemark(request.getRemark());
 			getHibernateTemplate().save(tHistoryCustomer);
@@ -770,7 +776,9 @@ public class HistoryCustomerService extends ExhibitorService {
 	 * @param inlandOrForeignFlag
 	 * @return
 	 */
-	public QueryHistoryCustomerResponse queryHistoryCustomersByPage(QueryHistoryCustomerRequest request,TUserInfo userInfo,TUserRole userRole,
+	public QueryHistoryCustomerResponse queryHistoryCustomersByPage(QueryHistoryCustomerRequest request,
+																	TUserInfo userInfo,
+																	TUserRole userRole,
 																	@ModelAttribute Integer inlandOrForeignFlag) throws UnsupportedEncodingException{
 		List<String> conditions = new ArrayList<String>();
 		QueryHistoryCustomerResponse response = new QueryHistoryCustomerResponse();
@@ -891,6 +899,21 @@ public class HistoryCustomerService extends ExhibitorService {
 	@Transactional
 	public List<THistoryCustomer> loadAllHistoryInlandCustomer() {
 		List<THistoryCustomer> customers = historyCustomerInfoDao.queryByHql("from THistoryCustomer where isDelete = 0 and country = 44 order by updatetime desc", new Object[]{});
+		return customers.size() > 0 ? customers : null;
+	}
+
+	/**
+	 * 查询国内历史客商基本信息
+	 * @return
+	 */
+	@Transactional
+	public List<THistoryCustomer> loadAllHistoryInlandCustomerByUserInfoAndUserRole(TUserInfo userInfo) {
+		List<THistoryCustomer> customers = new ArrayList<THistoryCustomer>();
+		if(userInfo != null && userInfo.getRoleId() == 2) {
+			customers = historyCustomerInfoDao.queryByHql("from THistoryCustomer where isDelete = 0 and country = 44 order by updatetime desc", new Object[]{});
+		}else if(userInfo != null){
+			customers = historyCustomerInfoDao.queryByHql("from THistoryCustomer where isDelete = 0 and country = 44 and owner=? order by updatetime desc", new Object[]{userInfo.getRoleId()});
+		}
 		return customers.size() > 0 ? customers : null;
 	}
 
@@ -1157,8 +1180,8 @@ public class HistoryCustomerService extends ExhibitorService {
 				tHistoryCustomer.setOwner(userInfo.getOwnerId());
 				tHistoryCustomer.setUpdateowner(userInfo.getName());
 			}
-			tHistoryCustomer.setCreatetime(String.valueOf(new Date()));
-			tHistoryCustomer.setUpdatetime(String.valueOf(new Date()));
+			tHistoryCustomer.setCreatetime(new Date());
+			tHistoryCustomer.setUpdatetime(new Date());
 			tHistoryCustomer.setPosition(request.getPosition());
 			tHistoryCustomer.setRemark(request.getRemark());
 			getHibernateTemplate().save(tHistoryCustomer);
@@ -1182,7 +1205,7 @@ public class HistoryCustomerService extends ExhibitorService {
 				tHistoryCustomer.setWebsite(request.getWebsite());
 				tHistoryCustomer.setBackupaddress(request.getBackupaddress());
 				tHistoryCustomer.setRemark(request.getRemark());
-				tHistoryCustomer.setUpdatetime(new Date().toString());
+				tHistoryCustomer.setUpdatetime(new Date());
 				tHistoryCustomer.setFax(request.getFax());
 				if(userInfo != null){
 					tHistoryCustomer.setUpdateowner(userInfo.getName());
@@ -1252,7 +1275,7 @@ public class HistoryCustomerService extends ExhibitorService {
 					if(userInfo != null){
 						tHistoryCustomer.setUpdateowner(userInfo.getName());
 					}
-					tHistoryCustomer.setUpdatetime((new Date()).toString());
+					tHistoryCustomer.setUpdatetime(new Date());
 					getHibernateTemplate().update(tHistoryCustomer);
 				}else {
 					tHistoryCustomerListTemp.add(tHistoryCustomer);
@@ -1279,7 +1302,7 @@ public class HistoryCustomerService extends ExhibitorService {
 				if(userInfo != null){
 					tHistoryCustomer.setUpdateowner(userInfo.getName());
 				}
-				tHistoryCustomer.setUpdatetime((new Date()).toString());
+				tHistoryCustomer.setUpdatetime(new Date());
 				getHibernateTemplate().update(tHistoryCustomer);
 			}
 		}

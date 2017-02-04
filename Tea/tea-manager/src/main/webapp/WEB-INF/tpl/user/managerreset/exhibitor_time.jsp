@@ -89,6 +89,28 @@
 				<input id="tea_Fair_Data_End_Html" style="width:80%;" type="text"/>
 			</td>
 		</tr>
+		<tr>
+			<td style="width: 200px">参展人员信息提交截止时间（中文）：</td>
+			<td>
+				<input id="tea_Fair_Contact_Submit_Deadline_Zh" style="width:80%;" type="text"/>
+			</td>
+
+			<td style="width: 200px">参展人员信息提交截止时间（英文）：</td>
+			<td>
+				<input id="tea_Fair_Contact_Submit_Deadline_En" style="width:80%;" type="text"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 200px">发票信息提交截止时间（中文）：</td>
+			<td>
+				<input id="tea_Fair_Invoice_Submit_Deadline_Zh" style="width:80%;" type="text"/>
+			</td>
+
+			<td style="width: 200px">发票人员信息提交截止时间（英文）：</td>
+			<td>
+				<input id="tea_Fair_Invoice_Submit_Deadline_En" style="width:80%;" type="text"/>
+			</td>
+		</tr>
 	</table>
 	<div class="email-footer" align="center" style="margin-left: 50%;margin-top: 30px">
 		<button type="button" class="btn btn-primary" id="saveData">确认修改</button>
@@ -112,6 +134,10 @@
 						document.getElementById("tea_Fair_Show_Year").value = map.tea_Fair_Show_Year;
 						document.getElementById("tea_Fair_Show_Begin_Date").value = map.tea_Fair_Show_Begin_Date;
 						document.getElementById("tea_Fair_Data_End_Html").value = map.tea_Fair_Data_End_Html;
+						document.getElementById("tea_Fair_Contact_Submit_Deadline_Zh").value = map.tea_Fair_Contact_Submit_Deadline_Zh;
+						document.getElementById("tea_Fair_Contact_Submit_Deadline_En").value = map.tea_Fair_Contact_Submit_Deadline_En;
+						document.getElementById("tea_Fair_Invoice_Submit_Deadline_Zh").value = map.tea_Fair_Invoice_Submit_Deadline_Zh;
+						document.getElementById("tea_Fair_Invoice_Submit_Deadline_En").value = map.tea_Fair_Invoice_Submit_Deadline_En;
 					}
 				}
 			}
@@ -133,7 +159,11 @@
 							"exhibitor_Info_Submit_Deadline_En": $("#exhibitor_Info_Submit_Deadline_En").val(),
 							"tea_Fair_Show_Year": $("#tea_Fair_Show_Year").val(),
 							"tea_Fair_Show_Begin_Date": $("#tea_Fair_Show_Begin_Date").val(),
-							"tea_Fair_Data_End_Html": $("#tea_Fair_Data_End_Html").val()},
+							"tea_Fair_Data_End_Html": $("#tea_Fair_Data_End_Html").val(),
+							"tea_Fair_Contact_Submit_Deadline_Zh": $("#tea_Fair_Contact_Submit_Deadline_Zh").val(),
+							"tea_Fair_Contact_Submit_Deadline_En": $("#tea_Fair_Contact_Submit_Deadline_En").val(),
+							"tea_Fair_Invoice_Submit_Deadline_Zh": $("#tea_Fair_Invoice_Submit_Deadline_Zh").val(),
+							"tea_Fair_Invoice_Submit_Deadline_En": $("#tea_Fair_Invoice_Submit_Deadline_En").val()},
 						success: function (data) {
 							if (data.resultCode == 1) {
 								$.messager.alert('错误', '更新时间参数失败错误');

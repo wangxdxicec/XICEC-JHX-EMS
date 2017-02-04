@@ -18,6 +18,8 @@
             width: 200px;
             height: 20px;
         }
+		#bg{ display: none; position: absolute; top: 0%; left: 0%; width: 50%; height: 50%; background-color: black; z-index:1001; -moz-opacity: 0.2; opacity:.2; filter: alpha(opacity=50);}
+		.loading{display: none; position: absolute; top: 50%; left: 50%; z-index:1002; }
     </style>
 </head>
 <body>
@@ -29,6 +31,8 @@
 						           singleSelect:false,	//只能当行选择：关闭
 						           fit:true,
 						           fitColumns:true,
+						           idField:'id',
+						           remoteSort:true,
 								   toolbar:'#customerbar',
 						           rownumbers: 'true',
 						           pagination:'true',
@@ -37,24 +41,24 @@
 			<tr>
 				<th data-options="field:'ck',checkbox:true"></th>
 				<th data-options="field: 'firstName', width: $(this).width() / 8">
-					<span id="sfirstName" class="sortable">姓名</span><br/>
+					姓名<br/>
 					<input id="customersFirstName" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
 				<th data-options="field: 'company', width: $(this).width() / 8">
-					<span id="scompany" class="sortable">公司名称</span><br/>
+					公司名称<br/>
 					<input id="customersCompany" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
 				<th data-options="field: 'country', formatter: formatCountry, width: $(this).width() * 0.07">
-					<span id="scountry" class="sortable">国家</span><br/>
+					国家<br/>
 					<select id="customersCountry" style="width:100%;height:21px;" onchange="filter(this.options[this.options.selectedIndex].value);">
 					</select>
 				</th>
 				<th data-options="field: 'address', width: $(this).width() / 8">
-					<span id="saddress" class="sortable">地址</span><br/>
+					地址<br/>
 					<input id="customersAddress" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
 				<th data-options="field: 'mobilePhone', width: $(this).width() / 8">
-					<span id="smobilePhone" class="sortable">手机</span><br/>
+					手机<br/>
 					<input id="customersMobilePhone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
 				<%--<th data-options="field: 'telephone', width: $(this).width() / 8">
@@ -62,11 +66,11 @@
 					<input id="customersTelephone" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>--%>
 				<th data-options="field: 'email', width: $(this).width() / 8">
-					<span id="semail" class="sortable">邮箱</span><br/>
+					邮箱<br/>
 					<input id="customersEmail" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
 				<th data-options="field: 'createdTime', formatter:formatDatebox, width: $(this).width() / 8">
-					<span id="screatedTime" class="sortable">登记时间</span><br/>
+					登记时间<br/>
 					<input id="createdTime" style="width:100%;height:15px;" type="text" onkeyup="filter();"/>
 				</th>
 				<th data-options="field: 'updateTime', formatter:formatDatebox, width: $(this).width() / 8">
@@ -85,7 +89,7 @@
 					<span id="sisActivated" class="sortable">状态</span><br/>
 					<select id="customerIsActivated" style="width:104%;height:21px;" onchange="filter();">
 						<option selected value="">全部</option>
-						<option value="0">注销</option>
+						<option value="0">未激活</option>
 						<option value="1">激活</option>
 					</select>
 				</th>
@@ -108,8 +112,8 @@
 		<div class="easyui-menubutton" menu="#email" iconCls="icon-redo">邮件</div>
 	</div>
 	<div id="email" style="width:180px;">
-		<div id="emailAllCustomers" iconCls="icon-redo">群发所有客商邮件</div>
-		<div id="emailSelectedCustomers" iconCls="icon-redo">群发所选客商邮件</div>
+		<div id="emailAllCustomers" iconCls="icon-redo">群发所有已激活客商邮件</div>
+		<div id="emailSelectedCustomers" iconCls="icon-redo">群发所选已激活客商邮件</div>
 	</div>
 	<div style="display:inline-block;">
 		<div class="easyui-menubutton" menu="#export" iconCls="icon-redo">导出</div>
@@ -285,7 +289,7 @@
 
 	function formatActiviteStatus(val, row) {
 		if (val == 0) {
-			return '注销';
+			return '未激活';
 		} else {
 			return '激活';
 		}
@@ -309,22 +313,6 @@
 							RegExp.$1.length == 1 ? o[k] :
 							("00" + o[k]).substr(("" + o[k]).length));
 		return format;
-	}
-
-	function filter(countryId){
-		$('#customers').datagrid('reload', {
-			firstName : document.getElementById("customersFirstName").value,
-			company : document.getElementById("customersCompany").value,
-			country : document.getElementById("customersCountry").value,
-			address : document.getElementById("customersAddress").value,
-			mobilePhone : document.getElementById("customersMobilePhone").value,
-			/*telephone : document.getElementById("customersTelephone").value,*/
-			email : document.getElementById("customersEmail").value,
-			createdTime : document.getElementById("createdTime").value,
-			updateTime: document.getElementById("updateTime").value,
-			sort : sort,
-			order : order
-		});
 	}
 
 	function filter() {
@@ -425,6 +413,13 @@
 		});
 
     	// 国外客商列表渲染
+		$('#tabs').tabs({
+			onClose: function(title,index){
+				filter();
+				return false;
+			}
+		});
+
         $('#customers').datagrid({
        		onSelect:function (rowIndex, rowData){
 	        	var row = $('#customers').datagrid('getSelections');
@@ -486,72 +481,6 @@
 			}
 			return -1;
 		}
-		$("#customers").data().datagrid.dc.view.find("div.datagrid-header td .sortable").click(function(){
-			sortForeign = $(this).prop("id").substr(1, $(this).prop("id").length);
-			if(orderForeign == "asc"){
-				$('#customers').datagrid('reload', {
-					firstName : document.getElementById("customersFirstName").value,
-					company : document.getElementById("customersCompany").value,
-					country : document.getElementById("customersCountry").value,
-					address : document.getElementById("customersAddress").value,
-					mobilePhone : document.getElementById("customersMobilePhone").value,
-					/*telephone : document.getElementById("customersTelephone").value,*/
-					email : document.getElementById("customersEmail").value,
-					createdTime : document.getElementById("createdTime").value,
-					updateTime: document.getElementById("updateTime").value,
-					sort : sortForeign,
-					order : orderForeign
-				});
-				$(this).html($(this).html().split(" ▲")[0].split(" ▼")[0] + " ▲");
-				orderForeign = "desc";
-			}else if(orderForeign == "desc"){
-				$('#customers').datagrid('reload', {
-					firstName : document.getElementById("customersFirstName").value,
-					company : document.getElementById("customersCompany").value,
-					country : document.getElementById("customersCountry").value,
-					address : document.getElementById("customersAddress").value,
-					mobilePhone : document.getElementById("customersMobilePhone").value,
-					/*telephone : document.getElementById("customersTelephone").value,*/
-					email : document.getElementById("customersEmail").value,
-					createdTime : document.getElementById("createdTime").value,
-					updateTime: document.getElementById("updateTime").value,
-					sort : sortForeign,
-					order : orderForeign
-				});
-				$(this).html($(this).html().split(" ▲")[0].split(" ▼")[0] + " ▼");
-				orderForeign = "null";
-			}else{
-				$('#customers').datagrid('reload', {
-					firstName : document.getElementById("customersFirstName").value,
-					company : document.getElementById("customersCompany").value,
-					country : document.getElementById("customersCountry").value,
-					address : document.getElementById("customersAddress").value,
-					mobilePhone : document.getElementById("customersMobilePhone").value,
-					/*telephone : document.getElementById("customersTelephone").value,*/
-					email : document.getElementById("customersEmail").value,
-					createdTime : document.getElementById("createdTime").value,
-					updateTime: document.getElementById("updateTime").value,
-					sort : null,
-					order : null
-				});
-				$(this).html($(this).html().split(" ▲")[0].split(" ▼")[0]);
-				orderForeign = "asc";
-			}
-		});
-
-		$('#customers').datagrid('reload', {
-			firstName : document.getElementById("customersFirstName").value,
-			company : document.getElementById("customersCompany").value,
-			country : document.getElementById("customersCountry").value,
-			address : document.getElementById("customersAddress").value,
-			mobilePhone : document.getElementById("customersMobilePhone").value,
-			/*telephone : document.getElementById("customersTelephone").value,*/
-			email : document.getElementById("customersEmail").value,
-			createdTime : document.getElementById("createdTime").value,
-			updateTime: document.getElementById("updateTime").value,
-			sort : sort,
-			order : order
-		});
     });
 </script>
 </body>
